@@ -1,0 +1,34 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# Unity
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Ll]ogs/
+[Uu]serSettings/
+*.csproj
+*.sln
+
+# Python / ML
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.ckpt
+*.pth
+*.onnx
+
+# Data — never commit bulk media; releases go to a data host
+data/raw/
+data/renders/
+data/benchmark/
+*.mp4
+*.mov
+
+# Node
+node_modules/
+
+# Provenance is COMMITTED on purpose — do not ignore provenance/
