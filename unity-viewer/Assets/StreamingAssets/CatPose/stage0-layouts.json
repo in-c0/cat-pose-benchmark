@@ -1,0 +1,260 @@
+{
+  "schemaVersion": "0.1.0",
+  "sourceLayoutSchemaVersion": "0.2.0",
+  "sourceReportSchemaVersion": "0.2.0",
+  "units": "metres",
+  "repositoryCoordinateSystem": {
+    "x": "portal left to right",
+    "y": "camera through portal",
+    "z": "up"
+  },
+  "repositoryToUnityAxisMap": [
+    "+x",
+    "+z",
+    "+y"
+  ],
+  "camera": {
+    "className": "colour global-shutter machine-vision camera",
+    "resolutionPx": [
+      1920,
+      1200
+    ],
+    "frameRateFps": 60,
+    "fxPx": 1100.0,
+    "fyPx": 1100.0,
+    "cxPx": 960.0,
+    "cyPx": 600.0,
+    "centreM": [
+      0.0,
+      -1.2,
+      0.55
+    ],
+    "lookAtM": [
+      0.0,
+      0.3,
+      0.32
+    ],
+    "pixelSigmaPx": 0.35
+  },
+  "captureVolume": {
+    "minM": [
+      -0.3,
+      -0.05,
+      0.05
+    ],
+    "maxM": [
+      0.3,
+      0.65,
+      0.65
+    ],
+    "samplesXyz": [
+      5,
+      5,
+      5
+    ]
+  },
+  "layouts": [
+    {
+      "id": "A_symmetric_lateral",
+      "description": "Direct view plus two symmetric lateral reflected views.",
+      "nominalFrameM": [
+        0.8,
+        1.3,
+        0.95
+      ],
+      "directView": {
+        "name": "direct",
+        "reflectionParity": "direct",
+        "coverageFraction": 1.0,
+        "roiMinPx": [
+          665.7666313330125,
+          332.1092831962396
+        ],
+        "roiMaxPx": [
+          1254.2333686669876,
+          890.2445652173911
+        ]
+      },
+      "mirrors": [
+        {
+          "name": "left",
+          "sizeM": [
+            1.0,
+            0.9
+          ],
+          "planePointM": [
+            -0.5,
+            0.1,
+            0.45
+          ],
+          "planeNormal": [
+            -0.939692621,
+            0.342020143,
+            0.0
+          ],
+          "verticalAxis": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "expectedVirtualCameraCentreM": [
+            -1.718646114,
+            -0.574463972,
+            0.55
+          ],
+          "reflectionParity": "mirrored",
+          "coverageFraction": 0.96,
+          "roiMinPx": [
+            160.87105980505757,
+            344.61631664129715
+          ],
+          "roiMaxPx": [
+            731.9337370323601,
+            836.2272530495071
+          ]
+        },
+        {
+          "name": "right",
+          "sizeM": [
+            1.0,
+            0.9
+          ],
+          "planePointM": [
+            0.5,
+            0.1,
+            0.45
+          ],
+          "planeNormal": [
+            0.939692621,
+            0.342020143,
+            0.0
+          ],
+          "verticalAxis": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "expectedVirtualCameraCentreM": [
+            1.718646114,
+            -0.574463972,
+            0.55
+          ],
+          "reflectionParity": "mirrored",
+          "coverageFraction": 0.96,
+          "roiMinPx": [
+            1188.06626296764,
+            344.61631664129715
+          ],
+          "roiMaxPx": [
+            1759.1289401949425,
+            836.2272530495071
+          ]
+        }
+      ],
+      "combinedCoverageFraction": 0.92,
+      "combinedP95RadialStandardDeviationMm": 0.8133944159108368,
+      "combinedP95Anisotropy": 1.529951161001104
+    },
+    {
+      "id": "B_lateral_pitched",
+      "description": "Direct view plus one lateral and one elevated-lateral reflected view.",
+      "nominalFrameM": [
+        0.8,
+        1.3,
+        1.05
+      ],
+      "directView": {
+        "name": "direct",
+        "reflectionParity": "direct",
+        "coverageFraction": 1.0,
+        "roiMinPx": [
+          665.7666313330125,
+          332.1092831962396
+        ],
+        "roiMaxPx": [
+          1254.2333686669876,
+          890.2445652173911
+        ]
+      },
+      "mirrors": [
+        {
+          "name": "left_pitched",
+          "sizeM": [
+            1.0,
+            0.9
+          ],
+          "planePointM": [
+            -0.5,
+            0.2,
+            0.55
+          ],
+          "planeNormal": [
+            -0.85165074,
+            0.397131262,
+            0.342020143
+          ],
+          "verticalAxis": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "expectedVirtualCameraCentreM": [
+            -1.672316955,
+            -0.420185797,
+            1.221597002
+          ],
+          "reflectionParity": "mirrored",
+          "coverageFraction": 0.992,
+          "roiMinPx": [
+            179.22508463163248,
+            14.519976459858515
+          ],
+          "roiMaxPx": [
+            786.5722811105046,
+            646.012206151255
+          ]
+        },
+        {
+          "name": "right",
+          "sizeM": [
+            1.0,
+            0.9
+          ],
+          "planePointM": [
+            0.5,
+            0.1,
+            0.45
+          ],
+          "planeNormal": [
+            0.939692621,
+            0.342020143,
+            0.0
+          ],
+          "verticalAxis": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "expectedVirtualCameraCentreM": [
+            1.718646114,
+            -0.574463972,
+            0.55
+          ],
+          "reflectionParity": "mirrored",
+          "coverageFraction": 0.96,
+          "roiMinPx": [
+            1188.06626296764,
+            344.61631664129715
+          ],
+          "roiMaxPx": [
+            1759.1289401949425,
+            836.2272530495071
+          ]
+        }
+      ],
+      "combinedCoverageFraction": 0.952,
+      "combinedP95RadialStandardDeviationMm": 0.8256158691599003,
+      "combinedP95Anisotropy": 1.5111283885776676
+    }
+  ]
+}
