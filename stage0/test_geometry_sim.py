@@ -6,6 +6,7 @@ from pathlib import Path
 
 import numpy as np
 
+from stage0.compare_reports import compare_values
 from stage0.geometry_sim import (
     direct_projection_matrix,
     evaluate,
@@ -104,6 +105,19 @@ class GeometrySimulationTests(unittest.TestCase):
                 if name != "direct+all_reflections"
             ]
             self.assertLess(combined, min(single_reflection_pairs))
+
+    def test_report_comparison_accepts_last_digit_numeric_drift(self) -> None:
+        expected = {"metric": [1.0, {"p95": 0.8133944159}]}
+        actual = {"metric": [1.0, {"p95": 0.8133944162}]}
+        self.assertEqual(compare_values(expected, actual), [])
+
+    def test_report_comparison_rejects_meaningful_or_structural_change(self) -> None:
+        expected = {"metric": {"p95": 0.8133944159}}
+        changed_value = {"metric": {"p95": 0.8134944159}}
+        changed_shape = {"metric": {"median": 0.8133944159}}
+
+        self.assertTrue(compare_values(expected, changed_value))
+        self.assertTrue(compare_values(expected, changed_shape))
 
 
 if __name__ == "__main__":
