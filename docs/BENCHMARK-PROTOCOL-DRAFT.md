@@ -1,164 +1,201 @@
-# Real-environment benchmark protocol — DRAFT v0.1
+# Real-environment benchmark protocol — DRAFT v0.2
 
-**Status:** specification work may proceed; collection remains blocked by the open
-decisions listed at the end of this document.
+**Status:** software implementation may proceed. No owner-operated physical capture is
+required for v0.1.
 
 ## Purpose
 
 Evaluate whether a monocular RGB system can recover feline surface pose, face, ears,
-tail, contact, and scene-relative motion with calibrated uncertainty in real conditions.
+tail, contact evidence, and scene-relative motion with calibrated uncertainty in real
+conditions.
 
 The benchmark does not require every frame to have one complete exact skeleton. It uses
 multiple evidence sources, and every observation retains its provenance and uncertainty.
 See [GROUND-TRUTH-PROVENANCE.md](GROUND-TRUTH-PROVENANCE.md).
 
+## Physical-work policy
+
+The lead developer does not construct, fabricate, calibrate, or operate a bespoke
+capture rig and does not personally collect research footage as a prerequisite.
+
+Permitted physical involvement is limited to ordinary use-testing of an app or an
+externally manufactured product.
+
+Any specialised measurement is supplied by:
+
+- a remote contributor following a guided protocol;
+- an institutional or laboratory partner;
+- an existing licence-clean dataset;
+- a product manufacturer or test service.
+
 ## Data tiers
 
-### Tier A — CatPose Portal geometric gold
+### Tier S — synthetic exact
 
-A compact capture volume using one physical camera and calibrated mirrors to create
-simultaneous virtual views. The initial design should aim for:
+Unity-generated scenes provide exact state and annotations for:
 
-- one direct view;
-- at least two reflected views with useful triangulation baselines;
-- a calibration object visible in each view;
-- a known metric reference;
-- global-shutter or sufficiently short exposure for fast motion;
-- voluntary movement through or within the capture area.
+- feline articulated pose and surface landmarks;
+- eye, muzzle, ear, and head state;
+- tail centreline, spline controls, curvature, and topology;
+- paw contact, support surfaces, and locomotion events;
+- camera intrinsics, extrinsics, trajectory, and scene geometry;
+- visibility, occlusion, clutter, lighting, motion blur, and sensor degradation;
+- displacement, velocity, acceleration, and angular derivatives.
 
-The portal establishes reference geometry for visible surface landmarks and curves. A
-transparent floor or mirror may expose paws from below.
+Tier S is the primary exact-data source for v0.1. It supports controlled evaluation,
+pretraining, ablation, stress testing, and deterministic regression tests. It does not
+independently prove real-cat metric accuracy.
 
-### Tier B — contact gold
+### Tier R2 — real observable
 
-A transparent or instrumented support surface may independently measure:
+Licence-clean or consented ordinary monocular video with labels restricted to facts that
+can be externally observed and reviewed:
 
-- paw location;
-- contact start and end;
-- stance duration;
-- take-off and landing;
-- support-surface transitions.
+- visible surface landmarks;
+- eye aperture or blink events where resolvable;
+- ear boundary and orientation cues;
+- silhouette and body centreline;
+- visible paw centres and contact evidence;
+- tail centreline and visibility;
+- track continuity, occlusion, exit, re-entry, and event timing.
 
-The first pilot can use visual underside contact before adding force or pressure sensing.
-Contact hardware must not materially alter natural movement.
+Tier R2 is the primary real-domain benchmark for v0.1. Hidden joints and metric depth are
+not treated as known.
 
-### Tier C — real-home challenge set
+### Tier R3 — reconstructed estimates
 
-Ordinary monocular videos recorded in natural environments. These represent the product
-domain and may have incomplete reference labels.
+Monocular or remotely contributed multi-view footage may produce:
 
-This tier evaluates:
+- articulated 3D pose;
+- personalised feline shape;
+- scene maps and world trajectories;
+- inferred contact;
+- latent joint distributions.
 
-- generalisation from the portal to homes;
-- occlusion and re-detection;
-- camera movement;
-- long-horizon temporal stability;
-- uncertainty and abstention;
-- scene-relative reasoning where a map is available.
+These are model-derived observations. They retain the generating method, checkpoint,
+constraints, uncertainty, and lineage. They may be used for training or analysis but may
+not serve as the sole evidence for the same model family’s accuracy.
 
-### Tier D — synthetic and reconstructed support data
+### Tier G — external hidden gold
 
-Unity rendering, personalised cat models, scene reconstruction, constrained fitting, and
-pseudo-labels may be used for training or ablation. Their source tier must remain visible,
-and they cannot be the sole reference for real-world accuracy claims.
+A laboratory or independent data partner may later operate synchronized cameras, Vicon,
+calibrated RGB-D, pressure walkways, a mirror portal, or another traceable system.
+
+The project supplies:
+
+- target ontology and schemas;
+- capture-neutral protocol;
+- automated QA;
+- calibration and file manifests;
+- encrypted or private upload tooling;
+- hidden evaluation adapter.
+
+The partner supplies and operates the physical apparatus. Tier G may remain private and
+serve only through an evaluation API. It is not a blocker for v0.1, but externally
+verified real-world metric 3D claims are blocked until it exists.
 
 ## Observable target set
 
-The final topology remains open, but v0 should prioritise variables that are both
-behaviourally relevant and externally observable.
+The final topology remains open, but v0 prioritises variables that are both behaviourally
+relevant and externally observable.
 
 ### Face and head
 
 - nose;
-- eye corners or eye aperture representation;
+- eye corners or eye-aperture representation;
 - muzzle or mouth boundary where resolvable;
 - ear bases, tips, and orientation-supporting boundary points;
-- head orientation.
+- head orientation cues.
 
 ### Body and limbs
 
-- visible shoulder/scapular surface landmarks;
-- visible hip/pelvic surface landmarks;
-- elbows, carpi, paws, stifles, hocks where externally resolvable;
-- body centreline or silhouette representation;
-- paw-contact regions.
+- visible shoulder/scapular and hip/pelvic surface landmarks;
+- elbows, carpi, paws, stifles, and hocks only where externally resolvable;
+- body centreline and silhouette representation;
+- visible paw-contact regions.
 
 ### Tail
 
-The tail should be represented as a centreline curve with:
+The canonical tail representation is a centreline curve with:
 
-- tail base anchor;
+- tail-base anchor;
 - ordered samples or spline control points;
 - local curvature;
 - tip location where visible;
 - per-sample visibility and uncertainty.
 
-A three-point tail is retained only as a compatibility export, not the canonical format.
+A three-point tail is retained only as a compatibility export.
 
 ### Latent anatomy
 
-Hidden joint centres may be provided as optional estimates with distributions. They are
-not required for the first gold benchmark and must not displace visible surface targets.
+Hidden joint centres may be provided as optional Tier R3 distributions. They are not
+required for the first public benchmark and do not displace visible surface targets.
 
-## Minimal capture experiment
+## Software-first implementation stages
 
-The first experiment must validate the measurement system before collecting a dataset.
+### Stage S0 — deterministic Unity annotation proof
 
-### Stage 0 — rigid-object validation
+Create one rigged feline scene and export:
 
-Use a rigid calibration object with known fiducials moving through the intended capture
-volume.
+- camera parameters;
+- 2D and 3D surface landmarks;
+- tail spline;
+- visibility and occlusion state;
+- contact state;
+- exact motion derivatives;
+- scene objects and support surfaces.
 
-Measure:
+Tests must verify that exported values match Unity state within declared numeric
+tolerance.
 
-- virtual-camera calibration repeatability;
-- triangulation error across the usable volume;
-- sensitivity to mirror-plane error;
-- temporal alignment within the single recorded frame;
-- reconstruction error by depth and view combination;
-- failure near mirror boundaries and grazing angles.
+### Stage S1 — procedural variation and challenge generation
 
-Do not involve an animal until this experiment produces a documented uncertainty model.
+Add controlled variation for:
 
-### Stage 1 — articulated non-animal validation
+- morphology and body proportions;
+- short, long, patterned, dark, and light coats;
+- ear and tail articulation;
+- walking, sitting, turning, grooming, jumping, play, and rapid local motion;
+- camera movement, focal length, distance, and image scale;
+- domestic lighting, noise, blur, compression, clutter, and occlusion;
+- one or more cats and distractor animals.
 
-Use a deformable or articulated object with known control points, such as a rigged model,
-segmented tail analogue, or articulated test target.
+Invalid anatomy, surface penetration, foot sliding, and impossible motion must be detected
+and excluded rather than hidden by rendering quality.
 
-Evaluate:
+### Stage R0 — one real observable sequence
 
-- fast curve motion;
-- self-occlusion;
-- motion blur;
-- point identity through crossing or overlap;
-- derivative recovery.
+Add one sequence whose rights permit the intended benchmark use. Produce sparse visible
+landmarks, tail curve, visibility states, temporal events, reviewer disagreement, and
+uncertainty.
 
-### Stage 2 — one voluntary feline pilot
+No hidden 3D, internal anatomy, behaviour, or health label is required.
 
-Record one short, non-coercive sequence involving simple natural actions, for example:
+### Stage R1 — observable challenge set
 
-- walking through the portal;
-- standing and turning;
-- sitting;
-- following a toy;
-- tail movement while otherwise stationary.
+Expand the real set through licence-clean sources or remote contributors. Use active
+review so humans resolve semantic identity and ambiguity rather than annotate every
+frame manually.
 
-Outputs:
+### Stage M0 — monocular baseline
 
-- calibrated views;
-- visible landmarks;
-- tail curve;
-- visibility states;
-- per-observation covariance or bounded uncertainty;
-- a Unity inspection scene;
-- documented failures.
+Evaluate one commercially usable baseline on:
 
-No behaviour or health labels are required for this pilot.
+- exact Tier S pose and derivatives;
+- Tier R2 visible landmarks and curves;
+- temporal stability and occlusion recovery;
+- confidence calibration and abstention;
+- synthetic-to-real degradation.
+
+### Stage G0 — external validation integration
+
+Only after the software benchmark is useful, integrate one independently operated hidden
+gold sequence. The partner performs all physical work.
 
 ## Real-environment stratification
 
-A full factorial design is not realistic for v0. Use a predeclared fractional design
-covering primary effects and selected high-risk interactions.
+Use a predeclared fractional design covering primary effects and selected high-risk
+interactions.
 
 ### Fur and morphology
 
@@ -166,11 +203,10 @@ covering primary effects and selected high-risk interactions.
 - short, dark solid coat;
 - patterned coat;
 - long-haired coat;
-- hairless or minimally fur-obscured upper-bound case;
-- at least one substantially different facial/body morphology when available.
+- hairless or minimally obscured upper-bound case;
+- substantially different facial/body morphologies.
 
-Avoid treating breed labels as precise morphology. Record observable coat and body
-features directly.
+Record observable morphology directly rather than treating breed as a precise proxy.
 
 ### Motion
 
@@ -189,20 +225,18 @@ features directly.
 - mixed or backlit scene;
 - different image scales and viewpoints;
 - handheld camera movement;
-- ordinary consumer frame rates and exposure behaviour.
+- ordinary consumer frame rates, exposure, and compression.
 
 ### Environment and occlusion
 
 - uncluttered indoor;
 - cluttered indoor;
 - soft furnishings and similar-coloured backgrounds;
-- partial furniture occlusion;
-- full temporary occlusion;
+- partial and full temporary occlusion;
 - frame exit and re-entry;
 - more than one cat or another moving subject.
 
-Each sequence must record which strata are present. Uncovered strata remain explicit
-coverage gaps.
+Each sequence records which strata are present. Uncovered strata remain explicit gaps.
 
 ## Tasks
 
@@ -217,7 +251,7 @@ trajectory continuity.
 
 ### T3 — face, eye, and ear dynamics
 
-Evaluate orientation, aperture or blink events, ear motion, and temporal derivative
+Evaluate orientation cues, aperture or blink events, ear motion, and temporal derivative
 quality where image scale permits.
 
 ### T4 — tail curve tracking
@@ -225,125 +259,169 @@ quality where image scale permits.
 Evaluate centreline distance, curve topology, curvature, tip motion, and recovery after
 self-occlusion.
 
-### T5 — 3D surface reconstruction on gold sequences
+### T5 — synthetic exact 3D reconstruction
 
-Evaluate metric surface landmarks and curves against simultaneous-view observations.
-Depth uncertainty must be reported separately from lateral uncertainty.
+Evaluate metric landmarks, curves, contact, and derivatives against Tier S state.
+Results must be clearly labelled synthetic.
 
-### T6 — contact and gait events
+### T6 — observable contact and gait events
 
-Evaluate paw assignment, contact location, stance interval, take-off, landing, and
-support-surface association.
+Evaluate paw assignment, visible contact interval, take-off, landing, and support-surface
+association. Instrumented real contact is a later Tier G extension.
 
 ### T7 — scene-relative reasoning
 
-Evaluate cat trajectory and relations such as on, under, inside, behind, approaching,
-and retreating where sufficient scene evidence exists.
+Evaluate trajectory and relations such as on, under, inside, behind, approaching, and
+retreating where sufficient evidence exists.
 
 ### T8 — calibrated confidence
 
-Evaluate whether declared confidence or uncertainty predicts realised error and whether
-the system abstains appropriately.
+Evaluate whether confidence predicts realised error and whether the system abstains
+appropriately under ambiguity.
 
-### T9 — deployment efficiency
+### T9 — synthetic-to-real transfer
 
-Report accuracy together with sustained latency, frame rate, memory, model size, power,
-and thermal behaviour on declared hardware.
+Measure the performance gap between controlled Tier S conditions and matching Tier R2
+strata. Report where randomisation improves or damages real performance.
+
+### T10 — deployment efficiency
+
+Report accuracy with sustained latency, frame rate, memory, model size, estimated or
+measured power, and declared hardware conditions.
+
+### T11 — external hidden-gold evaluation
+
+When Tier G exists, report metric real-world 3D and contact performance separately from
+all public-development tiers.
 
 ## Metrics
 
 ### Spatial accuracy
 
-- 2D point error normalised by a declared body or head scale;
-- PCK or OKS-compatible exports for comparison;
-- 3D point error for gold observations;
-- tail-curve distance and curvature error;
-- camera and scene error where applicable.
+- 2D point error normalised by declared body or head scale;
+- PCK or OKS-compatible exports;
+- synthetic 3D point error;
+- external-gold 3D point error when available;
+- tail-curve distance, topology, and curvature error;
+- scene and support-surface error where applicable.
 
 ### Temporal accuracy
 
 - positional jitter during true low-motion intervals;
-- velocity and acceleration error;
-- temporal event onset and duration error;
+- velocity and acceleration error on Tier S or Tier G;
+- event onset and duration error;
 - track survival through occlusion;
 - accumulated drift;
 - re-detection delay;
 - identity switches;
-- foot sliding during contact.
+- foot sliding during declared contact.
 
 ### Calibration
 
 - confidence-region coverage;
 - expected calibration error;
-- negative log likelihood or proper scoring rule where distributions are available;
+- negative log likelihood or another proper scoring rule;
 - risk–coverage curve;
-- error by visibility and evidence tier.
+- error by visibility, evidence tier, and image scale.
+
+### Transfer
+
+- exact-to-real observable performance delta;
+- calibration degradation across domains;
+- ranking stability across synthetic and real strata;
+- benefit from self-supervised or unsupervised real-video adaptation.
 
 ### Stratified reporting
 
-All primary results must be reported by relevant fur, motion, lighting, viewpoint,
-occlusion, and environment strata. A single aggregate score is insufficient.
+All primary results are reported by relevant fur, motion, lighting, viewpoint, occlusion,
+and environment strata. One aggregate score is insufficient.
 
 ## Annotation and review
 
-Manual work should target semantic identification, ambiguity resolution, and quality
-control—not frame-by-frame recreation of measurements that geometry can provide.
+Manual work targets semantic identification, ambiguity resolution, and quality control,
+not frame-by-frame recreation of model-generated measurements.
 
-The protocol must define:
+The protocol defines:
 
-- annotator instructions;
-- distinction between visible surface landmarks and inferred anatomy;
-- how uncertainty or ambiguity is entered;
-- blinded review where feasible;
-- inter-annotator or repeated-annotation analysis;
-- adjudication and post-hoc correction logs.
+- visible-versus-inferred instructions;
+- tail curve and occlusion conventions;
+- uncertainty and ambiguity entry;
+- sparse keyframe review plus temporal propagation;
+- reviewer agreement and adjudication;
+- post-hoc correction logs;
+- prohibition on evaluating a model solely against its own pseudo-label family.
+
+Review may be performed remotely by paid annotators, volunteers, feline experts, or
+research partners. The project lead need not record or physically stage footage.
 
 ## Sourcing, consent, and redistribution
 
 Allowed sources for released real media:
 
-1. self-recorded footage with explicit release terms;
-2. solicited owner contributions under a sequence-level agreement;
-3. institutional or shelter collaboration with documented authority and approvals;
-4. individually verified permissive sources only when their exact terms allow the
-   intended redistribution and downstream use.
+1. solicited remote owner contributions under sequence-level terms;
+2. institutional, shelter, or research collaboration with documented authority;
+3. individually verified permissive media whose exact terms allow redistribution and
+   downstream research/commercial use;
+4. purpose-created media supplied by a contractor or partner under assignment terms.
 
-No scraping, assumed permission, CC BY-NC, research-only, or licence-ambiguous source may
-enter a released dataset or production dependency.
+No assumed permission, licence ambiguity, research-only dependency, or non-commercial
+restriction may enter a production dependency or commercially usable release.
 
-Each sequence needs machine-readable records for:
+Each sequence requires machine-readable records for:
 
 - media owner and contributor;
-- people or private information present;
+- people and private information present;
 - consent and withdrawal process;
 - redistribution rights;
-- commercial and research use permissions;
+- research and commercial-use permissions;
 - licence version;
-- capture device and protocol version.
+- capture device and protocol version;
+- evidence tier and annotation lineage.
+
+## External validation contract
+
+A Tier G partner must receive a capture-neutral specification rather than instructions
+that assume a particular portal. The contract defines:
+
+- required variables and tolerances;
+- allowed measurement classes;
+- calibration and synchronisation evidence;
+- blinded holdout partition;
+- raw-data custody and privacy;
+- machine-readable import schema;
+- evaluation-server behaviour;
+- publication and attribution terms.
+
+See [EXTERNAL-VALIDATION-CONTRACT.md](EXTERNAL-VALIDATION-CONTRACT.md).
 
 ## v0.1 release contents
 
 Protocol v0.1 is complete when the repository contains:
 
-- frozen pilot landmark/curve ontology;
-- observation and provenance schema;
-- portal geometry and calibration specification;
-- rigid-object validation report;
-- one articulated-object test;
-- one voluntary feline pilot;
-- minimal Unity viewer;
-- baseline evaluation script;
-- documented uncertainty and limitations;
-- consent/licensing templates suitable for review.
+- frozen pilot landmark and tail-curve ontology;
+- observation and provenance schema with S/R2/R3/G tiers;
+- deterministic Unity sequence and exact annotation exporter;
+- synthetic challenge configuration and validation tests;
+- one licence-clean real observable sequence;
+- minimal Unity inspection viewer;
+- baseline evaluation scripts;
+- temporal, uncertainty, and transfer metrics;
+- documented limitations and forbidden claims;
+- consent and contributor templates;
+- external hidden-gold interface specification.
 
-## Open decisions blocking collection
+A portal validation report, owner-built rig, instrumented floor, or personal feline
+capture is not required for v0.1.
+
+## Open decisions blocking public release
 
 - final pilot landmark and tail-curve topology;
-- portal mirror layout, dimensions, materials, and camera specification;
-- whether v0 uses visual underside contact only or an instrumented surface;
-- numerical geometry and calibration acceptance thresholds;
-- minimum image rate and shutter requirements;
-- outbound licences and contributor terms;
-- ethics and animal-welfare review requirements for the intended capture protocol;
-- first monocular baseline and its licence suitability;
-- smallest useful real-home challenge sample after the portal pilot.
+- source and licence of the first rigged feline asset and animations;
+- Unity render pipeline and deterministic annotation-export format;
+- minimum synthetic variation set;
+- first real-video source and contributor terms;
+- reviewer protocol and minimum agreement requirements;
+- first monocular baseline and production licence suitability;
+- outbound code, data, annotation, and asset licences;
+- exact forbidden-claims language;
+- external evaluation API and custody model.
