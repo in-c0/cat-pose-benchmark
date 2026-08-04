@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cat-pose-benchmark.example/schemas/observation.schema.json",
+  "title": "Cat Pose Benchmark Observation",
+  "description": "Draft schema for a measured, inferred, synthetic, or derived feline observation with explicit provenance and uncertainty.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "observation_id",
+    "sequence_id",
+    "subject_id",
+    "observation_class",
+    "semantic_name",
+    "coordinate_space",
+    "evidence_tier",
+    "quality",
+    "visibility",
+    "source_ids",
+    "lineage"
+  ],
+  "properties": {
+    "observation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sequence_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "frame_index": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "interval": {
+      "$ref": "#/$defs/interval"
+    },
+    "timestamp_ns": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "subject_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "observation_class": {
+      "enum": [
+        "surface_landmark",
+        "surface_curve",
+        "contact_event",
+        "scene_geometry",
+        "latent_anatomy",
+        "derived_temporal"
+      ]
+    },
+    "semantic_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "coordinate_space": {
+      "enum": [
+        "image",
+        "camera",
+        "world",
+        "subject_local",
+        "surface",
+        "time"
+      ]
+    },
+    "units": {
+      "type": "string"
+    },
+    "mean": {
+      "oneOf": [
+        { "$ref": "#/$defs/vector" },
+        { "$ref": "#/$defs/curve" },
+        { "type": "number" },
+        { "type": "boolean" },
+        { "type": "string" }
+      ]
+    },
+    "covariance": {
+      "$ref": "#/$defs/matrix"
+    },
+    "confidence_region": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "visibility": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "visible",
+          "partially_occluded",
+          "fully_occluded",
+          "out_of_frame",
+          "motion_blurred",
+          "indistinguishable",
+          "not_applicable"
+        ]
+      }
+    },
+    "evidence_tier": {
+      "enum": ["G1", "G2", "G3", "S1", "S2", "X1", "U0"]
+    },
+    "quality": {
+      "enum": ["gold", "silver", "bronze", "unknown"]
+    },
+    "source_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "lineage": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "consent_record_id": {
+      "type": "string"
+    },
+    "licence_record_id": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "observation_class": {
+            "const": "contact_event"
+          }
+        }
+      },
+      "then": {
+        "required": ["interval"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "observation_class": {
+            "const": "latent_anatomy"
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "properties": {
+            "evidence_tier": {
+              "enum": ["G1", "G2"]
+            }
+          },
+          "required": ["evidence_tier"]
+        }
+      }
+    }
+  ],
+  "anyOf": [
+    { "required": ["frame_index"] },
+    { "required": ["interval"] },
+    { "required": ["timestamp_ns"] }
+  ],
+  "$defs": {
+    "vector": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "number"
+      }
+    },
+    "matrix": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "number"
+        }
+      }
+    },
+    "curve": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "$ref": "#/$defs/vector"
+      }
+    },
+    "interval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start_ns", "end_ns"],
+      "properties": {
+        "start_ns": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_ns": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "start_uncertainty_ns": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_uncertainty_ns": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}
