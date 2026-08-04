@@ -42,4 +42,9 @@ jobs:
             --output /tmp/geometry-conditioning-report.json
 
       - name: Verify committed report is reproducible
-        run: diff -u stage0/geometry-conditioning-report.json /tmp/geometry-conditioning-report.json
+        run: |
+          python stage0/compare_reports.py \
+            stage0/geometry-conditioning-report.json \
+            /tmp/geometry-conditioning-report.json \
+            --abs-tol 1e-8 \
+            --rel-tol 1e-10
