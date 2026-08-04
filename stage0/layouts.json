@@ -1,0 +1,139 @@
+{
+  "schema_version": "0.1.0",
+  "units": "metres",
+  "notes": [
+    "Mirror-plane normals are sign-invariant.",
+    "The geometry simulation aims every virtual camera at the capture-volume centre.",
+    "The dimensions are Stage 0 starting points, not a construction drawing."
+  ],
+  "camera": {
+    "class": "colour global-shutter machine-vision camera",
+    "resolution_px": [
+      1920,
+      1200
+    ],
+    "frame_rate_fps": 60,
+    "fx_px": 1300.0,
+    "fy_px": 1300.0,
+    "cx_px": 960.0,
+    "cy_px": 600.0,
+    "centre_m": [
+      0.0,
+      -1.2,
+      0.55
+    ],
+    "look_at_m": [
+      0.0,
+      0.3,
+      0.32
+    ],
+    "pixel_sigma_px": 0.35
+  },
+  "capture_volume": {
+    "min_m": [
+      -0.3,
+      -0.05,
+      0.05
+    ],
+    "max_m": [
+      0.3,
+      0.65,
+      0.65
+    ],
+    "samples_xyz": [
+      5,
+      5,
+      5
+    ]
+  },
+  "layouts": {
+    "A_symmetric_lateral": {
+      "description": "Direct view plus two approximately symmetric lateral virtual views.",
+      "nominal_frame_m": [
+        0.75,
+        1.2,
+        0.9
+      ],
+      "mirrors": [
+        {
+          "name": "left",
+          "nominal_size_m": [
+            0.45,
+            0.8
+          ],
+          "plane_point_m": [
+            -0.42,
+            0.15,
+            0.45
+          ],
+          "plane_normal": [
+            0.819152,
+            0.573576,
+            0.0
+          ]
+        },
+        {
+          "name": "right",
+          "nominal_size_m": [
+            0.45,
+            0.8
+          ],
+          "plane_point_m": [
+            0.42,
+            0.15,
+            0.45
+          ],
+          "plane_normal": [
+            -0.819152,
+            0.573576,
+            0.0
+          ]
+        }
+      ]
+    },
+    "B_lateral_overhead": {
+      "description": "Direct view plus one lateral and one elevated virtual view.",
+      "nominal_frame_m": [
+        0.75,
+        1.2,
+        1.2
+      ],
+      "mirrors": [
+        {
+          "name": "right",
+          "nominal_size_m": [
+            0.45,
+            0.8
+          ],
+          "plane_point_m": [
+            0.42,
+            0.15,
+            0.45
+          ],
+          "plane_normal": [
+            -0.819152,
+            0.573576,
+            0.0
+          ]
+        },
+        {
+          "name": "overhead",
+          "nominal_size_m": [
+            0.7,
+            0.5
+          ],
+          "plane_point_m": [
+            0.0,
+            -0.5,
+            1.025
+          ],
+          "plane_normal": [
+            0.0,
+            -0.827476,
+            -0.561501
+          ]
+        }
+      ]
+    }
+  }
+}
