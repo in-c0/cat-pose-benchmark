@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Compare candidate single-camera mirror layouts by first-order geometry.
+"""Compare candidate single-camera mirror layouts by finite-aperture geometry.
 
-This is a pre-construction conditioning simulation. It treats each planar reflection as
-a virtual camera centre, aims each virtual camera at the capture-volume centre, and
-propagates isotropic image-point noise through linear triangulation.
+The simulator uses the exact planar-reflection projection matrix for each mirror,
+including reflected-image parity. It also checks whether each object-to-virtual-camera
+ray intersects the finite mirror rectangle and lands inside the physical sensor.
 
-It deliberately does not model mirror ROI boundaries, image parity, reflected-camera
-handedness, lens distortion, occlusion, rolling shutter, mirror flatness, or detection
-bias. Those are physical Stage 0 measurements, not assumptions to hide in simulation.
+It remains a pre-construction model. It does not model lens distortion, mirror
+flatness, mounting flex, occlusion by the animal, reflected-view correspondence error,
+rolling shutter, or image-processing bias. Those are physical Stage 0 measurements.
 """
 
 from __future__ import annotations
@@ -30,16 +30,25 @@ def _unit(vector: Iterable[float]) -> np.ndarray:
     return value / norm
 
 
+def reflection_affine(
+    plane_point: Iterable[float],
+    plane_normal: Iterable[float],
+) -> tuple[np.ndarray, np.ndarray]:
+    """Return S, t for reflected point X' = S X + t."""
+    point = np.asarray(plane_point, dtype=float)
+    normal = _unit(plane_normal)
+    reflection = np.eye(3) - 2.0 * np.outer(normal, normal)
+    translation = 2.0 * normal * float(np.dot(normal, point))
+    return reflection, translation
+
+
 def reflect_point(
     point: Iterable[float],
     plane_point: Iterable[float],
     plane_normal: Iterable[float],
 ) -> np.ndarray:
-    """Reflect a 3D point across a plane."""
-    p = np.asarray(point, dtype=float)
-    q = np.asarray(plane_point, dtype=float)
-    n = _unit(plane_normal)
-    return p - 2.0 * n * float(np.dot(n, p - q))
+    reflection, translation = reflection_affine(plane_point, plane_normal)
+    return reflection @ np.asarray(point, dtype=float) + translation
 
 
 def world_to_camera_rotation(
@@ -60,38 +69,53 @@ def world_to_camera_rotation(
     return np.vstack([right, down, forward])
 
 
-def projection_matrix(
-    centre: np.ndarray,
-    rotation: np.ndarray,
-    intrinsics: tuple[float, float, float, float],
-) -> np.ndarray:
-    fx, fy, cx, cy = intrinsics
-    intrinsic_matrix = np.asarray(
-        [[fx, 0.0, cx], [0.0, fy, cy], [0.0, 0.0, 1.0]],
-        dtype=float,
-    )
-    translation = -rotation @ centre
-    return intrinsic_matrix @ np.hstack([rotation, translation[:, None]])
-
-
-def project_point(
-    point: np.ndarray,
-    centre: np.ndarray,
-    rotation: np.ndarray,
-    intrinsics: tuple[float, float, float, float],
-) -> np.ndarray:
-    camera_point = rotation @ (point - centre)
-    if camera_point[2] <= 1e-9:
-        raise ValueError("Sample point is behind a simulated camera.")
-
-    fx, fy, cx, cy = intrinsics
+def intrinsic_matrix(camera: dict[str, Any]) -> np.ndarray:
     return np.asarray(
         [
-            fx * camera_point[0] / camera_point[2] + cx,
-            fy * camera_point[1] / camera_point[2] + cy,
+            [float(camera["fx_px"]), 0.0, float(camera["cx_px"])],
+            [0.0, float(camera["fy_px"]), float(camera["cy_px"])],
+            [0.0, 0.0, 1.0],
         ],
         dtype=float,
     )
+
+
+def direct_projection_matrix(camera: dict[str, Any]) -> np.ndarray:
+    centre = np.asarray(camera["centre_m"], dtype=float)
+    rotation = world_to_camera_rotation(centre, camera["look_at_m"])
+    return intrinsic_matrix(camera) @ np.hstack(
+        [rotation, (-rotation @ centre)[:, None]]
+    )
+
+
+def mirror_projection_matrix(
+    camera: dict[str, Any],
+    mirror: dict[str, Any],
+) -> np.ndarray:
+    """Map real-world points directly to their physical-sensor mirror pixels."""
+    centre = np.asarray(camera["centre_m"], dtype=float)
+    rotation = world_to_camera_rotation(centre, camera["look_at_m"])
+    reflection, translation = reflection_affine(
+        mirror["plane_point_m"],
+        mirror["plane_normal"],
+    )
+    return intrinsic_matrix(camera) @ np.hstack(
+        [
+            rotation @ reflection,
+            (rotation @ (translation - centre))[:, None],
+        ]
+    )
+
+
+def project_with_matrix(
+    point: np.ndarray,
+    matrix: np.ndarray,
+) -> tuple[np.ndarray, float]:
+    homogeneous = matrix @ np.concatenate([point, [1.0]])
+    depth = float(homogeneous[2])
+    if abs(depth) <= 1e-12:
+        raise ValueError("Point projects at zero homogeneous depth.")
+    return homogeneous[:2] / depth, depth
 
 
 def triangulate(
@@ -116,18 +140,12 @@ def triangulate(
 
 def propagated_covariance(
     point: np.ndarray,
-    centres: list[np.ndarray],
-    rotations: list[np.ndarray],
-    intrinsics: tuple[float, float, float, float],
+    matrices: list[np.ndarray],
     pixel_sigma: float,
 ) -> np.ndarray:
-    matrices = [
-        projection_matrix(centre, rotation, intrinsics)
-        for centre, rotation in zip(centres, rotations)
-    ]
     observations = [
-        project_point(point, centre, rotation, intrinsics)
-        for centre, rotation in zip(centres, rotations)
+        project_with_matrix(point, matrix)[0]
+        for matrix in matrices
     ]
     observation_vector = np.concatenate(observations)
 
@@ -167,33 +185,145 @@ def sample_volume(volume: dict[str, Any]) -> list[np.ndarray]:
     ]
 
 
-def percentile(values: np.ndarray, amount: float) -> float:
-    return float(np.percentile(values, amount))
+def mirror_axes(mirror: dict[str, Any]) -> tuple[np.ndarray, np.ndarray]:
+    normal = _unit(mirror["plane_normal"])
+    vertical = np.asarray(mirror["vertical_axis"], dtype=float)
+    in_plane_vertical = vertical - normal * float(np.dot(vertical, normal))
+    in_plane_vertical = _unit(in_plane_vertical)
+    in_plane_horizontal = _unit(np.cross(in_plane_vertical, normal))
+    return in_plane_horizontal, in_plane_vertical
+
+
+def reflection_point(
+    object_point: np.ndarray,
+    camera_centre: np.ndarray,
+    mirror: dict[str, Any],
+) -> tuple[np.ndarray, float]:
+    plane_point = np.asarray(mirror["plane_point_m"], dtype=float)
+    normal = _unit(mirror["plane_normal"])
+    virtual_camera = reflect_point(
+        camera_centre,
+        plane_point,
+        normal,
+    )
+    denominator = float(np.dot(normal, virtual_camera - object_point))
+    if abs(denominator) <= 1e-12:
+        raise ValueError("Object-to-virtual-camera ray is parallel to mirror.")
+    amount = float(np.dot(normal, plane_point - object_point) / denominator)
+    return object_point + amount * (virtual_camera - object_point), amount
+
+
+def pixel_in_sensor(
+    pixel: np.ndarray,
+    depth: float,
+    resolution: tuple[int, int],
+) -> bool:
+    width, height = resolution
+    return (
+        depth > 0.0
+        and 0.0 <= float(pixel[0]) < width
+        and 0.0 <= float(pixel[1]) < height
+    )
+
+
+def direct_visibility(
+    points: list[np.ndarray],
+    camera: dict[str, Any],
+    matrix: np.ndarray,
+) -> tuple[np.ndarray, list[np.ndarray]]:
+    resolution = tuple(int(value) for value in camera["resolution_px"])
+    visible: list[bool] = []
+    pixels: list[np.ndarray] = []
+    for point in points:
+        pixel, depth = project_with_matrix(point, matrix)
+        is_visible = pixel_in_sensor(pixel, depth, resolution)
+        visible.append(is_visible)
+        pixels.append(pixel)
+    return np.asarray(visible, dtype=bool), pixels
+
+
+def mirror_visibility(
+    points: list[np.ndarray],
+    camera: dict[str, Any],
+    mirror: dict[str, Any],
+    matrix: np.ndarray,
+) -> tuple[np.ndarray, list[np.ndarray]]:
+    resolution = tuple(int(value) for value in camera["resolution_px"])
+    centre = np.asarray(camera["centre_m"], dtype=float)
+    mirror_centre = np.asarray(mirror["plane_point_m"], dtype=float)
+    axis_u, axis_v = mirror_axes(mirror)
+    width, height = [float(value) for value in mirror["size_m"]]
+
+    visible: list[bool] = []
+    pixels: list[np.ndarray] = []
+    for point in points:
+        try:
+            reflected_point, amount = reflection_point(point, centre, mirror)
+            pixel, depth = project_with_matrix(point, matrix)
+        except ValueError:
+            visible.append(False)
+            pixels.append(np.asarray([math.nan, math.nan]))
+            continue
+
+        offset = reflected_point - mirror_centre
+        inside_aperture = (
+            0.0 < amount < 1.0
+            and abs(float(np.dot(offset, axis_u))) <= width / 2.0
+            and abs(float(np.dot(offset, axis_v))) <= height / 2.0
+        )
+        is_visible = inside_aperture and pixel_in_sensor(
+            pixel,
+            depth,
+            resolution,
+        )
+        visible.append(is_visible)
+        pixels.append(pixel)
+
+    return np.asarray(visible, dtype=bool), pixels
+
+
+def roi_bounds(
+    pixels: list[np.ndarray],
+    visible: np.ndarray,
+) -> dict[str, list[float]] | None:
+    selected = np.asarray(
+        [pixel for pixel, is_visible in zip(pixels, visible) if is_visible],
+        dtype=float,
+    )
+    if selected.size == 0:
+        return None
+    return {
+        "min_xy": np.min(selected, axis=0).tolist(),
+        "max_xy": np.max(selected, axis=0).tolist(),
+    }
 
 
 def summarize_subset(
     points: list[np.ndarray],
-    centres: list[np.ndarray],
-    names: list[str],
-    look_at: np.ndarray,
-    intrinsics: tuple[float, float, float, float],
+    view_names: list[str],
+    view_matrices: dict[str, np.ndarray],
+    view_visibility: dict[str, np.ndarray],
+    view_centres: dict[str, np.ndarray],
     pixel_sigma: float,
 ) -> dict[str, Any]:
-    rotations = [
-        world_to_camera_rotation(centre, look_at)
-        for centre in centres
+    mask = np.logical_and.reduce(
+        [view_visibility[name] for name in view_names]
+    )
+    selected_points = [
+        point for point, is_visible in zip(points, mask) if is_visible
     ]
+    if not selected_points:
+        raise ValueError(f"No common visible points for views: {view_names}")
 
+    matrices = [view_matrices[name] for name in view_names]
     radial_std_mm: list[float] = []
     axis_std_mm: list[np.ndarray] = []
     anisotropy: list[float] = []
 
-    for point in points:
+    for point in selected_points:
         covariance = propagated_covariance(
             point,
-            centres,
-            rotations,
-            intrinsics,
+            matrices,
             pixel_sigma,
         )
         eigenvalues = np.maximum(np.linalg.eigvalsh(covariance), 1e-18)
@@ -206,28 +336,34 @@ def summarize_subset(
     anisotropy_values = np.asarray(anisotropy)
 
     baselines = []
-    for left_index in range(len(centres)):
-        for right_index in range(left_index + 1, len(centres)):
+    for left_index in range(len(view_names)):
+        for right_index in range(left_index + 1, len(view_names)):
+            left_name = view_names[left_index]
+            right_name = view_names[right_index]
             baselines.append(
                 {
-                    "views": [names[left_index], names[right_index]],
+                    "views": [left_name, right_name],
                     "distance_m": float(
-                        np.linalg.norm(centres[left_index] - centres[right_index])
+                        np.linalg.norm(
+                            view_centres[left_name] - view_centres[right_name]
+                        )
                     ),
                 }
             )
 
     return {
-        "views": names,
+        "views": view_names,
         "camera_centres_m": {
-            name: centre.round(9).tolist()
-            for name, centre in zip(names, centres)
+            name: view_centres[name].round(9).tolist()
+            for name in view_names
         },
         "baselines": baselines,
-        "sample_count": len(points),
+        "visible_sample_count": len(selected_points),
+        "total_sample_count": len(points),
+        "coverage_fraction": len(selected_points) / len(points),
         "radial_standard_deviation_mm": {
             "median": float(np.median(radial)),
-            "p95": percentile(radial, 95.0),
+            "p95": float(np.percentile(radial, 95.0)),
             "max": float(np.max(radial)),
         },
         "axis_standard_deviation_mm": {
@@ -236,7 +372,7 @@ def summarize_subset(
         },
         "anisotropy_ratio": {
             "median": float(np.median(anisotropy_values)),
-            "p95": percentile(anisotropy_values, 95.0),
+            "p95": float(np.percentile(anisotropy_values, 95.0)),
             "max": float(np.max(anisotropy_values)),
         },
     }
@@ -244,65 +380,87 @@ def summarize_subset(
 
 def evaluate(config: dict[str, Any]) -> dict[str, Any]:
     camera = config["camera"]
-    physical_centre = np.asarray(camera["centre_m"], dtype=float)
-    look_at = np.asarray(camera["look_at_m"], dtype=float)
-    intrinsics = (
-        float(camera["fx_px"]),
-        float(camera["fy_px"]),
-        float(camera["cx_px"]),
-        float(camera["cy_px"]),
-    )
     pixel_sigma = float(camera["pixel_sigma_px"])
     points = sample_volume(config["capture_volume"])
+    camera_centre = np.asarray(camera["centre_m"], dtype=float)
+
+    direct_matrix = direct_projection_matrix(camera)
+    direct_mask, direct_pixels = direct_visibility(
+        points,
+        camera,
+        direct_matrix,
+    )
 
     layout_reports: dict[str, Any] = {}
     for layout_name, layout in config["layouts"].items():
-        reflected: list[tuple[str, np.ndarray]] = []
+        view_matrices: dict[str, np.ndarray] = {"direct": direct_matrix}
+        view_visibility: dict[str, np.ndarray] = {"direct": direct_mask}
+        view_centres: dict[str, np.ndarray] = {"direct": camera_centre}
+        view_reports: dict[str, Any] = {
+            "direct": {
+                "coverage_fraction": float(np.mean(direct_mask)),
+                "visible_sample_count": int(np.sum(direct_mask)),
+                "roi_bounds_px": roi_bounds(direct_pixels, direct_mask),
+            }
+        }
+
+        reflected_names: list[str] = []
         for mirror in layout["mirrors"]:
-            reflected.append(
-                (
-                    str(mirror["name"]),
-                    reflect_point(
-                        physical_centre,
-                        mirror["plane_point_m"],
-                        mirror["plane_normal"],
-                    ),
-                )
+            name = str(mirror["name"])
+            reflected_names.append(name)
+            matrix = mirror_projection_matrix(camera, mirror)
+            mask, pixels = mirror_visibility(
+                points,
+                camera,
+                mirror,
+                matrix,
             )
+            view_matrices[name] = matrix
+            view_visibility[name] = mask
+            virtual_centre = reflect_point(
+                camera_centre,
+                mirror["plane_point_m"],
+                mirror["plane_normal"],
+            )
+            view_centres[name] = virtual_centre
+            view_reports[name] = {
+                "coverage_fraction": float(np.mean(mask)),
+                "visible_sample_count": int(np.sum(mask)),
+                "roi_bounds_px": roi_bounds(pixels, mask),
+                "virtual_camera_centre_m": virtual_centre.round(9).tolist(),
+            }
 
         subsets: dict[str, Any] = {}
-        for mirror_name, mirror_centre in reflected:
-            key = f"direct+{mirror_name}"
-            subsets[key] = summarize_subset(
+        for name in reflected_names:
+            subsets[f"direct+{name}"] = summarize_subset(
                 points,
-                [physical_centre, mirror_centre],
-                ["direct", mirror_name],
-                look_at,
-                intrinsics,
+                ["direct", name],
+                view_matrices,
+                view_visibility,
+                view_centres,
                 pixel_sigma,
             )
 
-        if len(reflected) >= 2:
-            names = ["direct"] + [name for name, _ in reflected]
-            centres = [physical_centre] + [centre for _, centre in reflected]
-            subsets["direct+all_reflections"] = summarize_subset(
-                points,
-                centres,
-                names,
-                look_at,
-                intrinsics,
-                pixel_sigma,
-            )
+        subsets["direct+all_reflections"] = summarize_subset(
+            points,
+            ["direct", *reflected_names],
+            view_matrices,
+            view_visibility,
+            view_centres,
+            pixel_sigma,
+        )
 
         layout_reports[layout_name] = {
             "description": layout.get("description", ""),
+            "views": view_reports,
             "subsets": subsets,
         }
 
     return {
-        "schema_version": "0.1.0",
+        "schema_version": "0.2.0",
         "warning": (
-            "Conditioning simulation only; values are not physical calibration results."
+            "Finite-aperture geometry simulation only; values are not physical "
+            "calibration results."
         ),
         "assumed_pixel_sigma_px": pixel_sigma,
         "capture_volume": config["capture_volume"],
