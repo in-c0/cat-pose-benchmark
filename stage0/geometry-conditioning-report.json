@@ -3,23 +3,49 @@
   "warning": "Conditioning simulation only; values are not physical calibration results.",
   "assumed_pixel_sigma_px": 0.35,
   "capture_volume": {
-    "min_m": [-0.3, -0.05, 0.05],
-    "max_m": [0.3, 0.65, 0.65],
-    "samples_xyz": [5, 5, 5]
+    "min_m": [
+      -0.3,
+      -0.05,
+      0.05
+    ],
+    "max_m": [
+      0.3,
+      0.65,
+      0.65
+    ],
+    "samples_xyz": [
+      5,
+      5,
+      5
+    ]
   },
   "layouts": {
     "A_symmetric_lateral": {
       "description": "Direct view plus two approximately symmetric lateral virtual views.",
       "subsets": {
         "direct+left": {
-          "views": ["direct", "left"],
+          "views": [
+            "direct",
+            "left"
+          ],
           "camera_centres_m": {
-            "direct": [0.0, -1.2, 0.55],
-            "left": [0.704936009, -0.706398841, 0.55]
+            "direct": [
+              0.0,
+              -1.2,
+              0.55
+            ],
+            "left": [
+              0.704936009,
+              -0.706398841,
+              0.55
+            ]
           },
           "baselines": [
             {
-              "views": ["direct", "left"],
+              "views": [
+                "direct",
+                "left"
+              ],
               "distance_m": 0.8605677666043346
             }
           ],
@@ -30,8 +56,16 @@
             "max": 1.5957907004359473
           },
           "axis_standard_deviation_mm": {
-            "median_xyz": [0.39355226436887447, 0.8272694683663395, 0.3084867525420382],
-            "p95_xyz": [0.5987715268758724, 1.3350521667796584, 0.4865299471668244]
+            "median_xyz": [
+              0.39355226436887447,
+              0.8272694683663395,
+              0.3084867525420382
+            ],
+            "p95_xyz": [
+              0.5987715268758724,
+              1.3350521667796584,
+              0.4865299471668244
+            ]
           },
           "anisotropy_ratio": {
             "median": 3.4859914724823926,
@@ -40,14 +74,28 @@
           }
         },
         "direct+right": {
-          "views": ["direct", "right"],
+          "views": [
+            "direct",
+            "right"
+          ],
           "camera_centres_m": {
-            "direct": [0.0, -1.2, 0.55],
-            "right": [-0.704936009, -0.706398841, 0.55]
+            "direct": [
+              0.0,
+              -1.2,
+              0.55
+            ],
+            "right": [
+              -0.704936009,
+              -0.706398841,
+              0.55
+            ]
           },
           "baselines": [
             {
-              "views": ["direct", "right"],
+              "views": [
+                "direct",
+                "right"
+              ],
               "distance_m": 0.8605677666043346
             }
           ],
@@ -58,8 +106,16 @@
             "max": 1.5957907004773035
           },
           "axis_standard_deviation_mm": {
-            "median_xyz": [0.393552264431257, 0.8272694683524866, 0.30848675259509445],
-            "p95_xyz": [0.5987715269033107, 1.3350521667532778, 0.48652994716959463]
+            "median_xyz": [
+              0.393552264431257,
+              0.8272694683524866,
+              0.30848675259509445
+            ],
+            "p95_xyz": [
+              0.5987715269033107,
+              1.3350521667532778,
+              0.48652994716959463
+            ]
           },
           "anisotropy_ratio": {
             "median": 3.4859914720210967,
@@ -68,16 +124,50 @@
           }
         },
         "direct+all_reflections": {
-          "views": ["direct", "left", "right"],
+          "views": [
+            "direct",
+            "left",
+            "right"
+          ],
           "camera_centres_m": {
-            "direct": [0.0, -1.2, 0.55],
-            "left": [0.704936009, -0.706398841, 0.55],
-            "right": [-0.704936009, -0.706398841, 0.55]
+            "direct": [
+              0.0,
+              -1.2,
+              0.55
+            ],
+            "left": [
+              0.704936009,
+              -0.706398841,
+              0.55
+            ],
+            "right": [
+              -0.704936009,
+              -0.706398841,
+              0.55
+            ]
           },
           "baselines": [
-            {"views": ["direct", "left"], "distance_m": 0.8605677666043346},
-            {"views": ["direct", "right"], "distance_m": 0.8605677666043346},
-            {"views": ["left", "right"], "distance_m": 1.4098720183119313}
+            {
+              "views": [
+                "direct",
+                "left"
+              ],
+              "distance_m": 0.8605677666043346
+            },
+            {
+              "views": [
+                "direct",
+                "right"
+              ],
+              "distance_m": 0.8605677666043346
+            },
+            {
+              "views": [
+                "left",
+                "right"
+              ],
+              "distance_m": 1.4098720183119313
+            }
           ],
           "sample_count": 125,
           "radial_standard_deviation_mm": {
@@ -86,8 +176,16 @@
             "max": 0.7909776585832585
           },
           "axis_standard_deviation_mm": {
-            "median_xyz": [0.2326078934007173, 0.4192835225181724, 0.2198271135808287],
-            "p95_xyz": [0.2768687341030411, 0.6460597096507735, 0.30268033530759547]
+            "median_xyz": [
+              0.2326078934007173,
+              0.4192835225181724,
+              0.2198271135808287
+            ],
+            "p95_xyz": [
+              0.2768687341030411,
+              0.6460597096507735,
+              0.30268033530759547
+            ]
           },
           "anisotropy_ratio": {
             "median": 2.071107068447538,
@@ -101,13 +199,30 @@
       "description": "Direct view plus one lateral and one elevated virtual view.",
       "subsets": {
         "direct+right": {
-          "views": ["direct", "right"],
+          "views": [
+            "direct",
+            "right"
+          ],
           "camera_centres_m": {
-            "direct": [0.0, -1.2, 0.55],
-            "right": [-0.704936009, -0.706398841, 0.55]
+            "direct": [
+              0.0,
+              -1.2,
+              0.55
+            ],
+            "right": [
+              -0.704936009,
+              -0.706398841,
+              0.55
+            ]
           },
           "baselines": [
-            {"views": ["direct", "right"], "distance_m": 0.8605677666043346}
+            {
+              "views": [
+                "direct",
+                "right"
+              ],
+              "distance_m": 0.8605677666043346
+            }
           ],
           "sample_count": 125,
           "radial_standard_deviation_mm": {
@@ -116,8 +231,16 @@
             "max": 1.5957907004773035
           },
           "axis_standard_deviation_mm": {
-            "median_xyz": [0.393552264431257, 0.8272694683524866, 0.30848675259509445],
-            "p95_xyz": [0.5987715269033107, 1.3350521667532778, 0.48652994716959463]
+            "median_xyz": [
+              0.393552264431257,
+              0.8272694683524866,
+              0.30848675259509445
+            ],
+            "p95_xyz": [
+              0.5987715269033107,
+              1.3350521667532778,
+              0.48652994716959463
+            ]
           },
           "anisotropy_ratio": {
             "median": 3.4859914720210967,
@@ -126,13 +249,30 @@
           }
         },
         "direct+overhead": {
-          "views": ["direct", "overhead"],
+          "views": [
+            "direct",
+            "overhead"
+          ],
           "camera_centres_m": {
-            "direct": [0.0, -1.2, 0.55],
-            "overhead": [0.0, 0.200000449, 1.499999338]
+            "direct": [
+              0.0,
+              -1.2,
+              0.55
+            ],
+            "overhead": [
+              0.0,
+              0.200000449,
+              1.499999338
+            ]
           },
           "baselines": [
-            {"views": ["direct", "overhead"], "distance_m": 1.6918924315686732}
+            {
+              "views": [
+                "direct",
+                "overhead"
+              ],
+              "distance_m": 1.6918924315686732
+            }
           ],
           "sample_count": 125,
           "radial_standard_deviation_mm": {
@@ -141,8 +281,16 @@
             "max": 0.8300156274635948
           },
           "axis_standard_deviation_mm": {
-            "median_xyz": [0.2671447747183534, 0.33914339456053183, 0.41515485225200005],
-            "p95_xyz": [0.323550973105184, 0.4381308279778642, 0.5554151845585781]
+            "median_xyz": [
+              0.2671447747183534,
+              0.33914339456053183,
+              0.41515485225200005
+            ],
+            "p95_xyz": [
+              0.323550973105184,
+              0.4381308279778642,
+              0.5554151845585781
+            ]
           },
           "anisotropy_ratio": {
             "median": 1.7810613361299785,
@@ -151,16 +299,50 @@
           }
         },
         "direct+all_reflections": {
-          "views": ["direct", "right", "overhead"],
+          "views": [
+            "direct",
+            "right",
+            "overhead"
+          ],
           "camera_centres_m": {
-            "direct": [0.0, -1.2, 0.55],
-            "right": [-0.704936009, -0.706398841, 0.55],
-            "overhead": [0.0, 0.200000449, 1.499999338]
+            "direct": [
+              0.0,
+              -1.2,
+              0.55
+            ],
+            "right": [
+              -0.704936009,
+              -0.706398841,
+              0.55
+            ],
+            "overhead": [
+              0.0,
+              0.200000449,
+              1.499999338
+            ]
           },
           "baselines": [
-            {"views": ["direct", "right"], "distance_m": 0.8605677666043346},
-            {"views": ["direct", "overhead"], "distance_m": 1.6918924315686732},
-            {"views": ["right", "overhead"], "distance_m": 1.4902996990477493}
+            {
+              "views": [
+                "direct",
+                "right"
+              ],
+              "distance_m": 0.8605677666043346
+            },
+            {
+              "views": [
+                "direct",
+                "overhead"
+              ],
+              "distance_m": 1.6918924315686732
+            },
+            {
+              "views": [
+                "right",
+                "overhead"
+              ],
+              "distance_m": 1.4902996990477493
+            }
           ],
           "sample_count": 125,
           "radial_standard_deviation_mm": {
@@ -169,8 +351,16 @@
             "max": 0.6730692765527679
           },
           "axis_standard_deviation_mm": {
-            "median_xyz": [0.22563298956139766, 0.2880389656827754, 0.27530263683853096],
-            "p95_xyz": [0.28186445143875644, 0.39320078224708266, 0.37397118683470304]
+            "median_xyz": [
+              0.22563298956139766,
+              0.2880389656827754,
+              0.27530263683853096
+            ],
+            "p95_xyz": [
+              0.28186445143875644,
+              0.39320078224708266,
+              0.37397118683470304
+            ]
           },
           "anisotropy_ratio": {
             "median": 1.645764525220895,
