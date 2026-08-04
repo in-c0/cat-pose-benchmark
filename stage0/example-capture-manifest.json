@@ -1,0 +1,73 @@
+{
+  "schema_version": "0.1.0",
+  "sequence_id": "stage0-a-static-centre-000",
+  "subject_type": "rigid_target",
+  "animal_present": false,
+  "capture_start_utc": "2026-08-04T07:30:00Z",
+  "operator_id": "example-only",
+  "rig": {
+    "rig_id": "portal-prototype-00",
+    "layout_id": "A_symmetric_lateral",
+    "mirror_state_id": "mirror-state-example",
+    "temperature_c": 21.0,
+    "notes": "Schema example only; not a recorded experiment."
+  },
+  "camera": {
+    "camera_id": "camera-example",
+    "manufacturer": "replace-me",
+    "model": "replace-me",
+    "serial": "replace-me",
+    "shutter_type": "global",
+    "lens_id": "lens-example",
+    "resolution_px": [1920, 1200],
+    "frame_rate_hz": 60.0,
+    "exposure_us": 1000.0,
+    "gain_db": 0.0,
+    "focus_locked": true,
+    "white_balance_locked": true,
+    "timestamp_source": "camera-hardware-clock",
+    "pixel_format": "Mono8-or-RGB8-replace-me",
+    "codec": null,
+    "firmware": null
+  },
+  "calibration": {
+    "intrinsics_id": "intrinsics-example",
+    "mirror_planes_id": "mirror-planes-example",
+    "target_geometry_id": "target-measurement-example",
+    "calibrated_at_utc": "2026-08-04T07:00:00Z",
+    "minutes_since_calibration": 30.0
+  },
+  "target": {
+    "target_id": "catpose-stage0-trihedral-v0",
+    "placement_region": "centre_centre_mid",
+    "motion": "static",
+    "motion_reference_id": null,
+    "notes": "Example placement."
+  },
+  "condition": {
+    "exposure_class": "motion_frozen",
+    "lighting_id": "lighting-example",
+    "trial_index": 0,
+    "rig_reassembled_since_calibration": false,
+    "notes": "Example condition."
+  },
+  "files": [
+    {
+      "role": "video",
+      "path": "raw/stage0-a-static-centre-000/video.raw",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "byte_count": 0,
+      "frame_count": 100
+    },
+    {
+      "role": "frame_timestamps",
+      "path": "raw/stage0-a-static-centre-000/timestamps.csv",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "byte_count": 0,
+      "frame_count": 100
+    }
+  ],
+  "exclusions": [
+    "This manifest is illustrative and must not be reported as measured evidence."
+  ]
+}
