@@ -13,12 +13,24 @@ from typing import Any, Iterable
 from jsonschema import Draft202012Validator
 
 
+AXES_2 = ("x", "y")
+AXES_3 = ("x", "y", "z")
+
+
 def _path(error: Any) -> str:
     return ".".join(str(part) for part in error.absolute_path) or "<root>"
 
 
+def _components(vector: dict[str, float], axes: tuple[str, ...]) -> list[float]:
+    return [float(vector[axis]) for axis in axes]
+
+
 def _finite(values: Iterable[float]) -> bool:
     return all(math.isfinite(float(value)) for value in values)
+
+
+def _finite_vector(vector: dict[str, float], axes: tuple[str, ...]) -> bool:
+    return _finite(_components(vector, axes))
 
 
 def canonical_sha256(sequence: dict[str, Any]) -> str:
@@ -66,18 +78,16 @@ def validate_sequence(
     for expected_index, frame in enumerate(frames):
         prefix = f"frames[{expected_index}]"
         if frame["frame_index"] != expected_index:
-            errors.append(
-                f"{prefix}.frame_index must be contiguous from zero"
-            )
+            errors.append(f"{prefix}.frame_index must be contiguous from zero")
         expected_timestamp = expected_index * fixed_timestep_ns
         if frame["timestamp_ns"] != expected_timestamp:
             errors.append(
                 f"{prefix}.timestamp_ns must equal frame_index * fixed_timestep_ns"
             )
 
-        if not _finite(frame["subject_root_world_m"]):
+        if not _finite_vector(frame["subject_root_world_m"], AXES_3):
             errors.append(f"{prefix}.subject_root_world_m contains a non-finite value")
-        if not _finite(frame["subject_velocity_world_mps"]):
+        if not _finite_vector(frame["subject_velocity_world_mps"], AXES_3):
             errors.append(
                 f"{prefix}.subject_velocity_world_mps contains a non-finite value"
             )
@@ -87,15 +97,21 @@ def validate_sequence(
             landmark_prefix = f"{prefix}.landmarks[{landmark_index}]"
             name = landmark["semantic_name"]
             if name in names:
-                errors.append(f"{prefix}.landmarks contains duplicate semantic_name {name}")
+                errors.append(
+                    f"{prefix}.landmarks contains duplicate semantic_name {name}"
+                )
             names.add(name)
 
-            for field in ("world_m", "camera_m", "image_px"):
-                if not _finite(landmark[field]):
-                    errors.append(f"{landmark_prefix}.{field} contains a non-finite value")
+            if not _finite_vector(landmark["world_m"], AXES_3):
+                errors.append(f"{landmark_prefix}.world_m contains a non-finite value")
+            if not _finite_vector(landmark["camera_m"], AXES_3):
+                errors.append(f"{landmark_prefix}.camera_m contains a non-finite value")
+            if not _finite_vector(landmark["image_px"], AXES_2):
+                errors.append(f"{landmark_prefix}.image_px contains a non-finite value")
 
-            image_x, image_y = landmark["image_px"]
-            camera_z = landmark["camera_m"][2]
+            image_x = float(landmark["image_px"]["x"])
+            image_y = float(landmark["image_px"]["y"])
+            camera_z = float(landmark["camera_m"]["z"])
             visibility = landmark["visibility"]
             in_frame = 0.0 <= image_x <= width and 0.0 <= image_y <= height
             if visibility == "visible" and not in_frame:
@@ -103,15 +119,16 @@ def validate_sequence(
                     f"{landmark_prefix} is visible but its image point is outside the frame"
                 )
             if visibility == "visible" and camera_z <= 0.0:
-                errors.append(
-                    f"{landmark_prefix} is visible but is behind the camera"
-                )
+                errors.append(f"{landmark_prefix} is visible but is behind the camera")
             if visibility == "out_of_frame" and in_frame and camera_z > 0.0:
                 errors.append(
                     f"{landmark_prefix} is out_of_frame but projects inside the image"
                 )
 
-        if not all(_finite(point) for point in frame["tail_curve_world_m"]):
+        if not all(
+            _finite_vector(point, AXES_3)
+            for point in frame["tail_curve_world_m"]
+        ):
             errors.append(f"{prefix}.tail_curve_world_m contains a non-finite value")
 
         for contact_index, contact in enumerate(frame["contacts"]):
@@ -132,12 +149,13 @@ def validate_sequence(
         for index in range(len(frames) - 1):
             current = frames[index]
             following = frames[index + 1]
+            current_root = _components(current["subject_root_world_m"], AXES_3)
+            following_root = _components(following["subject_root_world_m"], AXES_3)
             finite_difference = [
-                (following["subject_root_world_m"][axis] - current["subject_root_world_m"][axis])
-                / fixed_timestep_s
+                (following_root[axis] - current_root[axis]) / fixed_timestep_s
                 for axis in range(3)
             ]
-            declared = current["subject_velocity_world_mps"]
+            declared = _components(current["subject_velocity_world_mps"], AXES_3)
             for axis, (expected, actual) in enumerate(zip(finite_difference, declared)):
                 if not math.isclose(
                     expected,
