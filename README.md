@@ -8,7 +8,7 @@ ear, tail, contact, and scene-relative motion in real environments.**
 
 ---
 
-## Status: research direction v0.1
+## Status: research direction v0.1 + Stage 0 design
 
 Created 2026-08-03. Direction revised 2026-08-04.
 
@@ -19,9 +19,9 @@ methodological position is now:
 > **Each frame contains partially observable truths from different measurement sources,
 > each with its own provenance and time-varying uncertainty.**
 
-Collection and implementation have not started. The immediate milestone is to freeze a
-minimal ontology, provenance format, capture experiment, and acceptance gates before
-recording data.
+The Stage 0 rigid-target experiment is now specified and its nominal mirror layouts have
+been compared by a reproducible geometry-conditioning simulation. No animal collection
+has started.
 
 No outbound licence is set yet. Until the decisions in
 [docs/OPEN-DECISIONS.md](docs/OPEN-DECISIONS.md) are resolved, the repository remains
@@ -71,6 +71,9 @@ independent paw-contact evidence.
 
 This avoids multi-device synchronisation while preserving true simultaneous geometry
 for fast ear, face, paw, and tail motion.
+
+The first validation step is deliberately animal-free. See
+[docs/STAGE-0-PORTAL-GEOMETRY.md](docs/STAGE-0-PORTAL-GEOMETRY.md).
 
 ### 2. Monocular real-home set — deployment benchmark
 
@@ -129,6 +132,7 @@ docs/
   RESEARCH-CHARTER.md               locked research question, hypotheses, and gates
   GROUND-TRUTH-PROVENANCE.md        observation tiers, uncertainty, and anti-circularity
   BENCHMARK-PROTOCOL-DRAFT.md       capture tiers, evaluation tracks, and v0 experiment
+  STAGE-0-PORTAL-GEOMETRY.md        rigid-target mirror-layout experiment and gates
   KEYPOINT-TOPOLOGY-DRAFT.md        proposed landmarks and compatibility constraints
   PRIOR-ART-AND-LICENCE-SURVEY.md   existing resources and licence status
   LICENSING-POLICY.md               contamination and release constraints
@@ -136,4 +140,10 @@ docs/
 
 schemas/
   observation.schema.json           machine-readable observation/provenance draft
+
+stage0/
+  layouts.json                      nominal mirror planes and camera assumptions
+  geometry_sim.py                   virtual-camera conditioning and covariance simulation
+  geometry-conditioning-report.json generated nominal comparison; not measured evidence
+  test_geometry_sim.py              reflection and triangulation invariants
 ```
