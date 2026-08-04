@@ -100,7 +100,8 @@ jobs:
           python -m unittest \
             stage0.test_target_generator \
             stage0.test_capture_manifest \
-            synthetic.test_validate_sequence
+            synthetic.test_validate_sequence \
+            synthetic.test_reference_stage_s0
 
       - name: Generate low-resolution target dry run
         run: |
