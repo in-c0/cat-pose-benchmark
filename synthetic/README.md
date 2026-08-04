@@ -10,7 +10,7 @@ prove:
 Unity runtime state
 → deterministic sequence export
 → schema validation
-→ cross-field invariant checks
+→ independent Python projection comparison
 → later viewer and baseline ingestion
 ```
 
@@ -67,10 +67,33 @@ The command may require its path to be adjusted to the locally installed editor 
 
 ## Validate an export
 
+First run structural and cross-field validation:
+
 ```bash
 python synthetic/validate_sequence.py \
   synthetic/fixtures/stage-s0-unity-export.json
 ```
+
+Then compare the Unity result against the independent Python camera and procedural-motion
+reference:
+
+```bash
+python -m synthetic.reference_stage_s0 \
+  synthetic/fixtures/stage-s0-unity-export.json
+```
+
+The reference implementation independently reconstructs:
+
+- Unity-compatible camera right/up/forward axes;
+- world-to-camera transforms;
+- pinhole projection from vertical field of view and aspect ratio;
+- root motion and fixed timestamps;
+- semantic landmark positions;
+- procedural tail motion;
+- contact and scene-relation records.
+
+A serializer can therefore not pass merely by being self-consistent. Camera, timing,
+topology, or procedural-state drift appears as a path-specific numerical error.
 
 Validation covers:
 
@@ -83,7 +106,8 @@ Validation covers:
 - known support-surface references;
 - subject identity in spatial relations;
 - root velocity against finite differences;
-- canonical SHA-256 generation.
+- canonical SHA-256 generation;
+- independent Unity/Python transform and projection parity.
 
 ## Current proxy content
 
@@ -107,16 +131,17 @@ The generated sequence contains:
 - visibility is currently frustum-based, not raycast occlusion-aware;
 - contacts are declared by the procedural fixture, not collider events;
 - no Unity execution occurs in GitHub CI yet;
-- the committed Python tests validate the contract and invariants, not Unity compilation.
+- the committed Python tests validate the contract, camera equations, and invariants,
+  but not Unity compilation.
 
 These limitations keep Issue #7 open after the code lands.
 
 ## Next slice
 
 1. Execute the exporter in the pinned Unity editor.
-2. Validate and commit the first generated fixture.
-3. Add a Python reference projection and Unity/Python round-trip comparison.
-4. Add raycast visibility and explicit occluder test cases.
+2. Run both validation commands and commit the first generated fixture.
+3. Add raycast visibility and explicit occluder test cases.
+4. Add exact acceleration and tail-derivative exports.
 5. Add Unity Test Framework coverage or a licensed CI execution path.
 6. Replace or supplement the proxy with a licence-clean rigged feline asset without
    changing the sequence contract.
