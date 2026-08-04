@@ -1,28 +1,75 @@
-# CatPose Stage 0 Unity viewer
+# CatPose Unity project
 
-A minimal Unity 6 LTS project for inspecting the CatPose Portal coordinate convention,
-mirror planes, physical/virtual cameras, reflected rays, and capture volume.
+This Unity 6 LTS project now supports two distinct workflows:
 
-## Run
+1. **Stage S0 synthetic exact export** — the active software-first implementation path.
+2. **Stage 0 portal geometry viewer** — an optional external-validation design study.
 
-1. Open `unity-viewer/` as a Unity project with the editor version recorded in
+Neither workflow requires the project lead to construct or operate physical apparatus.
+
+## Stage S0 synthetic export
+
+The editor script at
+`Assets/Editor/StageS0SyntheticExporter.cs` creates a temporary procedural feline proxy,
+camera, floor, and scene objects entirely in memory. It exports exact Unity runtime state
+to:
+
+```text
+../synthetic/fixtures/stage-s0-unity-export.json
+```
+
+### Editor command
+
+1. Open `unity-viewer/` using the editor version in
    `ProjectSettings/ProjectVersion.txt`.
-2. Create or open an empty 3D scene.
-3. Enter Play Mode.
+2. Select **CatPose → Generate Stage S0 Synthetic Fixture**.
+3. Validate the output from the repository root:
+
+```bash
+python synthetic/validate_sequence.py \
+  synthetic/fixtures/stage-s0-unity-export.json
+```
+
+### Batch command
+
+```powershell
+& "C:\Program Files\Unity\Hub\Editor\6000.0.75f1\Editor\Unity.exe" `
+  -batchmode `
+  -quit `
+  -projectPath "$PWD\unity-viewer" `
+  -executeMethod CatPose.StageS0.StageS0SyntheticExporter.ExportFromCommandLine `
+  -catposeOutput "$PWD\synthetic\fixtures\stage-s0-unity-export.json" `
+  -logFile "$PWD\synthetic\fixtures\stage-s0-unity-export.log"
+```
+
+Adjust the Unity executable path to the installed editor version.
+
+The procedural proxy is a contract test, not a realistic cat asset and not evidence of
+real-world accuracy.
+
+## Optional portal geometry viewer
+
+The runtime `Stage0Viewer` inspects the archived mirror-portal coordinate convention,
+mirror planes, physical/virtual cameras, reflected rays, and nominal capture volume.
+
+To run it:
+
+1. Create or open an empty 3D scene.
+2. Enter Play Mode.
 
 `Stage0Viewer` bootstraps automatically and reads
-`Assets/StreamingAssets/stage0-scene-v2.json`; no scene asset or manual setup is required.
+`Assets/StreamingAssets/stage0-scene-v2.json`.
 
-## Coordinate conversion
+### Portal coordinate conversion
 
-The research geometry uses `+x` portal-left-to-right, `+y` through the portal, and `+z`
-up. Unity receives:
+The archived portal geometry uses `+x` portal-left-to-right, `+y` through the portal, and
+`+z` up. Unity receives:
 
 ```text
 unity = (source.x, source.z, source.y)
 ```
 
-Run the exporter from the repository root as a Python module:
+Regenerate the nominal portal scene from the repository root:
 
 ```bash
 python -m stage0.export_unity_scene_v2 \
@@ -31,19 +78,14 @@ python -m stage0.export_unity_scene_v2 \
   --output unity-viewer/Assets/StreamingAssets/stage0-scene-v2.json
 ```
 
-## Current visualisation
+The portal viewer is an engineering parity tool. It is not measured evidence and is not
+on the Protocol v0.1 critical path.
 
-- capture-volume wireframe;
-- coordinate axes;
-- physical camera and virtual reflected cameras;
-- finite mirror planes and normals;
-- direct and reflected representative rays;
-- representative target point.
+## Next Unity work
 
-This is an engineering parity tool, not measured evidence. Physical Stage 0 will extend
-the format with calibrated intrinsics/extrinsics, measured mirror boundaries, detected
-and reconstructed target points, holdout residuals, covariance ellipsoids, dropout rays,
-parity state, and frame/calibration identifiers.
-
-The Unity reconstruction must agree numerically with the Python reference geometry; a
-visually plausible scene is not sufficient.
+- execute and validate the first Stage S0 fixture;
+- add a sequence player for exact labels and model predictions;
+- add raycast visibility and occlusion cases;
+- add uncertainty and error overlays;
+- import a licence-clean rigged feline asset without changing the export contract;
+- add Unity Test Framework or licensed batch CI coverage.
