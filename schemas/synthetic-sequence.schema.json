@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cat-pose-benchmark.example/schemas/synthetic-sequence.schema.json",
+  "title": "CatPose Stage S0 Synthetic Sequence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "sequence_id",
+    "subject_id",
+    "evidence_tier",
+    "quality",
+    "units",
+    "engine",
+    "determinism",
+    "camera",
+    "scene",
+    "lineage",
+    "frames"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "sequence_id": {"type": "string", "minLength": 1},
+    "subject_id": {"type": "string", "minLength": 1},
+    "evidence_tier": {"const": "S"},
+    "quality": {"const": "gold"},
+    "units": {"const": "metres"},
+    "engine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "project", "required_editor", "exporter"],
+      "properties": {
+        "name": {"const": "Unity"},
+        "project": {"type": "string", "minLength": 1},
+        "required_editor": {"type": "string", "minLength": 1},
+        "exporter": {"type": "string", "minLength": 1}
+      }
+    },
+    "determinism": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["seed", "fixed_timestep_ns", "frame_count", "coordinate_convention"],
+      "properties": {
+        "seed": {"type": "integer"},
+        "fixed_timestep_ns": {"type": "integer", "minimum": 1},
+        "frame_count": {"type": "integer", "minimum": 2},
+        "coordinate_convention": {
+          "const": "unity-left-handed-x-right-y-up-z-forward"
+        }
+      }
+    },
+    "camera": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "camera_id",
+        "resolution_px",
+        "vertical_fov_degrees",
+        "position_world_m",
+        "look_at_world_m",
+        "screen_origin"
+      ],
+      "properties": {
+        "camera_id": {"type": "string", "minLength": 1},
+        "resolution_px": {
+          "type": "array",
+          "prefixItems": [
+            {"type": "integer", "minimum": 1},
+            {"type": "integer", "minimum": 1}
+          ],
+          "items": false
+        },
+        "vertical_fov_degrees": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 180},
+        "position_world_m": {"$ref": "#/$defs/vector3"},
+        "look_at_world_m": {"$ref": "#/$defs/vector3"},
+        "screen_origin": {"const": "bottom_left"}
+      }
+    },
+    "scene": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["support_surfaces", "objects"],
+      "properties": {
+        "support_surfaces": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["object_id", "plane_world"],
+            "properties": {
+              "object_id": {"type": "string", "minLength": 1},
+              "plane_world": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["normal", "offset_m"],
+                "properties": {
+                  "normal": {"$ref": "#/$defs/vector3"},
+                  "offset_m": {"type": "number"}
+                }
+              }
+            }
+          }
+        },
+        "objects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["object_id", "type", "position_world_m"],
+            "properties": {
+              "object_id": {"type": "string", "minLength": 1},
+              "type": {"type": "string", "minLength": 1},
+              "position_world_m": {"$ref": "#/$defs/vector3"}
+            }
+          }
+        }
+      }
+    },
+    "lineage": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "frames": {
+      "type": "array",
+      "minItems": 2,
+      "items": {"$ref": "#/$defs/frame"}
+    }
+  },
+  "$defs": {
+    "vector2": {
+      "type": "array",
+      "prefixItems": [{"type": "number"}, {"type": "number"}],
+      "items": false
+    },
+    "vector3": {
+      "type": "array",
+      "prefixItems": [
+        {"type": "number"},
+        {"type": "number"},
+        {"type": "number"}
+      ],
+      "items": false
+    },
+    "landmark": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["semantic_name", "world_m", "camera_m", "image_px", "visibility"],
+      "properties": {
+        "semantic_name": {"type": "string", "minLength": 1},
+        "world_m": {"$ref": "#/$defs/vector3"},
+        "camera_m": {"$ref": "#/$defs/vector3"},
+        "image_px": {"$ref": "#/$defs/vector2"},
+        "visibility": {
+          "enum": ["visible", "partially_occluded", "fully_occluded", "out_of_frame"]
+        }
+      }
+    },
+    "contact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["semantic_name", "active", "support_surface_id"],
+      "properties": {
+        "semantic_name": {"type": "string", "minLength": 1},
+        "active": {"type": "boolean"},
+        "support_surface_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "spatial_relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subject_id", "relation", "object_id"],
+      "properties": {
+        "subject_id": {"type": "string", "minLength": 1},
+        "relation": {"enum": ["on", "under", "inside", "behind", "approaching", "retreating"]},
+        "object_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "frame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "frame_index",
+        "timestamp_ns",
+        "subject_root_world_m",
+        "subject_velocity_world_mps",
+        "landmarks",
+        "tail_curve_world_m",
+        "contacts",
+        "spatial_relations"
+      ],
+      "properties": {
+        "frame_index": {"type": "integer", "minimum": 0},
+        "timestamp_ns": {"type": "integer", "minimum": 0},
+        "subject_root_world_m": {"$ref": "#/$defs/vector3"},
+        "subject_velocity_world_mps": {"$ref": "#/$defs/vector3"},
+        "landmarks": {
+          "type": "array",
+          "minItems": 2,
+          "items": {"$ref": "#/$defs/landmark"}
+        },
+        "tail_curve_world_m": {
+          "type": "array",
+          "minItems": 4,
+          "items": {"$ref": "#/$defs/vector3"}
+        },
+        "contacts": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/contact"}
+        },
+        "spatial_relations": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/spatial_relation"}
+        }
+      }
+    }
+  }
+}
