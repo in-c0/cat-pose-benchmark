@@ -38,7 +38,7 @@ def valid_sequence() -> dict:
         "contacts": [
             {
                 "semantic_name": "left_front_paw_contact",
-                "active": true,
+                "active": True,
                 "support_surface_id": "floor"
             }
         ],
