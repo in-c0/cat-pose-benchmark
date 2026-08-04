@@ -1,91 +1,149 @@
 # cat-pose-benchmark
 
-**An open, licence-clean keypoint benchmark for domestic cats — annotated in real
-environments, with ear and tail topology that no existing public dataset provides.**
+**An open benchmark and capture methodology for temporally stable feline pose, facial,
+ear, tail, contact, and scene-relative motion in real environments.**
 
-> **Repo name is a placeholder.** The consumer brand is not named yet; this repo is the
-> research artefact, and the two do not have to share a name.
-
----
-
-## Status: SCAFFOLD — held pending research direction
-
-Created 2026-08-03. **Nothing is being built yet.** Research direction is still being
-defined; this repo exists to hold the decisions and the evidence in one place.
-
-**No outbound licence is set yet** — that is
-[an open decision](docs/OPEN-DECISIONS.md), and until it is made the default
-(all rights reserved) applies. A licence will be added before any data or model is
-released. If you want to use any of this in the meantime, please open an issue.
-
-Every design choice below is marked **OPEN** and is deliberately undecided. See
-[docs/OPEN-DECISIONS.md](docs/OPEN-DECISIONS.md).
+> The repository name is provisional. The consumer cat brand and its products should
+> remain separate from this research artefact.
 
 ---
 
-## Why this exists
+## Status: research direction v0.1 + Stage 0 design
 
-The feasibility review ([docs/PRIOR-ART-AND-LICENCE-SURVEY.md](docs/PRIOR-ART-AND-LICENCE-SURVEY.md)) found a
-specific, verified gap:
+Created 2026-08-03. Direction revised 2026-08-04.
 
-- Every public keypoint dataset that annotates **cat ears or tail** is non-commercial
-  (CatFLW, CC BY-NC), research-only (SuperAnimal), or has **no stated licence at all**
-  (Animal-Pose).
-- Every public dataset that is **commercially usable** (AP-10K, APT-36K) uses a
-  17-keypoint skeleton with **no ear keypoints and a single tail-root point**.
-- There is **no public cat behaviour/ethogram video dataset** at any licence.
+The project is no longer based on the assumption that a real benchmark must be either
+fully hand-labelled or represented by one supposedly perfect source of truth. Its core
+methodological position is now:
 
-Ear position and tail motion are the two signals feline behaviour actually depends on.
-They are the exact signals nobody has published under a usable licence.
+> **Each frame contains partially observable truths from different measurement sources,
+> each with its own provenance and time-varying uncertainty.**
 
-**That gap is the asset.** This repo aims to close it.
+The Stage 0 rigid-target experiment is now specified and its nominal mirror layouts have
+been compared by a reproducible geometry-conditioning simulation. No animal collection
+has started.
 
-## The approach
+No outbound licence is set yet. Until the decisions in
+[docs/OPEN-DECISIONS.md](docs/OPEN-DECISIONS.md) are resolved, the repository remains
+all rights reserved. A licence must be added before any data, weights, or reusable code
+are released.
 
-Two halves, deliberately separated — this separation is the methodological core:
+---
 
-1. **Training data: synthetic.** Rigged 3D cat models rendered through
-   [Unity Perception](https://github.com/Unity-Technologies/com.unity.perception) with
-   pose and domain randomisation. Ground truth is exact by construction, keypoint
-   topology is arbitrary (so ear tips, ear bases, tail base→mid→tip come free), and the
-   licence is clean provided the source assets are commercially licensed.
-2. **Benchmark data: real.** Real cats, in real environments, annotated as an
-   **evaluation set only** — never trained on. Stratified across the axes that actually
-   break models: fur, motion, lighting, and indoor/outdoor.
+## Research objective
 
-The benchmark half is what makes this scientifically honest. Synthetic-trained models
-report flattering numbers on synthetic test sets; the entire question is whether they
-survive real fur, real motion blur, and real living rooms. **The benchmark is the
-contribution, not the by-product.**
+Build an open, licence-clean benchmark that can answer:
 
-Draft protocol: [docs/BENCHMARK-PROTOCOL-DRAFT.md](docs/BENCHMARK-PROTOCOL-DRAFT.md)
-Draft skeleton: [docs/KEYPOINT-TOPOLOGY-DRAFT.md](docs/KEYPOINT-TOPOLOGY-DRAFT.md)
+> Can an ordinary monocular RGB system recover feline surface pose and motion with
+> calibrated uncertainty, using independent geometric and contact measurements only for
+> a compact gold-standard subset?
 
-## What this repo is not
+The eventual app or puck should operate from one ordinary camera. More specialised
+capture equipment exists only to establish whether the monocular system is correct.
 
-- **Not a medical or veterinary instrument.** No pain scoring, no welfare inference, no
-  diagnostic output. Anything health-adjacent is a separate project with a separate
-  ethics and review path.
-- **Not a "translator".** No semantic intent decoding is claimed, because none is
-  scientifically supported. See the survey §2.
-- **Not the consumer app.** Products built on this benchmark live in their own repos.
+## What counts as ground truth
 
-## Licensing — the one hard rule
+The benchmark does **not** pretend that every anatomical joint is directly visible.
+Annotations are separated into:
 
-**No CC BY-NC or research-only data may touch this project**, including as a teacher
-model, a pseudo-labeller, or for pre-training. Derivative-work rules follow the source
-licence and would silently poison every downstream product.
+1. **Surface observations** — visible landmarks, contours, face points, ear geometry,
+   and tail centreline.
+2. **Contact observations** — paw location, support surface, take-off, landing, stance,
+   and other independently measured contact events.
+3. **Latent anatomical estimates** — joint centres or hidden geometry inferred through
+   anatomical and temporal models. These are estimates, never silently promoted to
+   direct truth.
+4. **Scene-relative observations** — camera pose, surfaces, obstacles, object relations,
+   and world-space trajectory.
+5. **Temporal measurements** — displacement, velocity, acceleration, curvature change,
+   blink timing, ear flicks, tail motion, gait phase, and recovery after occlusion.
 
-Full policy, including the still-open choice of outbound licence:
-[docs/LICENSING-POLICY.md](docs/LICENSING-POLICY.md)
+Every observation records its source, quality tier, visibility, uncertainty, and
+lineage. See [docs/GROUND-TRUTH-PROVENANCE.md](docs/GROUND-TRUTH-PROVENANCE.md).
 
-## Layout
+## Proposed capture strategy
 
-```
+### 1. CatPose Portal — compact gold subset
+
+A low-cost open capture appliance using one physical camera and calibrated mirrors to
+produce simultaneous virtual views. A transparent or instrumented surface can add
+independent paw-contact evidence.
+
+This avoids multi-device synchronisation while preserving true simultaneous geometry
+for fast ear, face, paw, and tail motion.
+
+The first validation step is deliberately animal-free. See
+[docs/STAGE-0-PORTAL-GEOMETRY.md](docs/STAGE-0-PORTAL-GEOMETRY.md).
+
+### 2. Monocular real-home set — deployment benchmark
+
+Ordinary owner-shot video under the conditions that break models: occlusion, motion
+blur, dark and long fur, clutter, low light, changing viewpoint, multi-cat scenes, and
+partial exits from frame.
+
+A scene-mapping system may provide camera trajectory and static-world geometry, but
+model-derived feline pose remains labelled as estimated supervision unless independently
+validated.
+
+### 3. Synthetic and reconstructed data — supplementary training only
+
+Unity-generated data, personalised digital twins, and model-generated labels may support
+pretraining, ablations, and rare-case coverage. They do not independently validate the
+same assumptions used to generate them.
+
+## Initial benchmark tracks
+
+- Temporally stable 2D surface landmarks
+- Ear articulation and facial landmark tracking
+- Tail centreline and curvature tracking
+- Calibrated 3D surface reconstruction on the gold subset
+- Paw contact, gait events, take-off, and landing
+- Occlusion recovery and long-horizon drift
+- Scene-relative position and support-surface reasoning
+- Confidence and uncertainty calibration
+- Edge deployment accuracy, latency, memory, power, and thermal behaviour
+
+## Product boundary
+
+The first consumer “translator” may use measured motion to create playful,
+clearly-labelled entertainment outputs. It must not imply literal semantic translation.
+
+Pain, health, welfare, or diagnostic inference is a separate research and validation
+programme. This repository produces measurement infrastructure, not veterinary claims.
+
+## First public milestone
+
+**CatPose Benchmark Protocol v0.1** should ship before model-building begins. It must
+include:
+
+- observable/latent ontology;
+- keypoint and curve topology;
+- provenance and uncertainty schema;
+- minimal CatPose Portal experiment;
+- real-home challenge taxonomy;
+- metrics and acceptance gates;
+- consent and redistribution requirements;
+- one small demonstration sequence and Unity inspection view.
+
+## Repository map
+
+```text
 docs/
-  PRIOR-ART-AND-LICENCE-SURVEY.md   what exists, what it permits, where the gap is
-  OPEN-DECISIONS.md                 the hold list; what must be settled before building
-  BENCHMARK-PROTOCOL-DRAFT.md       real-environment stratification axes
-  KEYPOINT-TOPOLOGY-DRAFT.md        proposed skeleton + compatibility with existing sets
-  LICENSING-POLICY.md               contamination rules + outbound licence decision
+  RESEARCH-CHARTER.md               locked research question, hypotheses, and gates
+  GROUND-TRUTH-PROVENANCE.md        observation tiers, uncertainty, and anti-circularity
+  BENCHMARK-PROTOCOL-DRAFT.md       capture tiers, evaluation tracks, and v0 experiment
+  STAGE-0-PORTAL-GEOMETRY.md        rigid-target mirror-layout experiment and gates
+  KEYPOINT-TOPOLOGY-DRAFT.md        proposed landmarks and compatibility constraints
+  PRIOR-ART-AND-LICENCE-SURVEY.md   existing resources and licence status
+  LICENSING-POLICY.md               contamination and release constraints
+  OPEN-DECISIONS.md                 unresolved choices that block collection
+
+schemas/
+  observation.schema.json           machine-readable observation/provenance draft
+
+stage0/
+  layouts.json                      nominal mirror planes and camera assumptions
+  geometry_sim.py                   virtual-camera conditioning and covariance simulation
+  geometry-conditioning-report.json generated nominal comparison; not measured evidence
+  test_geometry_sim.py              reflection and triangulation invariants
 ```

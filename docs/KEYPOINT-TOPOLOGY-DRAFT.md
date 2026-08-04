@@ -1,126 +1,213 @@
-# Keypoint topology — DRAFT
+# Observable topology — DRAFT v0.1
 
-**Status: DRAFT, nothing decided.** This is the single most consequential design choice
-in the project — it determines what the benchmark can measure, what downstream products
-can express, and whether anyone else can use the result. Changing it after data
-collection means recollecting.
+**Status:** direction resolved; exact pilot targets remain open.
 
----
+The canonical benchmark representation should describe what can actually be observed:
+points, curves, regions, contacts, visibility, and uncertainty. A conventional fixed
+keypoint skeleton remains available as a compatibility export.
 
-## The design tension
+## Design rules
 
-Two goals pull in opposite directions:
+1. **Prefer visible surface anatomy over hidden joint centres.**
+2. **Represent deformable structures as curves or regions when points discard the
+   signal.**
+3. **Do not force an exact label when the feature is occluded or anatomically ambiguous.**
+4. **Store left/right semantic identity separately from image order.**
+5. **Permit task-specific detail:** full-body footage and close facial footage need not
+   expose identical landmark density.
+6. **Preserve compatibility through exports, not by weakening the canonical format.**
+7. **Every target carries visibility, evidence tier, quality, and uncertainty.**
 
-- **Compatibility.** A skeleton that is a strict superset of AP-10K's 17 keypoints can
-  be evaluated against existing models and reuses the field's tooling. Adoption is
-  easier.
-- **Sufficiency.** The entire reason this project exists is that existing skeletons
-  cannot express ear and tail state. A skeleton that compromises on those reproduces the
-  gap it was built to close.
+## Canonical target families
 
-**Recommended resolution: strict superset.** Keep AP-10K's 17 exactly, in their order,
-then append. Costs nothing, buys cross-evaluation, and the appended points carry the
-contribution. **OPEN** for the research pass to overturn.
+### Face and head
 
----
+#### Pilot-required
 
-## Existing skeletons, for reference
+- `nose_tip`
+- `left_eye_outer`
+- `left_eye_inner`
+- `right_eye_inner`
+- `right_eye_outer`
+- `chin_visible`
+- `head_crown_visible`
 
-| Set | Count | Ear coverage | Tail coverage |
-|---|---|---|---|
-| AP-10K / APT-36K | 17 | **none** | 1 (root only) |
-| Animal-Pose | 20 | 2 earbases | 1 (tailbase) |
-| DLC multi-animal | 20 | 2 ears | 3 (base→tip) |
-| CatFLW | 48 facial | facial landmarks incl. ear region | **none** (face only) |
+Eye corners support eye aperture and blink measurements when image resolution permits.
+`chin_visible` and `head_crown_visible` are surface targets, not claims about internal
+head axes.
 
-Nothing published covers ear *articulation* (rotation and independent movement) or tail
-shape beyond three points. Cat ears rotate ~180° independently — a single point per ear
-cannot represent that, and ear rotation is one of the most information-dense signals in
-feline body language.
+#### Optional close-range face profile
 
----
+A later face-specific profile may add eyelid, muzzle, mouth, and whisker-pad boundaries.
+These points should not be required in wide full-body footage where they are not
+resolvable.
 
-## Draft proposal — 34 keypoints
+### Ears
 
-### Block 1 — AP-10K compatible core (1–17), unchanged
+Each ear requires enough geometry to distinguish orientation and deformation rather than
+one undifferentiated “ear point”.
 
-`1 L_eye · 2 R_eye · 3 nose · 4 neck · 5 tail_root · 6 L_shoulder · 7 L_elbow ·
-8 L_front_paw · 9 R_shoulder · 10 R_elbow · 11 R_front_paw · 12 L_hip · 13 L_knee ·
-14 L_back_paw · 15 R_hip · 16 R_knee · 17 R_back_paw`
+Pilot candidates per ear:
 
-### Block 2 — Ear articulation (18–23) — **the contribution**
+- `ear_tip`
+- `ear_base_rostral_visible`
+- `ear_base_caudal_visible`
+- optional sampled outer boundary curve
 
-| # | Point | Rationale |
-|---|---|---|
-| 18 | L_ear_base_front | Base pair defines the ear's mounting axis |
-| 19 | L_ear_base_back | With 18, gives rotation about the vertical |
-| 20 | L_ear_tip | With 18–19, gives pitch/flatten state |
-| 21 | R_ear_base_front | |
-| 22 | R_ear_base_back | |
-| 23 | R_ear_tip | |
+The base targets are explicitly visible surface locations. Long fur, viewpoint, or
+self-occlusion may make one or both unavailable; this becomes missing or uncertain data,
+not a guessed exact point.
 
-Three points per ear is the minimum that distinguishes **rotation** (swivelled back,
-listening behind) from **flattening** (airplane ears, defensive) — two states with
-completely different meanings that a single ear point collapses into one.
+Derived measurements may include:
 
-**Known risk:** ear-base points are exactly what long fur occludes (benchmark stratum
-A4) and what dark solid coats hide (A1). Expect these to be the lowest-accuracy points
-in the set. That is a finding worth publishing, not a reason to drop them.
+- ear direction in image or world coordinates;
+- left/right ear angular difference;
+- flattening proxy from visible geometry;
+- angular velocity and flick timing.
 
-### Block 3 — Tail chain (24–28)
+### Body surface and centreline
 
-`24 tail_base (≡ 5, or replacing it) · 25 tail_q1 · 26 tail_mid · 27 tail_q3 · 28 tail_tip`
+Pilot candidates:
 
-Five points along the tail. Rationale: a cat tail is a continuous curve whose *shape*
-carries the signal — question-mark hook, bottle-brush, low swish, tip-flick. Three
-points cannot represent an S-curve; five can approximate one.
+- `neck_dorsal_visible`
+- `withers_visible`
+- `spine_mid_visible`
+- `sacrum_visible`
+- optional dorsal centreline curve
+- body silhouette or mask
 
-**OPEN:** whether 24 duplicates keypoint 5 or replaces it. Duplication preserves strict
-AP-10K compatibility at the cost of a redundant point. Recommend duplicate.
+These targets support posture and curvature without claiming exact vertebral centres.
+The silhouette remains important because fur and body deformation cannot be represented
+fully by a sparse skeleton.
 
-**OPEN:** is a fixed-count chain even right? Tail visible length varies enormously with
-pose and occlusion. Alternatives: fixed count with visibility flags (simple, standard,
-recommended for v1) versus a parametric curve fit (more faithful, non-standard, harder
-to evaluate and for others to adopt).
+### Limbs and paws
 
-### Block 4 — Head orientation and posture (29–34)
+For each limb, pilot candidates include externally resolvable surface locations:
 
-| # | Point | Rationale |
-|---|---|---|
-| 29 | head_top | Head pitch; head position is an FGS action unit |
-| 30 | chin | With 29 and 3, a head orientation frame |
-| 31 | L_whisker_pad | Muzzle tension proxy — an FGS action unit |
-| 32 | R_whisker_pad | |
-| 33 | withers | Spine line start; back-arch detection |
-| 34 | spine_mid | With 4, 33, 5: posture curvature (arched, crouched, elongated) |
+- upper-limb or shoulder/hip surface anchor;
+- elbow or stifle visible centre;
+- carpus or hock visible centre;
+- paw centre or paw contact region.
 
-**OPEN and important:** points 31–32 are FGS-adjacent (muzzle tension is a pain action
-unit). Including them is fine for a *research benchmark*, but any consumer product
-reading them edges toward welfare inference and re-triggers the medical framing and vet
-review. **The skeleton may legitimately measure more than a product is allowed to say.**
-Keep that boundary explicit in product specs rather than by omitting points here.
+Names must distinguish `*_visible` surface observations from optional `*_joint_estimate`
+latent anatomy.
 
----
+Paw contact is represented separately from paw appearance because an instrumented or
+underside view may know contact precisely even when the paw is partly hidden in the
+ordinary camera.
 
-## Not included, deliberately
+### Tail
 
-- **Full facial landmarks (CatFLW's 48).** Out of scope: a different task (facial action
-  analysis), a different capture regime (close-range), and the existing work there is
-  CC BY-NC so there is no compatibility benefit to chase.
-- **Individual toe/claw points.** Not resolvable at consumer video quality.
-- **3D depth.** V1 is 2D. 3D is a later question and depends on the synthetic pipeline
-  emitting depth, which Unity Perception can do — noted, not scoped.
+The canonical tail representation is an ordered centreline curve:
 
----
+```text
+tail_base_anchor
++ ordered visible/estimated curve samples
++ tail_tip when resolvable
+```
 
-## Open questions for the research pass
+Each sample may have its own visibility, evidence tier, and uncertainty. The curve may be
+stored as:
 
-1. Strict AP-10K superset, or design fresh for cat anatomy and accept incompatibility?
-2. Three points per ear, or is two sufficient in practice at consumer resolution?
-3. Tail as fixed chain with visibility flags, or parametric curve?
-4. Include the FGS-adjacent points (31–32) in a public research benchmark, given the
-   product-side constraints they imply?
-5. Are per-keypoint OKS sigmas estimable, or does the benchmark report PCK only?
-6. Does the synthetic pipeline emit **occlusion** and **self-occlusion** flags per
-   keypoint? Unity can, real annotation must match, and it changes the annotation
-   protocol. Decide before either begins.
+- sampled 2D/3D points at normalised arc-length positions; or
+- a documented spline with control-point uncertainty.
+
+Derived measurements may include:
+
+- elevation and direction;
+- arc length visible;
+- local and integrated curvature;
+- curvature change;
+- tip velocity;
+- travelling wave or isolated flick timing.
+
+A fixed three- or five-point tail chain is generated only for model compatibility.
+
+### Contact and support
+
+Canonical contact observations are events or regions, not keypoints:
+
+- paw identity;
+- contact region;
+- start and end time with temporal uncertainty;
+- support-surface identifier;
+- take-off or landing role;
+- optional pressure or force values where independently measured.
+
+### Scene-relative targets
+
+Where a scene map is available:
+
+- camera pose distribution;
+- subject root or surface trajectory;
+- floor and support surfaces;
+- contact surface relation;
+- obstacle and occluder identity;
+- object-relative relations.
+
+Scene-derived coordinates inherit map and calibration uncertainty.
+
+## Latent anatomical profile
+
+Hidden joint centres may be exported under explicit names such as:
+
+- `left_shoulder_joint_estimate`
+- `left_hip_joint_estimate`
+- `left_stifle_joint_estimate`
+
+These observations must use an inferred evidence tier and carry a distribution or
+confidence region. They are optional in v0 and cannot be evaluated as independent gold
+unless a separate anatomical measurement validates them.
+
+## Compatibility export
+
+A compatibility adapter may emit a conventional quadruped keypoint array for existing
+pose frameworks. It should:
+
+- map canonical surface observations to the closest declared semantic target;
+- mark unavailable or non-equivalent targets explicitly;
+- export tail base/mid/tip samples from the canonical curve;
+- avoid fabricating hidden joints merely to fill every array position;
+- document any dependence on an external dataset ontology or licence.
+
+Compatibility order is not the canonical ontology. It may change without recollecting
+data as long as source observations remain intact.
+
+## Proposed pilot subset
+
+The smallest portal pilot should attempt:
+
+- nose and four eye corners when visible;
+- three surface targets per ear;
+- dorsal neck, withers, spine midpoint, and sacrum targets;
+- visible distal limb points and paw centres;
+- paw-contact regions where available;
+- tail base and centreline curve;
+- body mask;
+- visibility and covariance for every target.
+
+This is deliberately not yet a frozen numbered list. The rigid-object and articulated
+object experiments must establish whether the mirror geometry can measure the intended
+precision and whether each target has an operationally repeatable definition.
+
+## Annotation questions to resolve
+
+1. Which ear-base surface locations can independent annotators identify consistently?
+2. Should eye aperture be represented by corner points, eyelid curves, a scalar, or more
+   than one of these?
+3. Which limb surface landmarks remain repeatable across coat types?
+4. What tail sampling density captures curvature without creating unstable labels?
+5. How are curve samples matched through self-occlusion and topology ambiguity?
+6. Which targets become absent rather than inferred after a visibility threshold?
+7. Which compatibility formats are worth supporting in v0?
+8. What minimum image scale is required for each target family?
+
+## Freeze condition
+
+The pilot topology may be frozen only after:
+
+- written operational definitions exist;
+- repeated annotation or measurement estimates uncertainty;
+- rigid and articulated tests confirm sufficient geometry;
+- the portal pilot demonstrates that targets can be captured without coercion;
+- the compatibility export can be generated without silently inventing labels.

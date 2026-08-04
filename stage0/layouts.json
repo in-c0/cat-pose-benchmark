@@ -1,0 +1,68 @@
+{
+  "schema_version": "0.2.0",
+  "units": "metres",
+  "notes": [
+    "Mirror-plane normals are sign-invariant.",
+    "Mirror size is [width, height] along the derived in-plane horizontal and vertical axes.",
+    "The dimensions are Stage 0 starting points, not a construction drawing."
+  ],
+  "camera": {
+    "class": "colour global-shutter machine-vision camera",
+    "resolution_px": [1920, 1200],
+    "frame_rate_fps": 60,
+    "fx_px": 1100.0,
+    "fy_px": 1100.0,
+    "cx_px": 960.0,
+    "cy_px": 600.0,
+    "centre_m": [0.0, -1.2, 0.55],
+    "look_at_m": [0.0, 0.3, 0.32],
+    "pixel_sigma_px": 0.35
+  },
+  "capture_volume": {
+    "min_m": [-0.3, -0.05, 0.05],
+    "max_m": [0.3, 0.65, 0.65],
+    "samples_xyz": [5, 5, 5]
+  },
+  "layouts": {
+    "A_symmetric_lateral": {
+      "description": "Direct view plus two symmetric lateral reflected views.",
+      "nominal_frame_m": [0.8, 1.3, 0.95],
+      "mirrors": [
+        {
+          "name": "left",
+          "size_m": [1.0, 0.9],
+          "plane_point_m": [-0.5, 0.1, 0.45],
+          "plane_normal": [-0.939692621, 0.342020143, 0.0],
+          "vertical_axis": [0.0, 0.0, 1.0]
+        },
+        {
+          "name": "right",
+          "size_m": [1.0, 0.9],
+          "plane_point_m": [0.5, 0.1, 0.45],
+          "plane_normal": [0.939692621, 0.342020143, 0.0],
+          "vertical_axis": [0.0, 0.0, 1.0]
+        }
+      ]
+    },
+    "B_lateral_pitched": {
+      "description": "Direct view plus one lateral and one elevated-lateral reflected view.",
+      "nominal_frame_m": [0.8, 1.3, 1.05],
+      "mirrors": [
+        {
+          "name": "left_pitched",
+          "size_m": [1.0, 0.9],
+          "plane_point_m": [-0.5, 0.2, 0.55],
+          "plane_normal": [-0.85165074, 0.397131262, 0.342020143],
+          "vertical_axis": [0.0, 0.0, 1.0]
+        },
+        {
+          "name": "right",
+          "size_m": [1.0, 0.9],
+          "plane_point_m": [0.5, 0.1, 0.45],
+          "plane_normal": [0.939692621, 0.342020143, 0.0],
+          "vertical_axis": [0.0, 0.0, 1.0]
+        }
+      ]
+    }
+  }
+}
