@@ -4,17 +4,19 @@ on:
   push:
     paths:
       - "stage0/**"
+      - "schemas/stage0-capture-manifest.schema.json"
       - ".github/workflows/stage0-tests.yml"
   pull_request:
     paths:
       - "stage0/**"
+      - "schemas/stage0-capture-manifest.schema.json"
       - ".github/workflows/stage0-tests.yml"
 
 permissions:
   contents: read
 
 jobs:
-  test:
+  geometry:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -32,7 +34,7 @@ jobs:
       - name: Install dependency
         run: python -m pip install --disable-pip-version-check numpy
 
-      - name: Run unit tests
+      - name: Run geometry unit tests
         run: python -m unittest stage0.test_geometry_sim
 
       - name: Regenerate nominal report
@@ -48,3 +50,40 @@ jobs:
             /tmp/geometry-conditioning-report.json \
             --abs-tol 1e-8 \
             --rel-tol 1e-10
+
+  metadata-and-target:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --disable-pip-version-check \
+            jsonschema \
+            numpy \
+            opencv-contrib-python-headless \
+            pillow
+
+      - name: Test target and manifest tools
+        run: |
+          python -m unittest \
+            stage0.test_target_generator \
+            stage0.test_capture_manifest
+
+      - name: Generate low-resolution target dry run
+        run: |
+          python stage0/generate_target.py \
+            --output-dir /tmp/catpose-target \
+            --dpi 72
+
+      - name: Validate example capture manifest
+        run: |
+          python stage0/validate_capture_manifest.py \
+            stage0/example-capture-manifest.json
