@@ -70,7 +70,11 @@
           ],
           "items": false
         },
-        "vertical_fov_degrees": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 180},
+        "vertical_fov_degrees": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 180
+        },
         "position_world_m": {"$ref": "#/$defs/vector3"},
         "look_at_world_m": {"$ref": "#/$defs/vector3"},
         "screen_origin": {"const": "bottom_left"}
@@ -130,18 +134,23 @@
   },
   "$defs": {
     "vector2": {
-      "type": "array",
-      "prefixItems": [{"type": "number"}, {"type": "number"}],
-      "items": false
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": {"type": "number"},
+        "y": {"type": "number"}
+      }
     },
     "vector3": {
-      "type": "array",
-      "prefixItems": [
-        {"type": "number"},
-        {"type": "number"},
-        {"type": "number"}
-      ],
-      "items": false
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "z"],
+      "properties": {
+        "x": {"type": "number"},
+        "y": {"type": "number"},
+        "z": {"type": "number"}
+      }
     },
     "landmark": {
       "type": "object",
@@ -173,7 +182,9 @@
       "required": ["subject_id", "relation", "object_id"],
       "properties": {
         "subject_id": {"type": "string", "minLength": 1},
-        "relation": {"enum": ["on", "under", "inside", "behind", "approaching", "retreating"]},
+        "relation": {
+          "enum": ["on", "under", "inside", "behind", "approaching", "retreating"]
+        },
         "object_id": {"type": "string", "minLength": 1}
       }
     },
