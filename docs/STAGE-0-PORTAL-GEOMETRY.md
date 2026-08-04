@@ -15,10 +15,13 @@ estimate error and validate monocular outputs.
 ## Why Stage 0 precedes model work
 
 A reflected image is equivalent to observing the scene from a virtual camera, but mirror
-calibration has parity, handedness, plane-estimation, and degeneracy failure modes. A
-small reprojection error can still hide a wrong reflected-camera convention. Stage 0
-therefore uses a rigid 3D object with withheld check points before any deformable target
-or animal is introduced.
+calibration has parity, handedness, plane-estimation, finite-aperture, and degeneracy
+failure modes. A small reprojection error can still hide a wrong reflected-camera
+convention. A large virtual baseline is also meaningless when the reflected ray misses
+the physical mirror.
+
+Stage 0 therefore uses a rigid 3D object with withheld check points before any deformable
+target or animal is introduced.
 
 Relevant starting references:
 
@@ -49,8 +52,8 @@ The Stage 0 simulator and later Unity viewer use:
 - physical-camera frame: `+x` right, `+y` down, `+z` forward.
 
 Every exported transform must state whether it maps `world -> camera` or
-`camera -> world`. Mirrored observations also record whether parity correction has been
-applied.
+`camera -> world`. Mirrored observations also record whether reflected-image parity has
+been retained or explicitly corrected.
 
 ## Nominal capture volume
 
@@ -109,6 +112,11 @@ Stage 0 itself uses no animal.
 The dimensions below are starting points encoded in
 [`stage0/layouts.json`](../stage0/layouts.json). They are deliberately adjustable.
 
+The first unconstrained simulation included a nominal overhead mirror that created an
+attractive virtual baseline but no valid reflected paths through the specified finite
+mirror. That configuration was rejected before construction. The current candidates
+must pass both mirror-aperture and physical-sensor visibility tests.
+
 ## Layout A — symmetric lateral
 
 ```text
@@ -124,8 +132,8 @@ top view
 
 Nominal construction:
 
-- frame: approximately 0.75 m wide x 1.20 m deep x 0.90 m high;
-- two vertical first-surface mirrors, approximately 0.45 m x 0.80 m each;
+- frame: approximately 0.80 m wide x 1.30 m deep x 0.95 m high;
+- two vertical first-surface mirrors, approximately 1.00 m x 0.90 m each;
 - mirrored planes placed symmetrically around the direct view;
 - one direct view plus two lateral reflected views.
 
@@ -142,38 +150,57 @@ Expected weaknesses:
 - paws, back, and tail can share similar occlusion patterns;
 - mirror area may compete with direct-view resolution.
 
-## Layout B — lateral plus overhead
+## Layout B — lateral plus pitched lateral
 
 ```text
-side/front concept
+front/oblique concept
 
-             tilted overhead mirror
-                    /
-                   /
-          capture volume ---- side mirror
+ pitched left mirror       vertical right mirror
+          \                     /
+           \  capture volume   /
                    |
              physical camera
 ```
 
 Nominal construction:
 
-- frame: approximately 0.75 m wide x 1.20 m deep x 1.20 m high;
-- one vertical side mirror, approximately 0.45 m x 0.80 m;
-- one tilted overhead mirror, approximately 0.70 m x 0.50 m;
-- one direct, one lateral, and one elevated reflected view.
+- frame: approximately 0.80 m wide x 1.30 m deep x 1.05 m high;
+- one vertical side mirror, approximately 1.00 m x 0.90 m;
+- one side mirror pitched upward, approximately 1.00 m x 0.90 m;
+- one direct, one lateral, and one elevated-lateral reflected view.
 
 Expected strengths:
 
-- greater baseline diversity;
-- better conditioning for depth in some regions;
-- complementary visibility for back, ears, tail curvature, and self-occlusion.
+- greater elevation diversity without an impractical overhead ray path;
+- complementary visibility for the back, ears, tail curvature, and self-occlusion;
+- slightly larger simulated common visible volume and lower error anisotropy.
 
 Expected weaknesses:
 
-- less symmetric error;
-- a larger enclosure;
-- harder mirror support and masking;
-- the overhead reflection may receive fewer usable pixels.
+- asymmetric error and image regions;
+- harder mirror support and calibration;
+- the pitched reflected region approaches the top of the nominal sensor;
+- construction tolerances may erase the simulated advantage.
+
+## Current finite-aperture simulation
+
+Assumptions:
+
+- 1920 x 1200 sensor;
+- nominal 1100-pixel focal lengths;
+- 0.35-pixel independent image-point standard deviation;
+- ideal planar mirrors;
+- a 5 x 5 x 5 sample grid through the nominal capture volume;
+- no lens distortion, mounting flex, occlusion, or correspondence errors.
+
+| Layout | Three-view common coverage | Median radial SD | p95 radial SD | p95 anisotropy |
+|---|---:|---:|---:|---:|
+| A — symmetric lateral | 92.0% | 0.656 mm | 0.813 mm | 1.530 |
+| B — lateral pitched | 95.2% | 0.652 mm | 0.826 mm | 1.511 |
+
+The differences are too small and assumption-dependent to select a winner. Layout A is
+marginally better on nominal p95 radial uncertainty; Layout B is marginally better on
+coverage and isotropy. Both proceed to physical comparison.
 
 ## Selection rule
 
@@ -185,11 +212,11 @@ Select the first physical layout using this priority order:
 2. low holdout-point error and calibrated uncertainty;
 3. sufficient usable capture volume;
 4. complementary visibility;
-5. image area per view;
+5. image area and resolvable detail per view;
 6. build simplicity and safety.
 
-If Layout B provides materially better depth conditioning but unreliable mounting,
-Layout A remains the reference rig and the overhead view becomes an optional extension.
+If the pitched mirror provides useful elevation diversity but unreliable mounting,
+Layout A remains the reference rig and pitch becomes a later optional extension.
 
 # Rigid target
 
@@ -227,10 +254,20 @@ python -m pip install numpy
 python stage0/geometry_sim.py \
   --config stage0/layouts.json \
   --output stage0/geometry-conditioning-report.json
+python -m unittest stage0.test_geometry_sim
 ```
 
-The simulator compares direct plus one reflection and direct plus two reflections. It is
-not a renderer and does not claim physical accuracy.
+The simulator:
+
+- applies the exact planar-reflection affine transformation;
+- preserves reflected-image parity in the projection matrix;
+- verifies that object-to-virtual-camera rays hit the finite mirror rectangle;
+- verifies that projected points remain inside the physical sensor;
+- reports reflected image-region bounds and common-view coverage;
+- propagates assumed point-detection noise through triangulation.
+
+It is not a renderer and does not claim physical accuracy. Its purpose is to reject
+geometrically impossible layouts before purchasing or building hardware.
 
 ## 0B — intrinsic calibration
 
@@ -252,7 +289,8 @@ Required checks:
 - correct virtual rear-view convention;
 - independent plane estimate from multiple target poses;
 - bundle adjustment over physical camera, mirror planes, and target poses;
-- comparison against a separately measured mirror plane where practical.
+- comparison against a separately measured mirror plane where practical;
+- measured finite-mirror boundary masks rather than an infinite-plane assumption.
 
 ## 0D — static volume sweep
 
@@ -314,7 +352,7 @@ coverage.
 The minimal Unity scene must show:
 
 - physical camera;
-- mirror planes;
+- finite mirror planes and boundaries;
 - virtual camera centres;
 - direct and reflected rays;
 - target points and reconstructed points;
@@ -322,7 +360,8 @@ The minimal Unity scene must show:
 - covariance ellipsoids;
 - capture-volume boundaries;
 - coordinate axes and transform direction;
-- parity state for each reflected view.
+- parity state for each reflected view;
+- reflected sensor regions and invalid rays.
 
 Unity and the offline calibration code must reconstruct the same test points within
 floating-point tolerance. A visually plausible but convention-inconsistent scene fails
