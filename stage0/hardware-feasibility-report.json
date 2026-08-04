@@ -1,0 +1,55 @@
+{
+  "schema_version": "0.1.0",
+  "budget_aud": 300.0,
+  "minimum_reference_purchase_example_aud": 1623.4,
+  "budget_multiple": 5.411333333333333,
+  "purchase_feasible": false,
+  "candidates": [
+    {
+      "candidate_id": "small_sensor_usb3",
+      "camera_examples": [
+        "Basler a2A1920-160ucBAS",
+        "Teledyne FLIR BFS-U3-23S3C-C"
+      ],
+      "lens_focal_length_mm": 4.0,
+      "horizontal_fov_degrees": 79.2495132184858,
+      "vertical_fov_degrees": 54.72312964054159,
+      "spans": [
+        {"distance_m": 0.9, "horizontal_span_m": 1.4903999999999997, "vertical_span_m": 0.9315},
+        {"distance_m": 1.0, "horizontal_span_m": 1.6559999999999997, "vertical_span_m": 1.035},
+        {"distance_m": 1.2, "horizontal_span_m": 1.9871999999999996, "vertical_span_m": 1.2419999999999998}
+      ],
+      "data_rates": {
+        "target": {"frame_rate_hz": 60.0, "raw_bayer8_mb_per_s": 138.24, "raw_bayer8_gb_per_min": 8.2944},
+        "maximum": {"frame_rate_hz": 160.0, "raw_bayer8_mb_per_s": 368.64, "raw_bayer8_gb_per_min": 22.1184}
+      },
+      "bytes_for_100_bayer8_frames": 230400000
+    },
+    {
+      "candidate_id": "large_sensor_usb3",
+      "camera_examples": ["Basler acA1920-155uc"],
+      "lens_focal_length_mm": 6.5,
+      "horizontal_fov_degrees": 81.75086454311561,
+      "vertical_fov_degrees": 56.81995694045125,
+      "spans": [
+        {"distance_m": 0.9, "horizontal_span_m": 1.5578584615384616, "vertical_span_m": 0.9736615384615386},
+        {"distance_m": 1.0, "horizontal_span_m": 1.7309538461538463, "vertical_span_m": 1.081846153846154},
+        {"distance_m": 1.2, "horizontal_span_m": 2.0771446153846154, "vertical_span_m": 1.2982153846153845}
+      ],
+      "data_rates": {
+        "target": {"frame_rate_hz": 60.0, "raw_bayer8_mb_per_s": 138.24, "raw_bayer8_gb_per_min": 8.2944},
+        "maximum": {"frame_rate_hz": 164.0, "raw_bayer8_mb_per_s": 377.856, "raw_bayer8_gb_per_min": 22.67136}
+      },
+      "bytes_for_100_bayer8_frames": 230400000
+    }
+  ],
+  "decision": {
+    "purchase_reference_rig": "rejected",
+    "reason": "Even a body, lens, and two undersized first-surface mirrors exceed the full budget by more than five times.",
+    "next_path": [
+      "borrow camera, matched lens, and first-surface mirrors for reference capture",
+      "use existing printer and ordinary mirrors only for engineering-preview mock-up",
+      "split Stage 0 into compact optical proof and borrowed full-volume validation"
+    ]
+  }
+}
