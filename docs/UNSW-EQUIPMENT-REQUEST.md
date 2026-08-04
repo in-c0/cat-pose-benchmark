@@ -1,71 +1,73 @@
-# UNSW equipment and facility request
+# Optional external validation partner request
 
-## Purpose
+This template is **not** a request for the project lead to borrow equipment and operate a
+rig. It is for identifying an institutional partner willing to own and perform a small,
+independent validation study under the CatPose external-validation contract.
 
-Request short-term access or a referral for the animal-free Stage 0 validation of an
-open feline pose benchmark. The experiment uses only a printed rigid calibration target;
-no animals, people, clinical samples, or medical claims are involved at this stage.
+## Subject
 
-## Request text
+Collaboration enquiry: independent validation for an open feline computer-vision benchmark
 
-> Hello,
->
-> I am a UNSW Master of IT (AI) student developing an open-source benchmark and capture
-> methodology for temporally stable feline pose estimation. Before any animal footage is
-> considered, I am validating the measurement geometry using an asymmetric rigid
-> calibration target.
->
-> I am looking for short-term access, a loan, or a referral for some combination of:
->
-> - a colour global-shutter USB3 machine-vision camera around 1920 × 1200 at 60 fps or
->   above, such as a Basler ace/ace 2 or Teledyne FLIR Blackfly S;
-> - a matched C-mount lens giving roughly 80° horizontal field of view—approximately
->   4 mm for a 1/2.3-inch sensor or 6–7 mm for a 1/1.2-inch sensor;
-> - two planar first-surface mirrors and stable adjustable mounts;
-> - digital calipers and a method for measuring mirror plane/angle and target geometry;
-> - flicker-controlled diffuse lighting and safe bench space;
-> - alternatively, access to a synchronized multi-camera or Vicon system for independent
->   3D validation.
->
-> The first session would record only a printed rigid ChArUco target. I have a
-> pre-registered protocol, capture metadata schema, geometry simulation, holdout-point
-> evaluation, and Unity visualization ready. Raw data and results will distinguish
-> measured evidence from simulation and pseudo-labels.
->
-> The intended initial access is approximately half a day for equipment inspection,
-> field-of-view testing, calibration, and a repeated static target sweep. I can adapt the
-> setup to equipment already available and follow all facility inductions and safety
-> requirements.
->
-> Could you advise whether your facility has relevant equipment, or direct me to the
-> appropriate UNSW technical contact?
->
-> Thank you,
-> Ji
+## Message
+
+Hello,
+
+I am developing an open, software-first benchmark for monocular feline pose and temporal
+motion analysis. The public project uses Unity-generated exact annotations and
+licence-clean real video with observable labels. It intentionally does not require the
+lead developer to build or operate bespoke physical apparatus.
+
+I am seeking a laboratory or facility interested in independently operating a small
+hidden-gold validation study. The project would provide the ontology, schemas, automated
+QA, calibration manifests, prediction interface, and evaluation code. The partner would
+own all physical setup, operation, safety, ethics, animal-welfare, consent, and data
+custody.
+
+Potential measurement methods include:
+
+- synchronized calibrated RGB cameras;
+- Vicon or another motion-capture system;
+- calibrated RGB-D or photogrammetry;
+- pressure walkway or contact instrumentation;
+- a mirror-based simultaneous-view setup;
+- another traceable method your laboratory considers more appropriate.
+
+The initial study can be extremely small and may remain private behind a remote
+evaluation service. The goal is to evaluate a few externally observable surface points,
+tail geometry, timing, contact, or metric 3D variables without claiming medical or
+behavioural diagnosis.
+
+Would your group be open to a short discussion about:
+
+1. suitable measurement capabilities already operated by your staff;
+2. whether an existing ethically approved dataset could satisfy part of the interface;
+3. a partner-operated pilot with the project providing software only;
+4. data custody, attribution, publication, and collaboration terms?
+
+The current protocol and interface are documented in the repository under
+`docs/EXTERNAL-VALIDATION-CONTRACT.md`.
+
+Kind regards,
+Ava Kim
+
+## Relevant UNSW capability classes
+
+Potential pathways include groups operating:
+
+- human or animal motion capture;
+- close-range photogrammetry and spatial measurement;
+- optical testing and calibration;
+- veterinary or animal-behaviour research;
+- research software and data infrastructure.
+
+Availability of any specific camera, mirror, Vicon setup, or animal protocol must not be
+assumed from a public facility page. The enquiry asks whether a group wants to operate
+the validation, not whether equipment can be handed to the project lead.
 
 ## Information to attach
 
 - repository: `in-c0/cat-pose-benchmark`;
-- Stage 0 protocol: `docs/STAGE-0-PORTAL-GEOMETRY.md`;
-- hardware feasibility decision: `docs/STAGE-0-HARDWARE-FEASIBILITY.md`;
-- target and capture contract: draft PR #5;
-- explicit statement: no animal recording in Stage 0.
-
-## Contact order
-
-1. **UNSW Human Movement Laboratories** — ask about synchronized Vicon or markerless
-   validation and appropriate collaboration pathway.
-2. **UNSW Optics and Radiometry Laboratory** — ask about optical calibration expertise,
-   first-surface mirrors, plane measurement, or referral.
-3. **SAGE Laboratory** — ask about close-range photogrammetry, dimensional survey, and
-   target measurement.
-4. **UNSW Making / MCIC / Engineering Makerspaces** — ask for target fabrication,
-   printing, mounts, workbench space, calipers, and safe mirror supports.
-5. **Making Centre Resource Centre** — request consumer camera and lighting only for the
-   non-metric Stage 0M mock-up.
-
-## Acceptance rule
-
-Do not interpret a generic camera loan as a reference-rig solution. Record exact camera,
-sensor, shutter, lens, mirror dimensions, mounting method, timestamps, and raw-output
-capability before accepting the equipment for Stage 0R.
+- software-first roadmap: `docs/SOFTWARE-FIRST-ROADMAP.md`;
+- external validation interface: `docs/EXTERNAL-VALIDATION-CONTRACT.md`;
+- observation provenance: `docs/GROUND-TRUTH-PROVENANCE.md`;
+- explicit statement: the project lead will not operate specialised physical equipment.
