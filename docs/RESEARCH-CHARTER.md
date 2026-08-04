@@ -1,15 +1,20 @@
 # Research charter
 
-**Status:** direction v0.1, approved for specification work  
+**Status:** direction v0.2, approved for software-first implementation  
 **Date:** 2026-08-04
 
 ## Programme objective
 
 Create an open, reproducible visual-intelligence benchmark for domestic cats that
-measures pose, face, ears, tail, contact, and scene-relative motion over time, while
+measures pose, face, ears, tail, contact, and scene-relative motion over time while
 representing uncertainty honestly.
 
-The benchmark is intended to support three connected outcomes:
+The programme is intentionally structured so the lead developer performs no bespoke
+physical capture, rig construction, calibration-lab work, or hardware fabrication.
+Physical activity is limited to ordinary user testing of an eventual app or manufactured
+product.
+
+The benchmark supports three connected outcomes:
 
 1. a credible open research contribution;
 2. a monocular consumer application with playful, non-medical outputs;
@@ -19,53 +24,70 @@ The benchmark is intended to support three connected outcomes:
 ## Central research question
 
 > Can an ordinary monocular RGB system recover temporally stable feline surface pose and
-> motion with calibrated uncertainty, when evaluated against a compact set of
-> independently measured geometric and contact observations?
+> motion with calibrated uncertainty, learning from exact simulation and observable real
+> video, and later passing an independently operated hidden-gold evaluation?
 
-The product system is monocular. Specialised capture is used only to establish reliable
-reference measurements.
+The product system is monocular. Any specialised physical measurement is performed by an
+external partner under a published protocol and is not a prerequisite for the first
+public benchmark release.
 
 ## Methodological thesis
 
 Ground truth is not one complete skeleton attached to every frame.
 
 A real cat is only partially observable. Different sources measure different variables,
-and their reliability changes with viewpoint, motion, fur, lighting, and occlusion.
-Therefore, the benchmark will store a graph of observations with provenance and
-uncertainty rather than flattening all labels into equally certain points.
+and reliability changes with viewpoint, motion, fur, lighting, and occlusion. The
+benchmark stores a graph of observations with provenance and uncertainty rather than
+flattening all labels into equally certain points.
+
+The evidence hierarchy is:
+
+- **Tier S:** exact synthetic state generated in Unity;
+- **Tier R2:** observable facts verified in real video;
+- **Tier R3:** model-derived reconstruction with explicit uncertainty;
+- **Tier G:** independent external measurements, optionally hidden.
+
+No tier may be presented as stronger evidence than its acquisition method supports.
 
 ## Hypotheses
 
-### H1 — simultaneous virtual views can establish a useful geometric gold subset
+### H1 — procedural exact data can expose controlled failure modes
 
-A calibrated mirror-based capture portal using one physical camera can recover visible
-surface landmarks and curves with sufficient precision to evaluate monocular methods,
-without multi-device synchronisation.
+A Unity-based feline scene generator can provide exact pose, tail, face, contact, scene,
+visibility, and temporal labels across controlled variations that are difficult to
+collect systematically in real homes.
 
-### H2 — surface and contact truth are more defensible than hidden joint truth
+### H2 — observable real-video truth is scientifically useful without complete 3D
 
-Directly visible landmarks, silhouettes, tail curves, and paw contacts can be measured
-more reliably than anatomical joint centres hidden beneath fur. Models evaluated on
-latent joints must therefore be scored against distributions or uncertainty regions,
-not fictional exact coordinates.
+Visible landmarks, silhouettes, ear boundaries, tail curves, contact evidence, and
+tracking events can support credible real-domain evaluation without inventing hidden
+joint centres or metric depth.
 
 ### H3 — temporal metrics expose failures hidden by frame accuracy
 
-Models with similar per-frame landmark scores will differ materially in jitter, drift,
-occlusion recovery, derivative accuracy, gait timing, and confidence calibration.
-These temporal properties are necessary for downstream behavioural measurement.
+Models with similar per-frame scores will differ materially in jitter, drift, occlusion
+recovery, derivative accuracy, gait timing, and confidence calibration. These temporal
+properties are necessary for downstream behavioural measurement.
 
-### H4 — world and contact constraints improve monocular reconstruction
+### H4 — uncertainty-aware synthetic-to-real transfer can be evaluated before gold 3D
 
-Static-scene geometry, support surfaces, contact events, non-penetration, and
-identity-specific proportions will reduce monocular ambiguity without turning
-model-derived labels into independent ground truth.
+Tier S provides exact controlled error, while Tier R2 provides real-domain observable
+error. Agreement between these evaluations, combined with calibrated abstention, can
+support useful progress before Tier G exists.
 
-### H5 — uncertainty calibration is a first-class benchmark task
+### H5 — external gold is a late acceptance gate, not an implementation dependency
 
-A useful system must become less confident when landmarks are small, blurred, hidden,
-or geometrically ambiguous. Confidence quality should be evaluated independently from
-mean pose accuracy.
+An independent laboratory can later operate synchronized cameras, Vicon, calibrated
+RGB-D, pressure systems, mirrors, or another traceable apparatus using a capture-neutral
+contract. The project can publish, train, benchmark, and ship an entertainment product
+before that evaluation, but cannot claim externally verified metric 3D accuracy.
+
+### H6 — software-defined edge implementation demonstrates hardware workflow
+
+Quantisation, operator partitioning, HLS or RTL, simulation, cocotb/Verilator
+verification, synthesis, timing, area, and power estimation can demonstrate a credible
+hardware-aware workflow without personal fabrication. Physical silicon or board tests
+may be performed later by a partner or product vendor.
 
 ## Observation ontology
 
@@ -77,96 +99,111 @@ body contour, tail centreline, and visible contact patch.
 ### Independent contact observations
 
 Examples: paw-contact location and time, stance interval, take-off, landing, and support
-surface. These may be measured by an instrumented or transparent floor.
+surface. In v0 these may be exact synthetic labels or observable real-video events.
+Externally instrumented contact is optional Tier G evidence.
 
 ### Scene observations
 
 Examples: camera trajectory, floor plane, furniture surfaces, obstacle geometry,
-world-space cat trajectory, and object-relative relations.
+world-space trajectory, and object-relative relations.
 
 ### Latent anatomical estimates
 
-Examples: shoulder, hip, knee, or vertebral centres hidden beneath fur. These must retain
-an inference source and uncertainty distribution. They are not direct truth unless
-validated by an independent anatomical measurement.
+Examples: shoulder, hip, knee, or vertebral centres hidden beneath fur. These retain an
+inference source and uncertainty distribution. They are not direct truth unless validated
+by independent anatomical measurement.
 
 ### Temporal derived observations
 
-Examples: velocity, acceleration, angular velocity, blink duration, ear flick timing,
-tail curvature change, gait phase, freeze duration, and occlusion recovery time.
+Examples: velocity, acceleration, angular velocity, blink duration, ear-flick timing,
+tail-curvature change, gait phase, freeze duration, and occlusion recovery time.
 Derivatives inherit and amplify source uncertainty.
 
 ## Primary contributions
 
-The intended first paper should contribute:
+The first research release should contribute:
 
-1. an open capture protocol for simultaneous feline views using a compact catadioptric
-   portal;
-2. an observation and provenance schema that distinguishes measured surface/contact
-   truth from inferred anatomy;
-3. a real-environment temporal benchmark emphasizing ears, face, tail, contact,
-   occlusion, and uncertainty;
-4. metrics for jitter, drift, derivative accuracy, contact, and calibration;
-5. an open Unity inspection tool for synchronized media, geometry, uncertainty, and
-   model comparison.
+1. an open Unity generator for exact feline pose, tail, face, contact, visibility, and
+   scene labels;
+2. an observation and provenance schema distinguishing synthetic exact state, observable
+   real evidence, reconstructed estimates, and external gold;
+3. a real-video temporal benchmark emphasizing ears, face, tail, occlusion, tracking,
+   and uncertainty;
+4. metrics for jitter, drift, derivative quality, curve topology, calibration, and
+   synthetic-to-real transfer;
+5. an open Unity inspection tool for geometry, uncertainty, sequences, and model
+   comparison;
+6. a capture-neutral external-validation contract and hidden-evaluation adapter.
 
 ## Non-goals for v0
 
 - Literal translation of feline vocalisation or intent
 - Pain, illness, welfare, or diagnostic claims
 - A universal feline ethogram classifier
+- Personal construction or operation of a calibration portal
 - Full-room metric 4D reconstruction as a prerequisite
-- A custom consumer enclosure before the benchmark pipeline works
-- Claiming model-generated pseudo-labels as independent ground truth
+- A custom consumer enclosure before the software pipeline works
+- Claiming synthetic or model-generated labels as independent real-world truth
 - Recovering exact internal skeletal anatomy from ordinary RGB alone
 
 ## Benchmark acceptance gates
 
-The exact thresholds remain open until a pilot establishes realistic noise floors, but
-v0 must define and freeze them before the main collection.
+The public v0 release must demonstrate:
 
-At minimum, the benchmark must demonstrate:
-
-1. **Repeatability:** repeated calibration produces bounded geometric disagreement.
-2. **Independent evidence:** gold evaluation labels do not originate solely from the
-   model family being evaluated.
-3. **Temporal validity:** reference timing is sufficient to score velocity and event
-   onset, not just static position.
-4. **Uncertainty validity:** lower declared certainty predicts higher realised error.
-5. **Stratified reporting:** results are reported by fur, motion, lighting, viewpoint,
+1. **Synthetic exactness:** exported labels reproduce Unity state within declared numeric
+   tolerance.
+2. **Observable real validity:** real-video labels are restricted to externally
+   observable variables with documented reviewer agreement.
+3. **Temporal validity:** timing is sufficient to score trajectories and events, not just
+   static position.
+4. **Uncertainty validity:** lower declared certainty predicts higher realised error on
+   Tier S and observable Tier R2 labels.
+5. **Anti-circularity:** a model is not evaluated solely against labels generated by the
+   same model family.
+6. **Stratified reporting:** results are reported by fur, motion, lighting, viewpoint,
    occlusion, and environment strata.
-6. **Licence cleanliness:** every released sequence has machine-readable consent,
-   ownership, redistribution, and permitted-use records.
-7. **Reproducibility:** a second operator can build or calibrate the capture setup from
-   the released specification.
+7. **Licence cleanliness:** every released real sequence has machine-readable ownership,
+   consent, redistribution, and permitted-use records.
+8. **Reproducibility:** another developer can generate the synthetic set and run the
+   benchmark from the released software.
+
+Tier G adds a later gate for externally verified metric 3D and contact performance.
 
 ## Stop conditions
 
-Pause collection and revise the design if any of the following occurs:
+Pause or revise a track if:
 
-- mirror geometry cannot produce sufficiently separated simultaneous viewpoints;
-- the capture portal materially changes natural feline movement for the target tasks;
-- contact instrumentation alters gait or cannot be temporally aligned;
-- uncertainty cannot be estimated independently from the evaluated model;
-- consent or licensing terms do not permit the intended public benchmark release;
-- the keypoint/curve ontology proves ambiguous between annotators before collection;
-- the proposed gold measurements are no more reliable than ordinary manual labels.
+- synthetic randomisation produces visually implausible or physically invalid motion;
+- synthetic labels cannot be reproduced deterministically;
+- real-video sources lack sufficient rights for the intended release;
+- the keypoint or curve ontology proves ambiguous between reviewers;
+- pseudo-labels become the only evidence for a claimed result;
+- uncertainty does not correlate with realised error;
+- external partners require a protocol that materially changes the benchmark target;
+- physical work is being shifted back onto the project lead rather than handled by a
+  partner or product supplier.
 
 ## Initial execution sequence
 
 1. Freeze the observable-versus-latent ontology.
-2. Implement the observation/provenance schema.
-3. Design the smallest mirror-based calibration experiment using a rigid object.
-4. Validate camera and virtual-view geometry before involving an animal.
-5. Record one voluntary cat passage or play sequence.
-6. Produce surface landmarks, tail curve, visibility, covariance, and provenance.
-7. Build a minimal Unity inspection scene.
-8. Compare one monocular baseline against the measured subset.
-9. Publish Protocol v0.1 with known limitations.
+2. Extend the observation/provenance schema with Tier S, R2, R3, and G.
+3. Build the smallest deterministic Unity synthetic sequence and exact annotation
+   exporter.
+4. Add unit tests that render-state and exported labels agree.
+5. Define the real-video sourcing, consent, and observable-review protocol.
+6. Add one licence-clean real sequence with sparse visible labels and uncertainty.
+7. Implement temporal, curve, occlusion, and calibration metrics.
+8. Compare one monocular baseline across Tier S and Tier R2.
+9. Publish Protocol v0.1 and CatSynth4D demonstration assets.
+10. Seek an external Tier G partner after the public software benchmark is useful.
 
 ## Product relationship
 
-The consumer translator, puck, and future analyser are downstream demonstrations of the
-same visual-intelligence stack. They must not weaken the benchmark’s scientific claims.
-Entertainment outputs should be explicitly playful; health-related outputs require a
+The translator app, puck, and future analyser are downstream demonstrations of the same
+visual-intelligence stack. They must not weaken the benchmark’s scientific claims.
+Entertainment outputs remain explicitly playful; health-related outputs require a
 separate evidence, ethics, and regulatory programme.
+
+The project lead may install and use-test a finished or externally manufactured product,
+but does not need to fabricate, solder, machine, mount, calibrate, or operate bespoke
+research hardware.
