@@ -8,32 +8,40 @@ from pathlib import Path
 from synthetic.validate_sequence import canonical_sha256, validate_sequence
 
 
+def vec3(x: float, y: float, z: float) -> dict[str, float]:
+    return {"x": x, "y": y, "z": z}
+
+
+def vec2(x: float, y: float) -> dict[str, float]:
+    return {"x": x, "y": y}
+
+
 def valid_sequence() -> dict:
     frame_template = {
         "timestamp_ns": 0,
-        "subject_root_world_m": [0.0, 0.0, 0.0],
-        "subject_velocity_world_mps": [0.2, 0.0, 0.0],
+        "subject_root_world_m": vec3(0.0, 0.0, 0.0),
+        "subject_velocity_world_mps": vec3(0.2, 0.0, 0.0),
         "landmarks": [
             {
                 "semantic_name": "nose",
-                "world_m": [0.0, 0.5, 0.4],
-                "camera_m": [0.0, 0.0, 3.0],
-                "image_px": [320.0, 240.0],
+                "world_m": vec3(0.0, 0.5, 0.4),
+                "camera_m": vec3(0.0, 0.0, 3.0),
+                "image_px": vec2(320.0, 240.0),
                 "visibility": "visible"
             },
             {
                 "semantic_name": "tail_tip",
-                "world_m": [0.0, 0.4, -0.8],
-                "camera_m": [0.0, 0.0, 2.0],
-                "image_px": [300.0, 220.0],
+                "world_m": vec3(0.0, 0.4, -0.8),
+                "camera_m": vec3(0.0, 0.0, 2.0),
+                "image_px": vec2(300.0, 220.0),
                 "visibility": "visible"
             }
         ],
         "tail_curve_world_m": [
-            [0.0, 0.3, -0.3],
-            [0.0, 0.35, -0.5],
-            [0.0, 0.38, -0.65],
-            [0.0, 0.4, -0.8]
+            vec3(0.0, 0.3, -0.3),
+            vec3(0.0, 0.35, -0.5),
+            vec3(0.0, 0.38, -0.65),
+            vec3(0.0, 0.4, -0.8)
         ],
         "contacts": [
             {
@@ -55,13 +63,11 @@ def valid_sequence() -> dict:
     second = copy.deepcopy(frame_template)
     second["frame_index"] = 1
     second["timestamp_ns"] = 100_000_000
-    second["subject_root_world_m"] = [0.02, 0.0, 0.0]
-    second["landmarks"][0]["world_m"][0] = 0.02
-    second["landmarks"][1]["world_m"][0] = 0.02
-    second["tail_curve_world_m"] = [
-        [point[0] + 0.02, point[1], point[2]]
-        for point in second["tail_curve_world_m"]
-    ]
+    second["subject_root_world_m"]["x"] = 0.02
+    second["landmarks"][0]["world_m"]["x"] = 0.02
+    second["landmarks"][1]["world_m"]["x"] = 0.02
+    for point in second["tail_curve_world_m"]:
+        point["x"] += 0.02
 
     return {
         "schema_version": "0.1.0",
@@ -86,8 +92,8 @@ def valid_sequence() -> dict:
             "camera_id": "synthetic-camera-0",
             "resolution_px": [640, 480],
             "vertical_fov_degrees": 60.0,
-            "position_world_m": [0.0, 1.1, -3.0],
-            "look_at_world_m": [0.0, 0.4, 0.0],
+            "position_world_m": vec3(0.0, 1.1, -3.0),
+            "look_at_world_m": vec3(0.0, 0.4, 0.0),
             "screen_origin": "bottom_left"
         },
         "scene": {
@@ -95,7 +101,7 @@ def valid_sequence() -> dict:
                 {
                     "object_id": "floor",
                     "plane_world": {
-                        "normal": [0.0, 1.0, 0.0],
+                        "normal": vec3(0.0, 1.0, 0.0),
                         "offset_m": 0.0
                     }
                 }
@@ -104,7 +110,7 @@ def valid_sequence() -> dict:
                 {
                     "object_id": "box-left",
                     "type": "box",
-                    "position_world_m": [-0.8, 0.25, 0.4]
+                    "position_world_m": vec3(-0.8, 0.25, 0.4)
                 }
             ]
         },
@@ -149,13 +155,13 @@ class SyntheticSequenceValidatorTests(unittest.TestCase):
 
     def test_visible_landmark_outside_frame_fails(self) -> None:
         sequence = valid_sequence()
-        sequence["frames"][0]["landmarks"][0]["image_px"] = [-1.0, 240.0]
+        sequence["frames"][0]["landmarks"][0]["image_px"]["x"] = -1.0
         errors = validate_sequence(sequence, self.schema)
         self.assertTrue(any("outside the frame" in error for error in errors))
 
     def test_velocity_mismatch_fails(self) -> None:
         sequence = valid_sequence()
-        sequence["frames"][0]["subject_velocity_world_mps"] = [0.0, 0.0, 0.0]
+        sequence["frames"][0]["subject_velocity_world_mps"]["x"] = 0.0
         errors = validate_sequence(sequence, self.schema)
         self.assertTrue(any("finite difference" in error for error in errors))
 
