@@ -1,107 +1,96 @@
-# Stage 0 hardware handoff
+# Stage 0 hardware handoff — archived from critical path
 
-**Status:** software preparation may continue, but measured Stage 0 evidence cannot begin
-until the reference capture hardware is available and its exact metadata is recorded.
+**Status:** optional external-validation reference only.
 
-No animal recording is permitted during this handoff.
+The CatPose programme no longer requires the lead developer to purchase, construct,
+calibrate, or operate this apparatus. Physical involvement is limited to ordinary use
+of a finished application or externally manufactured product.
 
-## Why a handoff is now required
+This document is retained because a laboratory or independent partner may later choose
+to validate a mirror-based reference system. It must not be interpreted as a user task
+list or prerequisite for Protocol v0.1.
+
+## Current programme decision
+
+The critical path is:
+
+```text
+Unity synthetic exact data
+→ real-video observable benchmark
+→ monocular baseline and uncertainty
+→ playful application
+→ software-defined edge/RTL workflow
+→ optional external hidden-gold validation
+```
+
+A partner-operated portal is one possible Tier G measurement class. Synchronized
+multi-camera, Vicon, calibrated RGB-D, pressure systems, or another traceable method are
+equally acceptable under `EXTERNAL-VALIDATION-CONTRACT.md`.
+
+## Why this design study remains useful
 
 The repository can simulate candidate mirror geometry, generate a rigid target, validate
-capture manifests, and visualise nominal geometry without hardware. It cannot determine:
+capture manifests, and visualise nominal geometry. Those artefacts may help a partner
+assess:
 
-- real mirror flatness, ghosting, flex, and mounting repeatability;
-- usable reflected sensor area through a selected lens;
-- real point-detection precision;
-- calibration drift after handling;
-- rolling/global shutter motion error;
+- mirror flatness, ghosting, flex, and mounting repeatability;
+- reflected sensor area through a selected lens;
+- point-detection precision;
+- calibration drift;
+- shutter-related motion error;
 - physical holdout-point reconstruction error.
 
-Those quantities are the independent evidence needed to decide whether the portal is a
-valid ground-truth instrument.
+Simulation and nominal geometry are design aids, not measured evidence.
 
-## User action required before physical capture
+## Partner-operated reference-rig requirements
 
-Create one inventory response containing either exact model identifiers or `none` for:
-
-1. available global-shutter cameras;
-2. available lenses and mounts;
-3. available first-surface mirrors and dimensions;
-4. rigid panel or extrusion materials;
-5. access to a dimensionally reliable printer or print service;
-6. access to calipers, angle measurement, or a stronger dimensional measurement method;
-7. a safe indoor construction/capture area of roughly 0.8 m x 1.3 m x 1.1 m;
-8. maximum Stage 0 hardware budget in AUD;
-9. whether borrowing university/lab equipment is realistic.
-
-Do not purchase anything from the current nominal dimensions alone. The lens and mirror
-sizes must be selected together after a field-of-view calculation and a low-cost mock-up.
-
-## Reference-rig minimum
-
-The preferred physical validation rig needs:
+A partner choosing this route would normally need:
 
 - one colour global-shutter machine-vision camera;
 - fixed manual-focus lens with documented mount and focal length;
 - uncompressed or minimally processed frame access;
 - two first-surface planar mirrors;
-- stiff mirror mounts whose pose can be measured and repeated;
-- trihedral target generated from `stage0/target_spec.json`;
-- independent dimensional measurements of the assembled target;
+- stiff, safe mirror mounts;
+- independently measured non-coplanar target;
 - diffuse flicker-controlled lighting;
-- protective treatment for mirror edges;
-- a computer capable of sustained lossless capture at the chosen resolution/frame rate.
+- raw capture and timestamp export;
+- ethics, animal-welfare, facility, and operator approvals.
 
-The camera specification target remains at least 1920 x 1200 at 60 FPS with manual
-exposure, gain, focus, and white balance. This is a reference instrument requirement,
-not the eventual consumer-product camera requirement.
+The project lead supplies schemas, calibration software, QA, coordinate tests, and
+evaluation integration. The partner owns all physical operation and safety.
 
-## Cheap optical mock-up before purchasing reference mirrors
+## Evidence boundary
 
-A non-gold mock-up may use an existing camera and inexpensive mirrors solely to answer:
+Ordinary mirrors and rolling-shutter consumer cameras may support an engineering preview,
+but cannot establish metric reference truth without an independently justified error
+model.
 
-- can direct and two reflected regions fit on the sensor simultaneously;
-- which layout gives useful views of the intended volume;
-- where mirror supports obstruct rays;
-- whether the physical frame dimensions are workable;
-- how much reflected image resolution each view receives.
+Nominal target coordinates are construction coordinates only until the assembled target
+is independently measured.
 
-Mock-up footage is labelled `engineering_preview_only`. It cannot be reported as metric
-ground truth because rear-surface mirrors, unknown lens calibration, and rolling shutter
-can create systematic error.
+## Partner validation sequence
 
-## Acquisition gate
+If an external partner selects this method:
 
-Only select or purchase reference components after the inventory is known and the repo
-contains a computed field-of-view/BOM comparison for at least two feasible camera-lens
-combinations.
+1. select camera, lens, mirror dimensions, and capture volume from measured field of view;
+2. verify target dimensions independently;
+3. capture intrinsic and mirror-plane calibration sequences;
+4. repeat after teardown and reassembly;
+5. capture a pre-registered rigid-target volume sweep;
+6. estimate holdout error, repeatability, and covariance;
+7. compare against decision bands without tuning on feline model results;
+8. provide a Tier G package conforming to the external-validation contract.
 
-## First physical session
+## Stop conditions
 
-Once the rig exists:
+The partner route stops or revises when:
 
-1. verify printed panel dimensions at multiple locations;
-2. assemble and independently measure the target;
-3. record camera, lens, mirror, mount, lighting, and environmental metadata;
-4. capture intrinsic-calibration sequences before installing mirrors;
-5. install Layout A and capture mirror-plane calibration sequences;
-6. repeat after ordinary teardown/reassembly;
-7. capture the pre-registered static volume sweep;
-8. repeat for Layout B;
-9. run the same reconstruction and uncertainty report for both layouts;
-10. select, revise, or stop according to the frozen decision bands.
+- safe and mechanically stable mounting is unavailable;
+- useful simultaneous view coverage is impractically small;
+- target dimensions, raw timestamps, or calibration metadata cannot be verified;
+- reference labels depend primarily on the model being tested;
+- measurement uncertainty is too large for the intended temporal variables;
+- the procedure materially changes natural feline movement;
+- rights, consent, ethics, or data-custody requirements are unresolved.
 
-Every capture must have a manifest conforming to
-`schemas/stage0-capture-manifest.schema.json` and raw-file hashes must be verified before
-analysis.
-
-## Explicit stop conditions
-
-Stop physical work and document the failure when:
-
-- a mirror or mount cannot be made safe and mechanically stable;
-- a field-of-view mock-up cannot fit the required direct/reflected regions;
-- target print dimensions cannot be verified;
-- calibration metadata or raw timestamps cannot be exported;
-- a proposed shortcut would make the reference labels depend on the model being tested;
-- animal footage is proposed before the rigid-target gate is complete.
+No action is required from the project lead under this document.
