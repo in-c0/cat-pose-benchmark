@@ -28,6 +28,9 @@ python stage0/geometry_sim.py \
 
 ```bash
 python -m unittest stage0.test_geometry_sim
+python stage0/compare_reports.py \
+  stage0/geometry-conditioning-report.json \
+  /path/to/regenerated-report.json
 ```
 
 The generated report compares:
@@ -54,4 +57,6 @@ calibration measures mirror quality, rigidity, distortion, usable image detail, 
 repeatability.
 
 The generated JSON is a reproducible design artefact, not measured evidence. Regenerate
-it whenever geometry or assumptions change; CI verifies byte-for-byte agreement.
+it whenever geometry or assumptions change. CI checks exact structure and numeric
+agreement at `1e-8` absolute and `1e-10` relative tolerance so harmless platform-level
+linear-algebra rounding does not masquerade as a scientific change.
