@@ -1,60 +1,96 @@
-# Open decisions — the hold list
+# Open decisions — collection hold list
 
-**The repo is held here pending research direction.** This is the list of what that pass
-needs to settle. Nothing below is decided; nothing is being built until it is.
+**Status:** the research direction is set; specification and rigid-object experiments may
+proceed. Real-animal collection remains blocked by the Tier 1 decisions below.
 
 Ordered by how expensive they are to get wrong.
 
 ---
 
-## Tier 1 — irreversible after data collection starts
+## Resolved direction decisions
 
-| # | Decision | Why it locks | Draft position |
+| Decision | Resolution |
+|---|---|
+| Benchmark purpose | Evaluate monocular feline visual intelligence using a compact independently measured gold subset plus a real-home challenge set |
+| Ground-truth model | Per-observation provenance and time-varying uncertainty; no single equally certain skeleton per frame |
+| Observable versus latent anatomy | Visible surface, curves, contact, and scene observations are separated from inferred hidden joints |
+| Multi-view role | Simultaneous views are for a small reference subset, not the consumer product |
+| Preferred capture concept | Investigate a one-camera catadioptric portal with calibrated mirrors; optional transparent or instrumented floor |
+| Synthetic data | Supplementary training and ablation source, not the sole methodological core or real-world validation |
+| Behaviour scope | No behaviour, pain, health, welfare, diagnostic, or literal translation claims in benchmark v0 |
+| First public unit | Protocol v0.1, one small validated capture experiment, observation schema, Unity viewer, and baseline |
+
+See [RESEARCH-CHARTER.md](RESEARCH-CHARTER.md) and
+[GROUND-TRUTH-PROVENANCE.md](GROUND-TRUTH-PROVENANCE.md).
+
+---
+
+## Tier 1 — must be resolved before real-animal collection
+
+| # | Decision | Why it locks | Current position |
 |---|---|---|---|
-| 1 | **Keypoint topology** | Changing it after collection means recollecting everything | 34-point strict AP-10K superset — [KEYPOINT-TOPOLOGY-DRAFT.md](KEYPOINT-TOPOLOGY-DRAFT.md) |
-| 2 | **Benchmark sourcing + CLA** | Contributor rights cannot be retrofitted after footage is collected | Undecided — 4 options in [BENCHMARK-PROTOCOL-DRAFT.md](BENCHMARK-PROTOCOL-DRAFT.md) |
-| 3 | **Outbound licences** (code / synthetic / benchmark / weights) | The CLA depends on this; collection cannot start before it | Undecided — [LICENSING-POLICY.md](LICENSING-POLICY.md) §3 |
-| 4 | **Stratification design** | Coverage gaps must be declared up front, not discovered later | Fractional factorial vs tiered — undecided |
+| 1 | **Pilot landmark and curve ontology** | Changing semantic targets after capture invalidates labels and metrics | Prioritise visible surface points, detailed ears/face, paws, and tail centreline; latent joints optional |
+| 2 | **Portal optical design** | Determines view baselines, capture volume, occlusion pattern, and calibration method | One direct plus at least two useful reflected views; validate on rigid object first |
+| 3 | **Contact design** | Floor material and instrumentation may change gait and construction | Start with transparent/underside visual contact unless sensing is demonstrably non-intrusive |
+| 4 | **Geometric acceptance thresholds** | Must be set before seeing feline results | Derive noise floor from rigid-object validation, then freeze thresholds |
+| 5 | **Sourcing, consent, and contributor terms** | Rights and withdrawal conditions cannot be retrofitted safely | Self-recorded pilot first; public contribution only after reviewed templates exist |
+| 6 | **Outbound licences** | Contributor permissions and downstream product use depend on them | Still unresolved; no public data or weights until set |
+| 7 | **Ethics and welfare review path** | The portal must be voluntary and non-coercive, and institutional requirements may apply | Determine requirements before recording beyond ordinary owner footage |
 
-## Tier 2 — expensive to change, not fatal
+## Tier 2 — resolve before Protocol v0.1 release
 
-| # | Decision | Note |
+| # | Decision | Current position |
 |---|---|---|
-| 5 | **Occlusion flags** — does synthetic emit them, does real annotation match? | Must be answered before *either* pipeline starts |
-| 6 | **Metrics** — PCK only, or OKS with estimated sigmas? | Affects what the benchmark can claim |
-| 7 | **Rigged asset selection** | Licence-gated; see policy §2. Ear/tail rig quality is the binding constraint, not visual realism |
-| 8 | **Sim-to-real validation gate** | What accuracy on real data counts as "it worked"? Set the number *before* seeing results |
+| 8 | **Canonical topology versus compatibility export** | Canonical representation may use curves and surface regions; conventional keypoints are an export |
+| 9 | **Uncertainty representation** | Points: covariance or documented confidence region; curves: local covariance or parameter distribution |
+| 10 | **Gold/silver/bronze assignment rules** | Must be per observation or interval, not only per sequence |
+| 11 | **Minimum frame rate and exposure metadata** | Required for derivative and motion-blur evaluation |
+| 12 | **Monocular baseline** | Select a licence-clean implementation; model-generated labels cannot be its sole reference |
+| 13 | **Metrics and pilot gates** | Include spatial, temporal, contact, and calibration metrics; exact thresholds follow rigid-object pilot |
+| 14 | **Unity viewer scope** | Synchronized views, virtual cameras, observations, uncertainty, provenance, and model comparison |
+| 15 | **Scene-mapping backend** | Evaluate separately from dynamic cat reconstruction; map uncertainty must remain explicit |
 
-## Tier 3 — deferred, listed so they aren't forgotten
+## Tier 3 — deferred product and programme decisions
 
 | # | Decision |
 |---|---|
-| 9 | Brand name (separate from this repo's name) |
-| 10 | Whether the consumer app is a separate repo (recommended: yes) |
-| 11 | Paper venue and timing — dataset public first, paper later |
-| 12 | Whether to approach Tech4Animals / FGS group before or after first release |
+| 16 | Consumer brand name |
+| 17 | Translator app repository and launch scope |
+| 18 | Edge puck compute platform and camera |
+| 19 | Hardware accelerator/RTL demonstration target |
+| 20 | Future veterinary collaboration and health-validation programme |
+| 21 | Paper venue and release timing |
+| 22 | Wider contributor and shelter recruitment strategy |
 
 ---
 
 ## Unresolved external dependencies
 
-- **AP-10K licence conflict.** Repo states CC-BY-4.0; MMPose dataset zoo lists it as
-  non-commercial. **Blocks any use of AP-10K.** Resolve in writing with the authors;
-  commit the reply. Cost: one email. Not yet sent.
-- **Rigged cat asset terms.** No vendor identified yet. The specific question most
-  asset licences fail to answer: *may rendered derivative imagery be redistributed as a
-  public dataset, and are weights trained on it unencumbered?*
+- **AP-10K licence conflict.** The source repository and secondary listings reportedly
+  disagree. Do not use it until the authors or rights-holder confirms applicable terms
+  in writing and the evidence is committed.
+- **Model and checkpoint licensing.** Code and weights can carry different terms. Every
+  baseline, teacher, tracker, mapper, and reconstruction checkpoint needs an explicit
+  production and redistribution review.
+- **Rigged assets and rendered-data rights.** If synthetic data is released, source asset
+  terms must explicitly permit redistribution of rendered derivatives and downstream
+  trained weights.
+- **Animal-research requirements.** Confirm whether the proposed voluntary portal capture
+  is ordinary owner recording, institutional animal research, or another regulated
+  category in the relevant jurisdiction and institution.
 
 ---
 
-## Standing constraints (not decisions — these hold regardless)
+## Standing constraints
 
-- No CC BY-NC or research-only data, weights, or pseudo-labels. Ever. No laundering
-  path exists. See [LICENSING-POLICY.md](LICENSING-POLICY.md) §1.
-- No medical, veterinary, welfare, or diagnostic claims from anything built on this.
-- No semantic "translation" claims — unsupported by the literature.
-- Benchmark data is **evaluation only** and is never trained on. Violating this destroys
-  the only thing that makes the result meaningful.
-- Coverage gaps are declared in the datasheet. Silent truncation reads as full coverage.
-
----
+- No scraping or rights-by-assumption.
+- No CC BY-NC, research-only, or licence-ambiguous dependencies in released data or
+  production paths.
+- No model family is evaluated solely against labels generated by that family.
+- Synthetic exactness is not real-world ground truth.
+- Hidden anatomy is labelled as inferred unless independently measured.
+- Benchmark uncertainty must vary with actual observability; it cannot be one global
+  confidence score.
+- No medical, veterinary, welfare, or diagnostic claims from benchmark v0.
+- No literal semantic translation claim.
+- Coverage gaps, failed captures, and excluded cases are disclosed.
