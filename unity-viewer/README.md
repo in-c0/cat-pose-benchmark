@@ -22,10 +22,10 @@ up. Unity receives:
 unity = (source.x, source.z, source.y)
 ```
 
-The current scene is generated from `stage0/layouts.json`:
+Run the exporter from the repository root as a Python module:
 
 ```bash
-python stage0/export_unity_scene_v2.py \
+python -m stage0.export_unity_scene_v2 \
   --config stage0/layouts.json \
   --layout A_symmetric_lateral \
   --output unity-viewer/Assets/StreamingAssets/stage0-scene-v2.json
