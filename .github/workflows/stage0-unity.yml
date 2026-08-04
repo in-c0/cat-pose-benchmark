@@ -39,7 +39,7 @@ jobs:
         run: python -m unittest stage0.test_unity_export
       - name: Regenerate Unity scene
         run: |
-          python stage0/export_unity_scene_v2.py \
+          python -m stage0.export_unity_scene_v2 \
             --config stage0/layouts.json \
             --layout A_symmetric_lateral \
             --output /tmp/stage0-scene-v2.json
