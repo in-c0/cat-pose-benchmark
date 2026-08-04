@@ -1,0 +1,71 @@
+{
+  "schema_version": "0.1.0",
+  "target_id": "catpose-stage0-trihedral-v0",
+  "units": "metres",
+  "construction": {
+    "type": "trihedral",
+    "nominal_outer_extent_m": [0.30, 0.30, 0.30],
+    "minimum_rigidity_note": "Use dimensionally stable panels and verify all measured point coordinates after assembly; nominal CAD coordinates are not measurement truth.",
+    "faces": [
+      {
+        "name": "face_xy",
+        "plane": "z=0",
+        "origin_m": [0.025, 0.025, 0.0],
+        "axis_u": [1.0, 0.0, 0.0],
+        "axis_v": [0.0, 1.0, 0.0],
+        "squares_xy": [5, 7],
+        "square_length_m": 0.035,
+        "marker_length_m": 0.026,
+        "marker_id_offset": 0
+      },
+      {
+        "name": "face_xz",
+        "plane": "y=0",
+        "origin_m": [0.025, 0.0, 0.025],
+        "axis_u": [1.0, 0.0, 0.0],
+        "axis_v": [0.0, 0.0, 1.0],
+        "squares_xy": [5, 7],
+        "square_length_m": 0.035,
+        "marker_length_m": 0.026,
+        "marker_id_offset": 20
+      },
+      {
+        "name": "face_yz",
+        "plane": "x=0",
+        "origin_m": [0.0, 0.025, 0.025],
+        "axis_u": [0.0, 1.0, 0.0],
+        "axis_v": [0.0, 0.0, 1.0],
+        "squares_xy": [5, 7],
+        "square_length_m": 0.035,
+        "marker_length_m": 0.026,
+        "marker_id_offset": 40
+      }
+    ]
+  },
+  "fiducials": {
+    "family": "OpenCV ChArUco",
+    "dictionary": "DICT_5X5_100",
+    "border_bits": 1,
+    "render_dpi": 600,
+    "print_rule": "Print at 100 percent scale. Reject a panel when either printed check dimension differs from its nominal value by more than 0.20 mm.",
+    "parity_rule": "Reflected regions must be tested under both parity hypotheses before marker decoding; the retained hypothesis must agree with calibrated mirror geometry."
+  },
+  "point_partitions": {
+    "calibration": {
+      "rule": "Use ChArUco corners whose global corner index modulo 5 is 0, 1, or 2."
+    },
+    "validation": {
+      "rule": "Use ChArUco corners whose global corner index modulo 5 is 3."
+    },
+    "holdout": {
+      "rule": "Use ChArUco corners whose global corner index modulo 5 is 4; never use these points to estimate intrinsics, mirror planes, target pose, or model hyperparameters."
+    }
+  },
+  "measurement": {
+    "required_after_assembly": true,
+    "minimum_method": "Measure a documented set of cross-face distances and panel orthogonality independently of the vision reconstruction.",
+    "preferred_method": "Coordinate measuring arm, photogrammetric survey with an independently calibrated setup, or another traceable dimensional method.",
+    "export": "stage0/target-measured-points.json",
+    "warning": "Generated nominal coordinates are construction coordinates only. They must not be used as held-out physical truth until the assembled target has been measured."
+  }
+}
