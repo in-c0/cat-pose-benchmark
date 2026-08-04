@@ -1,14 +1,20 @@
-name: Stage 0 geometry tests
+name: Stage 0 and S0 tests
 
 on:
   push:
     paths:
       - "stage0/**"
+      - "synthetic/**"
+      - "schemas/observation.schema.json"
+      - "schemas/synthetic-sequence.schema.json"
       - "schemas/stage0-capture-manifest.schema.json"
       - ".github/workflows/stage0-tests.yml"
   pull_request:
     paths:
       - "stage0/**"
+      - "synthetic/**"
+      - "schemas/observation.schema.json"
+      - "schemas/synthetic-sequence.schema.json"
       - "schemas/stage0-capture-manifest.schema.json"
       - ".github/workflows/stage0-tests.yml"
 
@@ -69,7 +75,7 @@ jobs:
             --abs-tol 1e-8 \
             --rel-tol 1e-10
 
-  metadata-and-target:
+  schemas-target-and-synthetic:
     runs-on: ubuntu-latest
 
     steps:
@@ -89,11 +95,12 @@ jobs:
             opencv-contrib-python-headless \
             pillow
 
-      - name: Test target and manifest tools
+      - name: Test target, manifest, and synthetic tools
         run: |
           python -m unittest \
             stage0.test_target_generator \
-            stage0.test_capture_manifest
+            stage0.test_capture_manifest \
+            synthetic.test_validate_sequence
 
       - name: Generate low-resolution target dry run
         run: |
