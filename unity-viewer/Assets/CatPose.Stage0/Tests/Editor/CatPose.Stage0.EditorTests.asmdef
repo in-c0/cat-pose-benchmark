@@ -1,0 +1,21 @@
+{
+  "name": "CatPose.Stage0.EditorTests",
+  "rootNamespace": "CatPose.Stage0.Tests",
+  "references": [
+    "CatPose.Stage0.Runtime"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}
