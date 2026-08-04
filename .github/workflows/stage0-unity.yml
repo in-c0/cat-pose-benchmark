@@ -1,0 +1,52 @@
+name: Stage 0 Unity export tests
+
+on:
+  push:
+    paths:
+      - "stage0/export_unity_scene_v2.py"
+      - "stage0/test_unity_export.py"
+      - "stage0/layouts.json"
+      - "stage0/geometry_sim.py"
+      - "stage0/compare_reports.py"
+      - "unity-viewer/**"
+      - ".github/workflows/stage0-unity.yml"
+  pull_request:
+    paths:
+      - "stage0/export_unity_scene_v2.py"
+      - "stage0/test_unity_export.py"
+      - "stage0/layouts.json"
+      - "stage0/geometry_sim.py"
+      - "stage0/compare_reports.py"
+      - "unity-viewer/**"
+      - ".github/workflows/stage0-unity.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  export-parity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install dependency
+        run: python -m pip install --disable-pip-version-check numpy
+      - name: Run Unity export tests
+        run: python -m unittest stage0.test_unity_export
+      - name: Regenerate Unity scene
+        run: |
+          python stage0/export_unity_scene_v2.py \
+            --config stage0/layouts.json \
+            --layout A_symmetric_lateral \
+            --output /tmp/stage0-scene-v2.json
+      - name: Verify committed Unity scene is reproducible
+        run: |
+          python stage0/compare_reports.py \
+            unity-viewer/Assets/StreamingAssets/stage0-scene-v2.json \
+            /tmp/stage0-scene-v2.json \
+            --abs-tol 1e-8 \
+            --rel-tol 1e-10
