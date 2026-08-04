@@ -1,8 +1,7 @@
-# Open decisions — collection hold list
+# Open decisions — software-first release hold list
 
-**Status:** the research direction and Stage 0 rigid-target experiment are specified.
-Software-only geometry work may proceed. Real-animal collection remains blocked by the
-Tier 1 decisions below.
+**Status:** the software-first research direction is approved. No owner-operated physical
+capture, rig construction, or fabrication is required for Protocol v0.1.
 
 Ordered by how expensive they are to get wrong.
 
@@ -12,78 +11,89 @@ Ordered by how expensive they are to get wrong.
 
 | Decision | Resolution |
 |---|---|
-| Benchmark purpose | Evaluate monocular feline visual intelligence using a compact independently measured gold subset plus a real-home challenge set |
+| Benchmark purpose | Evaluate monocular feline visual intelligence through exact Unity simulation, observable real video, uncertainty-aware reconstruction, and optional external hidden gold |
 | Ground-truth model | Per-observation provenance and time-varying uncertainty; no single equally certain skeleton per frame |
-| Observable versus latent anatomy | Visible surface, curves, contact, and scene observations are separated from inferred hidden joints |
-| Multi-view role | Simultaneous views are for a small reference subset, not the consumer product |
-| Preferred capture concept | Investigate a one-camera catadioptric portal with calibrated mirrors; optional transparent or instrumented floor |
-| Stage 0 layouts | Compare symmetric lateral mirrors against a lateral-plus-overhead configuration before construction is frozen |
-| Stage 0 camera class | Use a colour global-shutter machine-vision camera as the reference source; consumer rolling-shutter capture is a later replication condition |
-| Stage 0 target | Use an asymmetric non-coplanar rigid target with separate calibration, validation, and holdout points |
-| Stage 0 decision bands | Pre-register go/revise/stop bands before physical calibration; do not tune thresholds on feline results |
-| Synthetic data | Supplementary training and ablation source, not the sole methodological core or real-world validation |
-| Behaviour scope | No behaviour, pain, health, welfare, diagnostic, or literal translation claims in benchmark v0 |
-| First public unit | Protocol v0.1, one small validated capture experiment, observation schema, Unity viewer, and baseline |
+| Evidence tiers | Tier S synthetic exact, Tier R2 real observable, Tier R3 reconstructed estimate, Tier G external hidden gold |
+| Observable versus latent anatomy | Visible surfaces, curves, contact evidence, and scene observations are separated from inferred hidden joints |
+| Physical-work policy | Lead developer performs no bespoke capture, rig construction, calibration-lab work, or hardware fabrication; ordinary product use testing remains allowed |
+| Synthetic data | Primary exact-data and controlled-evaluation source for v0.1, but never presented as real-world validation |
+| Real data | Licence-clean or consented video evaluated only on externally observable variables unless independent measurements exist |
+| External gold | Optional later acceptance gate operated by a partner; not a v0.1 implementation dependency |
+| Portal work | Retained as an optional external-validation design study, not the project’s critical path |
+| Behaviour scope | No pain, health, welfare, diagnostic, literal translation, or universal ethogram claim in benchmark v0 |
+| First public unit | Protocol v0.1, deterministic Unity sequence and exporter, one real observable sequence, Unity viewer, and baseline evaluation |
 
 See [RESEARCH-CHARTER.md](RESEARCH-CHARTER.md),
+[SOFTWARE-FIRST-ROADMAP.md](SOFTWARE-FIRST-ROADMAP.md),
 [GROUND-TRUTH-PROVENANCE.md](GROUND-TRUTH-PROVENANCE.md), and
-[STAGE-0-PORTAL-GEOMETRY.md](STAGE-0-PORTAL-GEOMETRY.md).
+[EXTERNAL-VALIDATION-CONTRACT.md](EXTERNAL-VALIDATION-CONTRACT.md).
 
 ---
 
-## Tier 1 — must be resolved before real-animal collection
+## Tier 1 — must be resolved before implementation assets are committed
 
 | # | Decision | Why it locks | Current position |
 |---|---|---|---|
-| 1 | **Pilot landmark and curve ontology** | Changing semantic targets after capture invalidates labels and metrics | Prioritise visible surface points, detailed ears/face, paws, and tail centreline; latent joints optional |
-| 2 | **Portal optical design** | Determines view baselines, capture volume, occlusion pattern, and calibration method | Two candidate layouts and nominal geometry are committed; physical rigid-target validation remains required |
-| 3 | **Contact design** | Floor material and instrumentation may change gait and construction | Start with transparent/underside visual contact unless sensing is demonstrably non-intrusive |
-| 4 | **Geometric acceptance thresholds** | Must be set before seeing feline results | Stage 0 rigid-object decision bands are pre-registered; final gold-label uncertainty rules must be frozen after physical noise-floor measurement and before feline capture |
-| 5 | **Sourcing, consent, and contributor terms** | Rights and withdrawal conditions cannot be retrofitted safely | Self-recorded pilot first; public contribution only after reviewed templates exist |
-| 6 | **Outbound licences** | Contributor permissions and downstream product use depend on them | Still unresolved; no public data or weights until set |
-| 7 | **Ethics and welfare review path** | The portal must be voluntary and non-coercive, and institutional requirements may apply | Determine requirements before recording beyond ordinary owner footage |
+| 1 | **Pilot landmark and curve ontology** | Changing semantic targets invalidates exporters, labels, and metrics | Prioritise visible surface points, detailed ears/face, paws, body centreline, and tail spline; latent joints optional |
+| 2 | **Rigged feline asset and animation rights** | Asset restrictions can contaminate rendered data, code examples, screenshots, and trained weights | Use only assets whose terms permit the intended rendered-data release and downstream model use; otherwise create or commission a clean asset |
+| 3 | **Unity coordinate and unit contract** | All annotations, viewers, and baselines depend on consistent transforms | Use metres and one documented world/camera/image convention with round-trip tests |
+| 4 | **Annotation export format** | Export structure locks synthetic generation and baseline ingestion | Extend the observation schema rather than create an unrelated synthetic-only format |
+| 5 | **Determinism contract** | Exact regression claims require controlled seeds and reproducible export | Record engine version, asset version, seed, timestep, render settings, and platform-dependent tolerances |
+| 6 | **Outbound licences** | Contributors, assets, generated data, and downstream product use depend on them | Still unresolved; no public data, weights, or reusable code until set |
 
 ## Tier 2 — resolve before Protocol v0.1 release
 
 | # | Decision | Current position |
 |---|---|---|
-| 8 | **Canonical topology versus compatibility export** | Canonical representation may use curves and surface regions; conventional keypoints are an export |
-| 9 | **Uncertainty representation** | Points: covariance or documented confidence region; curves: local covariance or parameter distribution |
-| 10 | **Gold/silver/bronze assignment rules** | Must be per observation or interval, not only per sequence |
-| 11 | **Minimum frame rate and exposure metadata** | Stage 0 reference class is >=60 FPS with manual exposure; final deployment strata remain unresolved |
-| 12 | **Monocular baseline** | Select a licence-clean implementation; model-generated labels cannot be its sole reference |
-| 13 | **Metrics and pilot gates** | Rigid-target gates are specified; feline surface/temporal gates require ontology and measured Stage 0 noise |
-| 14 | **Unity viewer scope** | Stage 0 view is specified: cameras, mirrors, rays, residuals, covariance, boundaries, axes, and parity; implementation remains open |
-| 15 | **Scene-mapping backend** | Evaluate separately from dynamic cat reconstruction; map uncertainty must remain explicit |
+| 7 | **Canonical topology versus compatibility export** | Canonical representation may use curves and regions; conventional keypoints are an export |
+| 8 | **Synthetic variation set** | Define the smallest credible morphology, motion, camera, lighting, blur, clutter, and occlusion matrix |
+| 9 | **Physical validity checks in simulation** | Reject impossible anatomy, penetration, foot sliding, and unstable tail topology |
+| 10 | **First real-video source** | Must be licence-clean or explicitly contributed with machine-readable rights |
+| 11 | **Observable reviewer protocol** | Define sparse keyframes, propagation, visibility, ambiguity, disagreement, and adjudication |
+| 12 | **Uncertainty representation** | Points: covariance or documented confidence region; curves: local covariance or parameter distribution |
+| 13 | **Monocular baseline** | Select a commercially usable implementation; its own pseudo-labels cannot be its sole reference |
+| 14 | **Metrics and gates** | Freeze exact synthetic tolerances, temporal metrics, transfer metrics, and real observable reviewer thresholds |
+| 15 | **Unity viewer scope** | Extend current geometry viewer to synthetic sequences, exact labels, predictions, uncertainty, and failure comparison |
+| 16 | **Scene-mapping backend** | Evaluate separately from feline pose; mapping uncertainty remains explicit |
+| 17 | **Forbidden claims language** | Public documentation must distinguish observed signal, hypothesis, entertainment copy, and unsupported medical claims |
 
-## Tier 3 — deferred product and programme decisions
+## Tier 3 — external validation decisions
+
+| # | Decision | Current position |
+|---|---|---|
+| 18 | **Tier G custody mode** | Public release, private labels, remote evaluator, or escrow evaluation |
+| 19 | **Measurement class** | Partner may use synchronized cameras, Vicon, RGB-D, pressure, mirrors, or another traceable system |
+| 20 | **Partner and attribution terms** | Define publication, authorship, costs, data custody, and withdrawal |
+| 21 | **External gold thresholds** | Freeze only after the partner measurement noise floor is documented; never tune on model test results |
+
+Tier G decisions do not block v0.1.
+
+## Tier 4 — deferred product and programme decisions
 
 | # | Decision |
 |---|---|
-| 16 | Consumer brand name |
-| 17 | Translator app repository and launch scope |
-| 18 | Edge puck compute platform and camera |
-| 19 | Hardware accelerator/RTL demonstration target |
-| 20 | Future veterinary collaboration and health-validation programme |
-| 21 | Paper venue and release timing |
-| 22 | Wider contributor and shelter recruitment strategy |
+| 22 | Consumer brand name |
+| 23 | Translator app repository and launch scope |
+| 24 | Edge puck compute platform and camera |
+| 25 | Hardware accelerator/RTL demonstration target |
+| 26 | Contract manufacturer or hardware-development partner |
+| 27 | Future veterinary collaboration and health-validation programme |
+| 28 | Paper venue and release timing |
+| 29 | Wider contributor and shelter recruitment strategy |
 
 ---
 
 ## Unresolved external dependencies
 
-- **AP-10K licence conflict.** The source repository and secondary listings reportedly
-  disagree. Do not use it until the authors or rights-holder confirms applicable terms
-  in writing and the evidence is committed.
 - **Model and checkpoint licensing.** Code and weights can carry different terms. Every
-  baseline, teacher, tracker, mapper, and reconstruction checkpoint needs an explicit
-  production and redistribution review.
-- **Rigged assets and rendered-data rights.** If synthetic data is released, source asset
-  terms must explicitly permit redistribution of rendered derivatives and downstream
-  trained weights.
-- **Animal-research requirements.** Confirm whether the proposed voluntary portal capture
-  is ordinary owner recording, institutional animal research, or another regulated
-  category in the relevant jurisdiction and institution.
+  baseline, teacher, tracker, mapper, and reconstruction checkpoint needs explicit review.
+- **Rigged assets and rendered-data rights.** Source terms must permit the planned rendered
+  derivatives and downstream model use. Do not assume that owning or downloading an asset
+  grants dataset rights.
+- **Real-video rights.** Platform availability does not imply redistribution or training
+  permission. Sequence-level evidence is required.
+- **External partner availability.** Lack of Tier G access restricts claims but does not
+  block synthetic, observable-real, temporal, transfer, or entertainment-product work.
 
 ---
 
@@ -95,10 +105,10 @@ See [RESEARCH-CHARTER.md](RESEARCH-CHARTER.md),
 - No model family is evaluated solely against labels generated by that family.
 - Synthetic exactness is not real-world ground truth.
 - Hidden anatomy is labelled as inferred unless independently measured.
-- Benchmark uncertainty must vary with actual observability; it cannot be one global
-  confidence score.
-- Geometry-conditioning simulations are design aids, not measured ground truth.
-- No animal capture occurs before the portal, consent, licence, and ethics gates are met.
+- Benchmark uncertainty varies with actual observability.
+- No owner-operated research rig, calibration apparatus, or product fabrication enters
+  the critical path.
+- External measurement results remain separate from synthetic and model-derived scores.
 - No medical, veterinary, welfare, or diagnostic claims from benchmark v0.
 - No literal semantic translation claim.
-- Coverage gaps, failed captures, and excluded cases are disclosed.
+- Coverage gaps, failed generations, failed annotations, and excluded cases are disclosed.
