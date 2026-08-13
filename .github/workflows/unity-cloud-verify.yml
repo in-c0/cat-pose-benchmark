@@ -1,0 +1,190 @@
+name: Unity cloud verify
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/unity-stage0-viewer
+    paths:
+      - "unity-viewer/**"
+      - ".github/workflows/unity-cloud-verify.yml"
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+jobs:
+  unity-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+      UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Verify Unity credential configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${UNITY_EMAIL:-}" || -z "${UNITY_PASSWORD:-}" ]]; then
+            echo "::error::Missing UNITY_EMAIL or UNITY_PASSWORD GitHub Actions secret."
+            exit 1
+          fi
+          if [[ -z "${UNITY_LICENSE:-}" && -z "${UNITY_SERIAL:-}" ]]; then
+            echo "::error::Configure either UNITY_LICENSE (Personal) or UNITY_SERIAL (Pro) as a GitHub Actions secret."
+            exit 1
+          fi
+
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: unity-viewer/Library
+          key: unity-library-${{ runner.os }}-6000.3.0f1-${{ hashFiles('unity-viewer/Packages/**', 'unity-viewer/ProjectSettings/**') }}
+          restore-keys: |
+            unity-library-${{ runner.os }}-6000.3.0f1-
+
+      - name: Run Unity EditMode tests
+        id: unity_tests
+        uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ env.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ env.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ env.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ env.UNITY_SERIAL }}
+        with:
+          projectPath: unity-viewer
+          unityVersion: auto
+          testMode: editmode
+          artifactsPath: unity-test-artifacts
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          checkName: CatPose Unity EditMode Tests
+
+      - name: Build Linux player and execute Stage S0 pre-build gate
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ env.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ env.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ env.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ env.UNITY_SERIAL }}
+        with:
+          projectPath: unity-viewer
+          unityVersion: auto
+          targetPlatform: StandaloneLinux64
+          buildsPath: unity-build
+          buildName: catpose-stage0-verification
+          allowDirtyBuild: true
+
+      - name: Verify Stage S0 fixture independently
+        shell: python
+        run: |
+          import json, math
+          from pathlib import Path
+
+          path = Path("synthetic/fixtures/stage-s0-unity-export.json")
+          if not path.is_file():
+              raise SystemExit(f"missing Unity-generated fixture: {path}")
+
+          data = json.loads(path.read_text(encoding="utf-8"))
+          assert data["schema_version"] == "0.1.0"
+          assert data["sequence_id"] == "stage-s0-proxy-v0"
+          assert data["evidence_tier"] == "S"
+          assert data["quality"] == "gold"
+          assert data["engine"]["name"] == "Unity"
+          assert data["engine"]["exporter"] == "StageS0SyntheticExporter-v0.2"
+          assert data["camera"]["resolution_px"] == [640, 480]
+          assert data["determinism"]["seed"] == 17
+          assert data["determinism"]["fixed_timestep_ns"] == 100_000_000
+          assert data["determinism"]["frame_count"] == 5
+          assert len(data["frames"]) == 5
+
+          expected_names = {
+              "nose", "left_ear_tip", "right_ear_tip",
+              "left_front_paw", "right_front_paw",
+              "left_hind_paw", "right_hind_paw",
+              "tail_base", "tail_tip",
+          }
+
+          dt = data["determinism"]["fixed_timestep_ns"] / 1e9
+          for i, frame in enumerate(data["frames"]):
+              assert frame["frame_index"] == i
+              assert frame["timestamp_ns"] == i * data["determinism"]["fixed_timestep_ns"]
+              assert {p["semantic_name"] for p in frame["landmarks"]} == expected_names
+              assert len(frame["tail_curve_world_m"]) == 4
+              assert len(frame["contacts"]) == 4
+              assert frame["spatial_relations"] == [{
+                  "subject_id": "proxy-cat-001",
+                  "relation": "on",
+                  "object_id": "floor",
+              }]
+              for key in ("subject_root_world_m", "subject_velocity_world_mps"):
+                  vec = frame[key]
+                  assert all(math.isfinite(float(vec[a])) for a in ("x", "y", "z"))
+              if i < len(data["frames"]) - 1:
+                  a = frame["subject_root_world_m"]
+                  b = data["frames"][i + 1]["subject_root_world_m"]
+                  v = frame["subject_velocity_world_mps"]
+                  for axis in ("x", "y", "z"):
+                      fd = (float(b[axis]) - float(a[axis])) / dt
+                      assert math.isclose(fd, float(v[axis]), abs_tol=1e-6, rel_tol=1e-6)
+
+          # Independently recompute Unity-style pinhole projection for every landmark.
+          cam_pos = (0.0, 1.1, -3.0)
+          look_at = (0.0, 0.4, 0.0)
+          up0 = (0.0, 1.0, 0.0)
+
+          def sub(a, b): return tuple(x-y for x,y in zip(a,b))
+          def dot(a, b): return sum(x*y for x,y in zip(a,b))
+          def cross(a, b):
+              return (a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0])
+          def norm(a):
+              n = math.sqrt(dot(a,a)); return tuple(x/n for x in a)
+
+          forward = norm(sub(look_at, cam_pos))
+          right = norm(cross(up0, forward))
+          up = cross(forward, right)
+          tan_half = math.tan(math.radians(60.0)/2.0)
+          aspect = 640/480
+
+          for frame in data["frames"]:
+              for lm in frame["landmarks"]:
+                  w = lm["world_m"]
+                  world = (float(w["x"]), float(w["y"]), float(w["z"]))
+                  delta = sub(world, cam_pos)
+                  camera = (dot(delta, right), dot(delta, up), dot(delta, forward))
+                  c = lm["camera_m"]
+                  for actual, expected in zip((c["x"], c["y"], c["z"]), camera):
+                      assert math.isclose(float(actual), expected, abs_tol=2e-5, rel_tol=2e-5)
+                  x, y, z = camera
+                  px = ((x/(z*tan_half*aspect)) + 1.0) * 0.5 * 640
+                  py = ((y/(z*tan_half)) + 1.0) * 0.5 * 480
+                  p = lm["image_px"]
+                  assert math.isclose(float(p["x"]), px, abs_tol=2e-4, rel_tol=2e-5)
+                  assert math.isclose(float(p["y"]), py, abs_tol=2e-4, rel_tol=2e-5)
+
+          print(f"Verified Unity-generated Stage S0 fixture: {path}")
+
+      - name: Upload Unity test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unity-editmode-test-results
+          path: unity-test-artifacts
+          if-no-files-found: warn
+
+      - name: Upload Stage S0 verification artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage-s0-unity-verification
+          path: |
+            synthetic/fixtures/stage-s0-unity-export.json
+            unity-viewer/Assets/StreamingAssets/CatPose/stage-s0-unity-export.json
+          if-no-files-found: warn
