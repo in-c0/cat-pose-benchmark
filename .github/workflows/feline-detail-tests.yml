@@ -34,6 +34,7 @@ jobs:
           python -m pip install --disable-pip-version-check \
             jsonschema \
             numpy \
+            pillow \
             scikit-image
 
       - name: Run feline detail tests
