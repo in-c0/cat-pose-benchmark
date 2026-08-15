@@ -57,7 +57,8 @@ jobs:
 
       - name: Make four-frame smoke clip and manifest
         run: |
-          ffmpeg -hide_banner -loglevel error -y \
+          FFMPEG="$(python -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')"
+          "$FFMPEG" -hide_banner -loglevel error -y \
             -i bakeoff/media/cat-plays.webm \
             -t 1.0 -vf fps=4 -an /tmp/cat-plays-fmpose3d-smoke.mp4
           python - <<'PY'
