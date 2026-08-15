@@ -60,7 +60,7 @@
         "canonical_name": {"type": ["string", "null"]},
         "x_px": {"type": "number"},
         "y_px": {"type": "number"},
-        "score": {"type": "number", "minimum": 0, "maximum": 1}
+        "score": {"type": "number", "minimum": 0}
       }
     },
     "keypoint3d": {
@@ -74,7 +74,7 @@
         "y": {"type": "number"},
         "z": {"type": "number"},
         "coordinate_frame": {"enum": ["camera", "root_relative", "world", "model_native"]},
-        "score": {"type": "number", "minimum": 0, "maximum": 1}
+        "score": {"type": "number", "minimum": 0}
       }
     },
     "frame": {
