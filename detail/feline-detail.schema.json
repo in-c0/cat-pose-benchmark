@@ -48,16 +48,17 @@
       }
     },
     "tail_sample": {
-      "allOf": [
-        {"$ref": "#/$defs/point"},
-        {
-          "type": "object",
-          "required": ["u"],
-          "properties": {
-            "u": {"type": "number", "minimum": 0, "maximum": 1}
-          }
-        }
-      ]
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["u", "x_px", "y_px", "visibility"],
+      "properties": {
+        "u": {"type": "number", "minimum": 0, "maximum": 1},
+        "x_px": {"type": "number"},
+        "y_px": {"type": "number"},
+        "visibility": {"enum": ["visible", "partially_occluded", "fully_occluded", "out_of_frame"]},
+        "confidence": {"type": "number", "minimum": 0},
+        "provenance": {"type": "string"}
+      }
     },
     "tail": {
       "type": "object",
