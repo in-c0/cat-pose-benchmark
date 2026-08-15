@@ -8,14 +8,14 @@ This experiment answers one question before CatPose trains another pose network:
 > given a fair test?**
 
 The bake-off is deliberately model-neutral. Every adapter converts native model output
-into one prediction contract, then common metrics measure temporal stability, coverage,
+into one prediction contract, then common metrics measure coverage, motion consistency,
 3D plausibility, and feline-specific topology gaps.
 
 ## Baselines
 
 | ID | Role | Dimensionality | Current commercial status |
 |---|---|---:|---|
-| `rtmpose_animal` | Fast generic animal baseline | 2D | `unknown` pending checkpoint/dataset review |
+| `rtmpose_animal` | Fast generic animal baseline | 2D | `unknown` pending packaged-checkpoint pretraining review |
 | `superanimal_quadruped` | Broad quadruped research baseline | 2D | `research_only` for provided SuperAnimal weights |
 | `fmpose3d_animal` | Monocular animal lifting baseline | 2D -> 3D | `research_only_or_unknown` pending all downloaded weight licences |
 | `gem_x_reference` | Architecture reference only | human 2D -> 3D | not a feline baseline |
@@ -55,7 +55,7 @@ Important design choices:
 - 3D coordinates must name their coordinate frame;
 - model confidence remains model confidence, not benchmark uncertainty;
 - adapter metadata records model/version/checkpoint and licence status;
-- per-frame inference time is recorded independently of video decoding.
+- per-frame inference time is recorded independently of video decoding where the native API permits it.
 
 ## Metrics implemented in v0
 
@@ -64,15 +64,31 @@ set:
 
 - keypoint coverage above a confidence threshold;
 - per-keypoint dropout count and recovery length;
-- normalized temporal second-difference (jitter/instability proxy);
-- normalized acceleration-spike rate;
+- normalized 2D **motion curvature** (second difference);
+- motion-curvature spike rate;
 - 3D bone-length coefficient of variation when skeleton edges are declared;
 - depth sign/ordering flips for declared diagnostic pairs;
 - topology coverage for feline requirements such as paws, ears and tail.
 
+Motion curvature is **not called jitter on unconstrained video**. It contains real animal
+acceleration/articulation, camera motion, sampling effects and estimator noise. It may be
+used as a jitter proxy only on a pre-declared quasi-static or otherwise motion-controlled
+slice.
+
 These are **failure-discovery metrics**, not a substitute for accuracy against independent
 reference labels. Sparse observable labels can be added later for normalized 2D error and
 confidence calibration.
+
+## First real-model result
+
+`bakeoff/reports/rtmpose-commons-cat-plays-v0.md` records the first zero-touch real-cat
+smoke test. RTMPose Animal produced 17-point gross-body pose on eight sampled cat frames
+with 98.53% thresholded coverage, but its AP-10K topology structurally lacks feline ear
+tips and provides only a tail root—so it cannot represent the requested tail curve.
+
+That result is evidence against making **generic 2D cat pose** the primary CatPose
+novelty target. It is not yet evidence about SuperAnimal's richer topology or FMPose3D's
+monocular 3D capability.
 
 ## Dry run
 
