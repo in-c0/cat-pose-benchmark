@@ -54,12 +54,13 @@ class BakeoffTests(unittest.TestCase):
         self.assertAlmostEqual(result["feline_topology"]["tail"]["coverage"], 1 / 3)
         self.assertFalse(result["feline_topology"]["tail_curve_capability"]["satisfied"])
 
-    def test_translation_motion_has_near_zero_second_difference(self) -> None:
+    def test_constant_velocity_translation_has_near_zero_motion_curvature(self) -> None:
         result = evaluate(self.prediction, self.requirements, confidence=0.2)
-        value = result["two_d"]["mean_normalized_second_difference"]
+        value = result["two_d"]["mean_normalized_motion_curvature"]
         self.assertIsNotNone(value)
         self.assertLess(value, 1e-12)
-        self.assertEqual(result["two_d"]["acceleration_spike_rate"], 0.0)
+        self.assertEqual(result["two_d"]["motion_curvature_spike_rate"], 0.0)
+        self.assertIn("true subject motion", result["two_d"]["motion_curvature_interpretation"])
 
     def test_constant_3d_geometry_has_stable_bone_lengths(self) -> None:
         result = evaluate(self.prediction, self.requirements, confidence=0.2)
