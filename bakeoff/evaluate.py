@@ -90,9 +90,15 @@ def evaluate(
     requirements: dict[str, Any] | None = None,
     *,
     confidence: float = 0.2,
-    acceleration_spike_threshold: float = 0.03,
+    motion_curvature_spike_threshold: float = 0.03,
 ) -> dict[str, Any]:
-    """Compute model-neutral failure-discovery metrics for one prediction sequence."""
+    """Compute model-neutral failure-discovery metrics for one prediction sequence.
+
+    The 2D second-difference statistic is intentionally called *motion curvature*, not
+    jitter. On unconstrained video it contains true animal acceleration/articulation,
+    camera motion, sampling effects and estimator noise. It becomes a jitter proxy only
+    on a pre-declared quasi-static or otherwise motion-controlled slice.
+    """
 
     frames = prediction.get("frames", [])
     if not frames:
@@ -118,9 +124,9 @@ def evaluate(
     keypoint_names = sorted(set().union(*(set(frame) for frame in frame_maps_2d)))
     coverage_by_keypoint: dict[str, float] = {}
     dropout: dict[str, Any] = {}
-    second_differences: list[float] = []
-    spike_count = 0
-    second_difference_count = 0
+    motion_curvatures: list[float] = []
+    curvature_spike_count = 0
+    motion_curvature_count = 0
 
     for name in keypoint_names:
         visible = [name in frame for frame in frame_maps_2d]
@@ -148,11 +154,11 @@ def evaluate(
             p2 = _point2(following[name])
             dx = p2[0] - 2.0 * p1[0] + p0[0]
             dy = p2[1] - 2.0 * p1[1] + p0[1]
-            normalized_second_difference = math.hypot(dx, dy) / image_diagonal
-            second_differences.append(normalized_second_difference)
-            second_difference_count += 1
-            if normalized_second_difference > acceleration_spike_threshold:
-                spike_count += 1
+            normalized_motion_curvature = math.hypot(dx, dy) / image_diagonal
+            motion_curvatures.append(normalized_motion_curvature)
+            motion_curvature_count += 1
+            if normalized_motion_curvature > motion_curvature_spike_threshold:
+                curvature_spike_count += 1
 
     total_expected = len(keypoint_names) * len(frames)
     total_present = sum(len(frame) for frame in frame_maps_2d)
@@ -241,18 +247,21 @@ def evaluate(
             "coverage": (total_present / total_expected) if total_expected else 0.0,
             "coverage_by_keypoint": coverage_by_keypoint,
             "dropout": dropout,
-            "mean_normalized_second_difference": (
-                statistics.fmean(second_differences)
-                if second_differences
+            "mean_normalized_motion_curvature": (
+                statistics.fmean(motion_curvatures) if motion_curvatures else None
+            ),
+            "motion_curvature_spike_threshold": motion_curvature_spike_threshold,
+            "motion_curvature_spike_rate": (
+                curvature_spike_count / motion_curvature_count
+                if motion_curvature_count
                 else None
             ),
-            "acceleration_spike_threshold": acceleration_spike_threshold,
-            "acceleration_spike_rate": (
-                spike_count / second_difference_count
-                if second_difference_count
-                else None
+            "motion_curvature_samples": motion_curvature_count,
+            "motion_curvature_interpretation": (
+                "Contains true subject motion, camera motion, sampling effects and "
+                "estimator noise. Treat as jitter only on a pre-declared motion-controlled "
+                "slice."
             ),
-            "second_difference_samples": second_difference_count,
         },
         "feline_topology": _topology_metrics(frame_maps_2d, requirements),
         "three_d": {
@@ -274,7 +283,7 @@ def main() -> None:
     parser.add_argument("prediction", type=Path)
     parser.add_argument("--requirements", type=Path)
     parser.add_argument("--confidence", type=float, default=0.2)
-    parser.add_argument("--acceleration-spike-threshold", type=float, default=0.03)
+    parser.add_argument("--motion-curvature-spike-threshold", type=float, default=0.03)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
 
@@ -288,7 +297,7 @@ def main() -> None:
         prediction,
         requirements,
         confidence=args.confidence,
-        acceleration_spike_threshold=args.acceleration_spike_threshold,
+        motion_curvature_spike_threshold=args.motion_curvature_spike_threshold,
     )
     rendered = json.dumps(result, indent=2, sort_keys=True) + "\n"
     if args.output:
