@@ -59,6 +59,7 @@ jobs:
 
       - name: Materialize licence-approved source clip
         run: |
+          set -o pipefail
           python -m bakeoff.materialize_clip bakeoff/clips/commons-cat-plays.json \
             | tee /tmp/materialized.json
 
@@ -79,12 +80,14 @@ jobs:
 
       - name: Prompt SAM2 and derive tail centreline
         run: |
+          set -o pipefail
           python -m detail.sam2_tail_prompt \
             /tmp/cat-frame-0001.png \
             detail/fixtures/superanimal-tail-prompt-frame1.json \
             --output-dir /tmp/sam2-tail \
             --checkpoint facebook/sam2.1-hiera-tiny \
             --samples 24 \
+            --device cpu \
             | tee /tmp/sam2-tail-run.json
 
       - name: Print diagnostics
