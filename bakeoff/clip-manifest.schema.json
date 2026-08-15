@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CatPose bake-off clip manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "clip_id", "source", "licence", "slices"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "clip_id": {"type": "string", "minLength": 1},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": {"enum": ["owned", "redistributable", "link_only", "synthetic"]},
+        "url": {"type": "string"},
+        "local_path": {"type": "string"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "licence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "redistribution"],
+      "properties": {
+        "status": {"enum": ["verified", "unverified", "owned", "synthetic"]},
+        "identifier": {"type": "string"},
+        "source_url": {"type": "string"},
+        "redistribution": {"enum": ["allowed", "link_only", "forbidden", "not_applicable"]},
+        "notes": {"type": "string"}
+      }
+    },
+    "slices": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "lateral_locomotion",
+          "front_rear_locomotion",
+          "posture_transition",
+          "jump",
+          "self_occlusion",
+          "furniture_occlusion",
+          "moving_camera",
+          "face_ear_detail",
+          "tail_dynamics"
+        ]
+      }
+    },
+    "notes": {"type": "string"}
+  }
+}

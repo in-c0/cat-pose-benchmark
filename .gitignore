@@ -25,8 +25,11 @@ venv/
 data/raw/
 data/renders/
 data/benchmark/
+bakeoff/media/
 *.mp4
 *.mov
+*.webm
+*.ogv
 
 # Node
 node_modules/

@@ -1,0 +1,22 @@
+{
+  "schema_version": "0.1.0",
+  "clip_id": "commons-cat-jumping-backwards",
+  "source": {
+    "kind": "redistributable",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f1/Cat_jumping_backwards.webm",
+    "local_path": "bakeoff/media/cat-jumping-backwards.webm"
+  },
+  "licence": {
+    "status": "verified",
+    "identifier": "CC-BY-3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Cat_jumping_backwards.webm",
+    "redistribution": "allowed",
+    "notes": "Author: Mary Qin. Wikimedia Commons records the source licence as Creative Commons Attribution 3.0 Unported and notes that the Vimeo licence was reviewed on 2 June 2017. Preserve attribution and indicate modifications."
+  },
+  "slices": [
+    "jump",
+    "posture_transition",
+    "tail_dynamics"
+  ],
+  "notes": "18.8 s clip containing original motion plus a 1/4-speed replay; segment-level reporting should distinguish original and slow-motion portions."
+}
