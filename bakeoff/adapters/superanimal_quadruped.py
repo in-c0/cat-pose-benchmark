@@ -93,7 +93,10 @@ class SuperAnimalQuadrupedAdapter(PoseAdapter):
                 plot_trajectories=False,
                 batch_size=self.batch_size,
                 detector_batch_size=self.batch_size,
-                max_individuals=4,
+                # The first bake-off corpus is deliberately single-cat. Restricting
+                # detections prevents per-frame identity switches from polluting the
+                # temporal metrics before multi-cat tracking is itself under test.
+                max_individuals=1,
                 device=self.device,
                 plot_bboxes=False,
                 create_labeled_video=False,
