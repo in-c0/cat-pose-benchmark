@@ -167,6 +167,8 @@ def evaluate(
     mean_inference_ms = statistics.fmean(inference_ms)
     sorted_inference = sorted(inference_ms)
     p95_index = max(0, math.ceil(0.95 * len(sorted_inference)) - 1)
+    timing = prediction.get("timing", {})
+    timing_scope = timing.get("scope", "unspecified")
 
     bone_metrics: dict[str, Any] = {}
     for edge in prediction.get("skeleton_edges_3d", []):
@@ -236,10 +238,16 @@ def evaluate(
         "model_id": prediction["model"]["id"],
         "confidence_threshold": confidence,
         "runtime": {
+            "timing_scope": timing_scope,
+            "timing_notes": timing.get("notes"),
             "mean_inference_ms": mean_inference_ms,
             "p95_inference_ms": sorted_inference[p95_index],
             "effective_inference_fps": (
                 1000.0 / mean_inference_ms if mean_inference_ms > 0 else None
+            ),
+            "comparison_boundary": (
+                "Compare throughput across models only when timing_scope matches and "
+                "hardware/execution conditions are equivalent."
             ),
         },
         "two_d": {
