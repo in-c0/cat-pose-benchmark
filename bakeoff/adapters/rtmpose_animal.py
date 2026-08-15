@@ -58,44 +58,62 @@ def _mmpose_version() -> str:
         return "unknown"
 
 
+def _length(value: Any) -> int:
+    if value is None:
+        return 0
+    try:
+        return len(value)
+    except TypeError:
+        return 0
+
+
 def _unwrap_instances(result: dict[str, Any]) -> list[dict[str, Any]]:
-    predictions = result.get("predictions", [])
-    if not predictions:
+    predictions = result.get("predictions")
+    if predictions is None or _length(predictions) == 0:
         return []
     # One ndarray/image input normally yields one batch element containing instances.
-    if len(predictions) == 1 and isinstance(predictions[0], list):
+    if _length(predictions) == 1 and isinstance(predictions[0], list):
         return predictions[0]
     if all(isinstance(item, dict) for item in predictions):
-        return predictions
+        return list(predictions)
     return []
 
 
 def _instance_score(instance: dict[str, Any]) -> float:
-    scores = instance.get("keypoint_scores") or []
-    if scores:
-        return sum(float(score) for score in scores) / len(scores)
+    scores = instance.get("keypoint_scores")
+    if scores is not None and _length(scores) > 0:
+        return sum(float(score) for score in scores) / _length(scores)
+
     bbox_score = instance.get("bbox_score")
-    if isinstance(bbox_score, (int, float)):
+    if bbox_score is None:
+        return 0.0
+    try:
         return float(bbox_score)
-    if isinstance(bbox_score, list) and bbox_score:
-        return float(bbox_score[0])
+    except (TypeError, ValueError):
+        if _length(bbox_score) > 0:
+            return float(bbox_score[0])
     return 0.0
 
 
 def canonical_keypoints(instance: dict[str, Any]) -> list[dict[str, Any]]:
-    coordinates = instance.get("keypoints") or []
-    scores = instance.get("keypoint_scores") or []
-    if len(coordinates) != len(AP10K_NAMES):
+    coordinates = instance.get("keypoints")
+    scores = instance.get("keypoint_scores")
+    if coordinates is None:
+        coordinates = []
+    if scores is None:
+        scores = []
+
+    if _length(coordinates) != len(AP10K_NAMES):
         raise ValueError(
-            f"RTMPose animal returned {len(coordinates)} keypoints; expected "
+            f"RTMPose animal returned {_length(coordinates)} keypoints; expected "
             f"{len(AP10K_NAMES)} for AP-10K."
         )
-    if scores and len(scores) != len(coordinates):
+    if _length(scores) not in (0, _length(coordinates)):
         raise ValueError("RTMPose keypoint_scores length does not match keypoints")
 
     converted = []
     for index, (native_name, coordinate) in enumerate(zip(AP10K_NAMES, coordinates)):
-        score = float(scores[index]) if scores else 1.0
+        score = float(scores[index]) if _length(scores) else 1.0
         converted.append(
             {
                 "native_name": native_name,
