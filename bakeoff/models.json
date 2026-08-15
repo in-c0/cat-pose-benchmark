@@ -10,10 +10,12 @@
       "dimensionality": "2d",
       "native_topology": "AP-10K animal keypoints",
       "code_license": "Apache-2.0",
-      "checkpoint_license": "verify_before_use",
+      "training_dataset_license": "AP-10K: CC-BY-4.0",
+      "checkpoint_lineage": "AP-10K training; CSPNeXt backbone initialized from OpenMMLab AIC+COCO pose pretraining",
+      "checkpoint_license": "verify_pretraining_lineage_before_product_use",
       "commercial_status": "unknown",
-      "contamination_policy": "Do not use predictions as product-training labels until checkpoint and source-dataset rights are recorded.",
-      "notes": "Primary fast generic animal baseline."
+      "contamination_policy": "Benchmark use is allowed. Do not promote this packaged checkpoint or its predictions into the commercial training path until AIC/COCO pretraining lineage and checkpoint terms are documented.",
+      "notes": "Primary fast generic animal baseline. MMPose/RTMPose implementation is Apache-2.0 and AP-10K is CC-BY-4.0, but the published animal checkpoint has additional AIC/COCO pretrained-backbone lineage."
     },
     {
       "id": "superanimal_quadruped",
