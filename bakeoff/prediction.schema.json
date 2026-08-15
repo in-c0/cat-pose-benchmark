@@ -28,6 +28,21 @@
         "fps": {"type": "number", "exclusiveMinimum": 0}
       }
     },
+    "timing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope"],
+      "properties": {
+        "scope": {
+          "enum": [
+            "per_frame_model_call_after_initialization",
+            "whole_video_amortized_including_setup",
+            "synthetic_fixture"
+          ]
+        },
+        "notes": {"type": "string"}
+      }
+    },
     "skeleton_edges_3d": {
       "type": "array",
       "items": {
