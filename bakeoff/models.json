@@ -1,0 +1,59 @@
+{
+  "schema_version": "0.1.0",
+  "models": [
+    {
+      "id": "rtmpose_animal",
+      "role": "baseline",
+      "library": "MMPose",
+      "model": "rtmpose-m_8xb64-210e_ap10k-256x256",
+      "detector": "RTMDet-m",
+      "dimensionality": "2d",
+      "native_topology": "AP-10K animal keypoints",
+      "code_license": "Apache-2.0",
+      "checkpoint_license": "verify_before_use",
+      "commercial_status": "unknown",
+      "contamination_policy": "Do not use predictions as product-training labels until checkpoint and source-dataset rights are recorded.",
+      "notes": "Primary fast generic animal baseline."
+    },
+    {
+      "id": "superanimal_quadruped",
+      "role": "research_baseline",
+      "library": "DeepLabCut",
+      "model": "SuperAnimal-Quadruped",
+      "dimensionality": "2d",
+      "native_topology": "39-keypoint quadruped",
+      "code_license": "LGPL-3.0",
+      "checkpoint_license": "academic_noncommercial_modified_MIT",
+      "commercial_status": "research_only",
+      "contamination_policy": "Isolate research outputs; do not promote pseudo-labels into product training data without derived-data rights review.",
+      "notes": "Useful zero-shot quadruped teacher/baseline, not the default commercial runtime."
+    },
+    {
+      "id": "fmpose3d_animal",
+      "role": "research_baseline",
+      "library": "FMPose3D",
+      "model": "animal flow-matching lifter",
+      "detector": "26-joint SuperAnimal-Quadruped fine-tuned on Animal3D",
+      "dimensionality": "2d_to_3d",
+      "native_topology": "26-joint animal",
+      "code_license": "Apache-2.0",
+      "checkpoint_license": "verify_all_downloaded_assets",
+      "commercial_status": "research_only_or_unknown",
+      "contamination_policy": "Treat downloaded animal checkpoints and their outputs as restricted until each asset licence is resolved.",
+      "notes": "Primary monocular animal 3D reference; multiple plausible poses are scientifically useful under occlusion."
+    },
+    {
+      "id": "gem_x_reference",
+      "role": "architecture_reference",
+      "library": "NVIDIA GEM-X",
+      "model": "GEM SOMA",
+      "dimensionality": "video_to_world_3d",
+      "native_topology": "77-joint human SOMA",
+      "code_license": "Apache-2.0",
+      "checkpoint_license": "NVIDIA_Open_Model_License",
+      "commercial_status": "not_assessed_for_product",
+      "contamination_policy": "Do not use as feline supervision; study architecture and evaluation ideas only.",
+      "notes": "Human-specific detector/body prior. Relevant for dynamic-camera handling, temporal motion and global trajectory recovery."
+    }
+  ]
+}
