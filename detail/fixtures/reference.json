@@ -1,0 +1,62 @@
+{
+  "schema_version": "0.1.0",
+  "sequence_id": "detail-synthetic-v0",
+  "image": {"width_px": 640, "height_px": 480},
+  "evidence_tier": "S",
+  "frames": [
+    {
+      "frame_index": 0,
+      "timestamp_s": 0.0,
+      "ears": [
+        {
+          "side": "left",
+          "base_medial": {"x_px": 200, "y_px": 160, "visibility": "visible", "provenance": "synthetic_exact"},
+          "base_lateral": {"x_px": 180, "y_px": 165, "visibility": "visible", "provenance": "synthetic_exact"},
+          "tip": {"x_px": 190, "y_px": 120, "visibility": "visible", "provenance": "synthetic_exact"}
+        },
+        {
+          "side": "right",
+          "base_medial": {"x_px": 250, "y_px": 160, "visibility": "visible", "provenance": "synthetic_exact"},
+          "base_lateral": {"x_px": 270, "y_px": 165, "visibility": "visible", "provenance": "synthetic_exact"},
+          "tip": {"x_px": 260, "y_px": 120, "visibility": "visible", "provenance": "synthetic_exact"}
+        }
+      ],
+      "tail": {
+        "samples": [
+          {"u": 0.0, "x_px": 300, "y_px": 260, "visibility": "visible", "provenance": "synthetic_exact"},
+          {"u": 0.25, "x_px": 340, "y_px": 270, "visibility": "visible", "provenance": "synthetic_exact"},
+          {"u": 0.5, "x_px": 380, "y_px": 300, "visibility": "visible", "provenance": "synthetic_exact"},
+          {"u": 0.75, "x_px": 420, "y_px": 320, "visibility": "visible", "provenance": "synthetic_exact"},
+          {"u": 1.0, "x_px": 450, "y_px": 300, "visibility": "visible", "provenance": "synthetic_exact"}
+        ]
+      }
+    },
+    {
+      "frame_index": 1,
+      "timestamp_s": 0.1,
+      "ears": [
+        {
+          "side": "left",
+          "base_medial": {"x_px": 202, "y_px": 160, "visibility": "visible", "provenance": "synthetic_exact"},
+          "base_lateral": {"x_px": 182, "y_px": 165, "visibility": "visible", "provenance": "synthetic_exact"},
+          "tip": {"x_px": 192, "y_px": 119, "visibility": "visible", "provenance": "synthetic_exact"}
+        },
+        {
+          "side": "right",
+          "base_medial": {"x_px": 252, "y_px": 160, "visibility": "visible", "provenance": "synthetic_exact"},
+          "base_lateral": {"x_px": 272, "y_px": 165, "visibility": "visible", "provenance": "synthetic_exact"},
+          "tip": {"x_px": 262, "y_px": 119, "visibility": "visible", "provenance": "synthetic_exact"}
+        }
+      ],
+      "tail": {
+        "samples": [
+          {"u": 0.0, "x_px": 302, "y_px": 260, "visibility": "visible", "provenance": "synthetic_exact"},
+          {"u": 0.25, "x_px": 342, "y_px": 270, "visibility": "visible", "provenance": "synthetic_exact"},
+          {"u": 0.5, "x_px": 382, "y_px": 300, "visibility": "fully_occluded", "provenance": "synthetic_exact"},
+          {"u": 0.75, "x_px": 422, "y_px": 320, "visibility": "visible", "provenance": "synthetic_exact"},
+          {"u": 1.0, "x_px": 452, "y_px": 300, "visibility": "visible", "provenance": "synthetic_exact"}
+        ]
+      }
+    }
+  ]
+}

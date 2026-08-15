@@ -1,0 +1,63 @@
+{
+  "schema_version": "0.1.0",
+  "sequence_id": "detail-synthetic-v0",
+  "image": {"width_px": 640, "height_px": 480},
+  "evidence_tier": "R3",
+  "frames": [
+    {
+      "frame_index": 0,
+      "timestamp_s": 0.0,
+      "ears": [
+        {
+          "side": "left",
+          "base_medial": {"x_px": 201, "y_px": 160, "visibility": "visible", "confidence": 0.95, "provenance": "mock_prediction"},
+          "base_lateral": {"x_px": 181, "y_px": 166, "visibility": "visible", "confidence": 0.95, "provenance": "mock_prediction"},
+          "tip": {"x_px": 192, "y_px": 121, "visibility": "visible", "confidence": 0.92, "provenance": "mock_prediction"}
+        },
+        {
+          "side": "right",
+          "base_medial": {"x_px": 249, "y_px": 161, "visibility": "visible", "confidence": 0.95, "provenance": "mock_prediction"},
+          "base_lateral": {"x_px": 269, "y_px": 165, "visibility": "visible", "confidence": 0.95, "provenance": "mock_prediction"},
+          "tip": {"x_px": 259, "y_px": 122, "visibility": "visible", "confidence": 0.90, "provenance": "mock_prediction"}
+        }
+      ],
+      "tail": {
+        "samples": [
+          {"u": 0.0, "x_px": 301, "y_px": 260, "visibility": "visible", "confidence": 0.97, "provenance": "mock_prediction"},
+          {"u": 0.2, "x_px": 333, "y_px": 268, "visibility": "visible", "confidence": 0.94, "provenance": "mock_prediction"},
+          {"u": 0.4, "x_px": 366, "y_px": 291, "visibility": "visible", "confidence": 0.92, "provenance": "mock_prediction"},
+          {"u": 0.6, "x_px": 398, "y_px": 311, "visibility": "visible", "confidence": 0.90, "provenance": "mock_prediction"},
+          {"u": 0.8, "x_px": 429, "y_px": 316, "visibility": "visible", "confidence": 0.88, "provenance": "mock_prediction"},
+          {"u": 1.0, "x_px": 449, "y_px": 302, "visibility": "visible", "confidence": 0.86, "provenance": "mock_prediction"}
+        ]
+      }
+    },
+    {
+      "frame_index": 1,
+      "timestamp_s": 0.1,
+      "ears": [
+        {
+          "side": "left",
+          "base_medial": {"x_px": 203, "y_px": 160, "visibility": "visible", "confidence": 0.95, "provenance": "mock_prediction"},
+          "base_lateral": {"x_px": 183, "y_px": 165, "visibility": "visible", "confidence": 0.95, "provenance": "mock_prediction"},
+          "tip": {"x_px": 193, "y_px": 120, "visibility": "visible", "confidence": 0.91, "provenance": "mock_prediction"}
+        },
+        {
+          "side": "right",
+          "base_medial": {"x_px": 251, "y_px": 160, "visibility": "visible", "confidence": 0.94, "provenance": "mock_prediction"},
+          "base_lateral": {"x_px": 271, "y_px": 166, "visibility": "visible", "confidence": 0.94, "provenance": "mock_prediction"},
+          "tip": {"x_px": 261, "y_px": 121, "visibility": "visible", "confidence": 0.89, "provenance": "mock_prediction"}
+        }
+      ],
+      "tail": {
+        "samples": [
+          {"u": 0.0, "x_px": 303, "y_px": 260, "visibility": "visible", "confidence": 0.96, "provenance": "mock_prediction"},
+          {"u": 0.25, "x_px": 343, "y_px": 270, "visibility": "visible", "confidence": 0.92, "provenance": "mock_prediction"},
+          {"u": 0.5, "x_px": 383, "y_px": 299, "visibility": "fully_occluded", "confidence": 0.55, "provenance": "mock_prediction"},
+          {"u": 0.75, "x_px": 423, "y_px": 320, "visibility": "visible", "confidence": 0.90, "provenance": "mock_prediction"},
+          {"u": 1.0, "x_px": 451, "y_px": 301, "visibility": "visible", "confidence": 0.88, "provenance": "mock_prediction"}
+        ]
+      }
+    }
+  ]
+}
