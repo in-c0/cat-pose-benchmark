@@ -93,9 +93,6 @@ class SuperAnimalQuadrupedAdapter(PoseAdapter):
                 plot_trajectories=False,
                 batch_size=self.batch_size,
                 detector_batch_size=self.batch_size,
-                # The first bake-off corpus is deliberately single-cat. Restricting
-                # detections prevents per-frame identity switches from polluting the
-                # temporal metrics before multi-cat tracking is itself under test.
                 max_individuals=1,
                 device=self.device,
                 plot_bboxes=False,
@@ -124,6 +121,10 @@ class SuperAnimalQuadrupedAdapter(PoseAdapter):
                 "commercial_status": self.info.commercial_status,
             },
             "source": {"width_px": width, "height_px": height, "fps": fps},
+            "timing": {
+                "scope": "whole_video_amortized_including_setup",
+                "notes": "Whole video_inference_superanimal call divided by output frames; includes model/setup overhead and is not directly comparable to RTMPose per-frame timing.",
+            },
             "frames": frames,
         }
 
