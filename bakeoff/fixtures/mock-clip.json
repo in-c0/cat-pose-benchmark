@@ -1,0 +1,19 @@
+{
+  "schema_version": "0.1.0",
+  "clip_id": "synthetic-mock-cat-v0",
+  "source": {
+    "kind": "synthetic",
+    "local_path": "not-a-real-video.mp4"
+  },
+  "licence": {
+    "status": "synthetic",
+    "redistribution": "not_applicable",
+    "notes": "CI-only deterministic fixture; no media file is required."
+  },
+  "slices": [
+    "lateral_locomotion",
+    "face_ear_detail",
+    "tail_dynamics"
+  ],
+  "notes": "Input manifest for the mock adapter."
+}
