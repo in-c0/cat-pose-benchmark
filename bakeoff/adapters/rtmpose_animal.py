@@ -71,7 +71,6 @@ def _unwrap_instances(result: dict[str, Any]) -> list[dict[str, Any]]:
     predictions = result.get("predictions")
     if predictions is None or _length(predictions) == 0:
         return []
-    # One ndarray/image input normally yields one batch element containing instances.
     if _length(predictions) == 1 and isinstance(predictions[0], list):
         return predictions[0]
     if all(isinstance(item, dict) for item in predictions):
@@ -227,6 +226,10 @@ class RTMPoseAnimalAdapter(PoseAdapter):
                 "commercial_status": self.info.commercial_status,
             },
             "source": {"width_px": width, "height_px": height, "fps": fps},
+            "timing": {
+                "scope": "per_frame_model_call_after_initialization",
+                "notes": "Per emitted frame around the inferencer call; model construction/checkpoint initialization is excluded.",
+            },
             "frames": frames,
         }
 
