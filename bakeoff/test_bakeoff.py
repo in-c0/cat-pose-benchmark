@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 
 from bakeoff.adapters.mock import MockAdapter
+from bakeoff.adapters.rtmpose_animal import AP10K_NAMES, canonical_keypoints
 from bakeoff.evaluate import evaluate
 from bakeoff.validate import validate
 
@@ -24,9 +25,7 @@ class BakeoffTests(unittest.TestCase):
     def test_mock_prediction_conforms_to_schema(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             prediction_path = Path(directory) / "prediction.json"
-            prediction_path.write_text(
-                json.dumps(self.prediction), encoding="utf-8"
-            )
+            prediction_path.write_text(json.dumps(self.prediction), encoding="utf-8")
             errors = validate(
                 prediction_path,
                 ROOT / "bakeoff" / "prediction.schema.json",
@@ -69,6 +68,23 @@ class BakeoffTests(unittest.TestCase):
                 self.assertLess(edge["coefficient_of_variation"], 1e-12)
         for pair in result["three_d"]["diagnostic_depth_flips"].values():
             self.assertEqual(pair["flips"], 0)
+
+    def test_rtmpose_ap10k_mapping_exposes_feline_topology_gap(self) -> None:
+        coordinates = [[float(index), float(index + 1)] for index in range(len(AP10K_NAMES))]
+        scores = [0.9 for _ in AP10K_NAMES]
+        scores[0] = 1.08  # Preserve native score scale; do not silently clamp.
+        converted = canonical_keypoints(
+            {"keypoints": coordinates, "keypoint_scores": scores}
+        )
+        by_native = {point["native_name"]: point for point in converted}
+
+        self.assertEqual(len(converted), 17)
+        self.assertEqual(by_native["tail_root"]["canonical_name"], "tail_base")
+        self.assertEqual(by_native["left_back_paw"]["canonical_name"], "left_hind_paw")
+        self.assertEqual(by_native["right_back_paw"]["canonical_name"], "right_hind_paw")
+        self.assertEqual(by_native["left_eye"]["score"], 1.08)
+        self.assertNotIn("left_ear_tip", {point["canonical_name"] for point in converted})
+        self.assertNotIn("tail_tip", {point["canonical_name"] for point in converted})
 
 
 if __name__ == "__main__":
