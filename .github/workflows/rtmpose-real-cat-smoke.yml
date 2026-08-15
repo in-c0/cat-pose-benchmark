@@ -41,8 +41,9 @@ jobs:
           mim install "mmengine>=0.9.0,<1.0.0"
           mim install "mmcv==2.1.0"
           mim install "mmdet==3.2.0"
-          # MMPose 1.3.2 still depends on chumpy 0.70. Its legacy setup imports pip
-          # during wheel requirement discovery, which fails in modern isolated builds.
+          # MMPose 1.3.2 still depends on chumpy 0.70. Its legacy package needs both
+          # pip and bdist_wheel visible in the non-isolated build environment.
+          python -m pip install wheel
           python -m pip install --no-build-isolation "chumpy==0.70"
           mim install "mmpose==1.3.2"
           # Guard against transitive packages replacing the NumPy/OpenCV pair after MIM.
