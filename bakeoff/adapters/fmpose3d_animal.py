@@ -35,7 +35,6 @@ FMPOSE_CANONICAL_NAME = {
     "right_back_paw": "right_hind_paw",
     "withers": "withers",
     "throat": "throat",
-    # Generic ear points are preserved but are not silently promoted to ear tips.
     "left_ear": "left_ear",
     "right_ear": "right_ear",
     "mouth": "mouth",
@@ -145,8 +144,6 @@ class FMPose3DAnimalAdapter(PoseAdapter):
         points_3d = dataframe_to_3d_by_frame(
             df_3d,
             canonical_map=FMPOSE_CANONICAL_NAME,
-            # Current integration exposes coordinates but does not make us claim a
-            # world/camera convention here. Preserve them as model-native evidence.
             coordinate_frame="model_native",
         )
         for frame, frame_points_3d in zip(frames, points_3d):
@@ -162,6 +159,10 @@ class FMPose3DAnimalAdapter(PoseAdapter):
                 "commercial_status": self.info.commercial_status,
             },
             "source": {"width_px": width, "height_px": height, "fps": fps},
+            "timing": {
+                "scope": "whole_video_amortized_including_setup",
+                "notes": "Whole DeepLabCut/FMPose3D call divided by output frames; includes model/setup overhead and is not directly comparable to RTMPose per-frame timing.",
+            },
             "skeleton_edges_3d": SKELETON_EDGES,
             "diagnostic_depth_pairs": DIAGNOSTIC_DEPTH_PAIRS,
             "frames": frames,
