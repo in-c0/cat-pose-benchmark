@@ -72,8 +72,6 @@ def _candidate_diagnostics(
 
 
 def _candidate_rank(diagnostic: dict[str, Any]) -> tuple[float, float, float, float]:
-    # Prompt consistency outranks SAM2's own mask-quality score. This avoids selecting a
-    # high-IoU whole-cat mask that ignores the explicit negative body prompts.
     return (
         float(diagnostic["positive_prompt_inside_fraction"]),
         float(diagnostic["negative_prompt_outside_fraction"]),
@@ -123,6 +121,7 @@ def run(
     output_dir: Path,
     checkpoint: str,
     sample_count: int,
+    device: str,
 ) -> dict[str, Any]:
     try:
         from sam2.sam2_image_predictor import SAM2ImagePredictor
@@ -143,7 +142,7 @@ def run(
         )
 
     point_coords, point_labels = _prompt_arrays(prompt)
-    predictor = SAM2ImagePredictor.from_pretrained(checkpoint)
+    predictor = SAM2ImagePredictor.from_pretrained(checkpoint, device=device)
     predictor.set_image(np.asarray(image))
     masks, scores, _logits = predictor.predict(
         point_coords=point_coords,
@@ -188,6 +187,7 @@ def run(
             "prompt": prompt["prompt_provenance"],
             "segmentation_model": prompt["segmentation_model"],
             "method": "prompted_mask_to_skeleton_longest_path_v0",
+            "inference_device": device,
         },
         "scientific_boundary": (
             "Model-derived segmentation and geometry. This is not observed ground truth "
@@ -201,6 +201,7 @@ def run(
     result = {
         "schema_version": "0.1.0",
         "checkpoint": checkpoint,
+        "device": device,
         "chosen_candidate": diagnostics[chosen_index],
         "all_candidates": diagnostics,
         "tail_sample_count": len(tail_samples),
@@ -224,6 +225,7 @@ def main() -> None:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--checkpoint", default="facebook/sam2.1-hiera-tiny")
     parser.add_argument("--samples", type=int, default=24)
+    parser.add_argument("--device", default="cpu")
     args = parser.parse_args()
 
     result = run(
@@ -232,6 +234,7 @@ def main() -> None:
         output_dir=args.output_dir,
         checkpoint=args.checkpoint,
         sample_count=args.samples,
+        device=args.device,
     )
     print(json.dumps(result, indent=2, sort_keys=True))
 
