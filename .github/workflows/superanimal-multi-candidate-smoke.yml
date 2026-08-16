@@ -1,0 +1,163 @@
+name: SuperAnimal multi-candidate identity probe
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "temporal/superanimal_multi_candidates.py"
+      - "temporal/test_superanimal_multi_candidates.py"
+      - "temporal/appearance_assignment.py"
+      - "temporal/test_appearance_assignment.py"
+      - "temporal/fixtures/superanimal-grey-cat-identity-seed-frame5.json"
+      - "bakeoff/adapters/deeplabcut_common.py"
+      - "bakeoff/materialize_clip.py"
+      - "bakeoff/clips/commons-cat-jumping-backwards.json"
+      - ".github/workflows/superanimal-multi-candidate-smoke.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  lightweight:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install test dependencies
+        run: python -m pip install --disable-pip-version-check pandas pillow
+      - name: Run candidate and assignment tests
+        run: |
+          python -m unittest \
+            temporal.test_superanimal_multi_candidates \
+            temporal.test_appearance_assignment
+
+  real-window:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - name: Install CPU DeepLabCut research stack
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            "torch==2.4.1" "torchvision==0.19.1" \
+            --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install "deeplabcut==3.0.1" pillow imageio-ffmpeg
+      - name: Materialize licence-approved source clip
+        run: |
+          set -o pipefail
+          python -m bakeoff.materialize_clip bakeoff/clips/commons-cat-jumping-backwards.json \
+            | tee /tmp/materialized.json
+      - name: Build exact frame-8-to-11 failure window
+        run: |
+          FFMPEG="$(python -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')"
+          "$FFMPEG" -hide_banner -loglevel error -y \
+            -i bakeoff/media/cat-jumping-backwards.webm \
+            -t 8.0 -vf fps=1.5 -an /tmp/full-regression.mp4
+          mkdir -p /tmp/all-frames /tmp/failure-frames
+          "$FFMPEG" -hide_banner -loglevel error -y \
+            -i /tmp/full-regression.mp4 -q:v 2 -start_number 0 /tmp/all-frames/%05d.jpg
+          cp /tmp/all-frames/00008.jpg /tmp/failure-frames/00000.jpg
+          cp /tmp/all-frames/00009.jpg /tmp/failure-frames/00001.jpg
+          cp /tmp/all-frames/00010.jpg /tmp/failure-frames/00002.jpg
+          cp /tmp/all-frames/00011.jpg /tmp/failure-frames/00003.jpg
+          "$FFMPEG" -hide_banner -loglevel error -y \
+            -framerate 1.5 -i /tmp/failure-frames/%05d.jpg \
+            -c:v libx264 -pix_fmt yuv420p -r 1.5 /tmp/failure-window.mp4
+          python - <<'PY'
+          import cv2
+          cap = cv2.VideoCapture('/tmp/failure-window.mp4')
+          count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+          fps = cap.get(cv2.CAP_PROP_FPS)
+          width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+          height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+          cap.release()
+          print('window', count, fps, width, height)
+          assert count == 4, count
+          assert (width, height) == (1920, 1080)
+          PY
+      - name: Run two-individual SuperAnimal probe
+        run: |
+          set -o pipefail
+          python -m temporal.superanimal_multi_candidates \
+            /tmp/failure-window.mp4 \
+            --output-dir /tmp/multi-candidates \
+            --device cpu \
+            --max-individuals 2 \
+            --frame-offset 8 \
+            --confidence 0.2 \
+            | tee /tmp/multi-candidate-summary.json
+      - name: Print candidate diagnostics
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result = json.loads(Path('/tmp/multi-candidates/multi-candidates.json').read_text())
+          print(json.dumps(result['summary'], indent=2, sort_keys=True))
+          for frame in result['frames']:
+              print('frame', frame['frame_index'], 'candidates', frame['candidate_count'])
+              for candidate in frame['candidates']:
+                  print(
+                      ' ', candidate['individual'],
+                      'n=', candidate['high_confidence_keypoint_count'],
+                      'mean=', round(candidate['mean_keypoint_score'], 3),
+                      'bbox=', [round(v, 1) for v in candidate['bbox_xyxy']],
+                  )
+          PY
+      - name: Assign target conservatively with exploratory appearance gate
+        run: |
+          set -o pipefail
+          python -m temporal.appearance_assignment \
+            /tmp/multi-candidates/multi-candidates.json \
+            temporal/fixtures/superanimal-grey-cat-identity-seed-frame5.json \
+            /tmp/all-frames \
+            --appearance-threshold 0.30 \
+            --seed-padding-fraction 0.05 \
+            --histogram-bins 8 \
+            --output /tmp/identity-assignment.json \
+            --overlays-dir /tmp/assignment-overlays \
+            | tee /tmp/identity-assignment-summary.json
+      - name: Print assignment diagnostics
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result = json.loads(Path('/tmp/identity-assignment.json').read_text())
+          print(json.dumps(result['summary'], indent=2, sort_keys=True))
+          for frame in result['frames']:
+              print(
+                  'frame', frame['frame_index'],
+                  frame['state'], frame['transition'],
+                  'selected=', None if frame['selected_candidate'] is None else frame['selected_candidate']['individual'],
+              )
+              for candidate in frame['candidate_costs']:
+                  print(
+                      ' ', candidate['individual'],
+                      'JSD=', round(candidate['appearance_jsd'], 4),
+                      'score=', round(candidate['mean_keypoint_score'], 3),
+                  )
+          PY
+      - name: Upload multi-candidate and assignment evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jumping-cat-superanimal-multi-candidates
+          if-no-files-found: warn
+          path: |
+            /tmp/materialized.json
+            /tmp/multi-candidate-summary.json
+            /tmp/multi-candidates/multi-candidates.json
+            /tmp/multi-candidates/candidate-contact-sheet.jpg
+            /tmp/multi-candidates/overlays/*.jpg
+            /tmp/identity-assignment.json
+            /tmp/identity-assignment-summary.json
+            /tmp/assignment-overlays/*.jpg
