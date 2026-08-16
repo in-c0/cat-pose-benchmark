@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cat-pose-benchmark.example/schemas/observation.schema.json",
   "title": "Cat Pose Benchmark Observation",
-  "description": "Draft schema for a measured, inferred, synthetic, or derived feline observation with explicit provenance and uncertainty.",
+  "description": "Observation with explicit source tier, provenance, visibility, and uncertainty. Tier S is exact inside simulation, R2 is observable real evidence, R3 is reconstructed/model-derived, and G1-G5 are independently operated external-gold measurement classes.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -19,6 +19,10 @@
     "lineage"
   ],
   "properties": {
+    "schema_version": {
+      "type": "string",
+      "default": "0.2.0"
+    },
     "observation_id": {
       "type": "string",
       "minLength": 1
@@ -48,6 +52,7 @@
         "surface_curve",
         "contact_event",
         "scene_geometry",
+        "spatial_relation",
         "latent_anatomy",
         "derived_temporal"
       ]
@@ -63,7 +68,8 @@
         "world",
         "subject_local",
         "surface",
-        "time"
+        "time",
+        "categorical"
       ]
     },
     "units": {
@@ -102,7 +108,17 @@
       }
     },
     "evidence_tier": {
-      "enum": ["G1", "G2", "G3", "S1", "S2", "X1", "U0"]
+      "enum": [
+        "S",
+        "R2",
+        "R3",
+        "G1",
+        "G2",
+        "G3",
+        "G4",
+        "G5",
+        "U0"
+      ]
     },
     "quality": {
       "enum": ["gold", "silver", "bronze", "unknown"]
@@ -145,7 +161,8 @@
           "observation_class": {
             "const": "contact_event"
           }
-        }
+        },
+        "required": ["observation_class"]
       },
       "then": {
         "required": ["interval"]
@@ -154,19 +171,35 @@
     {
       "if": {
         "properties": {
-          "observation_class": {
-            "const": "latent_anatomy"
+          "evidence_tier": {
+            "const": "S"
           }
-        }
+        },
+        "required": ["evidence_tier"]
       },
       "then": {
-        "not": {
-          "properties": {
-            "evidence_tier": {
-              "enum": ["G1", "G2"]
-            }
-          },
-          "required": ["evidence_tier"]
+        "required": ["validation"],
+        "properties": {
+          "quality": {
+            "const": "gold"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "evidence_tier": {
+            "const": "R3"
+          }
+        },
+        "required": ["evidence_tier"]
+      },
+      "then": {
+        "properties": {
+          "quality": {
+            "enum": ["silver", "bronze", "unknown"]
+          }
         }
       }
     }

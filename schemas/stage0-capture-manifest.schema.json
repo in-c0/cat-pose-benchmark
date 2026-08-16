@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/in-c0/cat-pose-benchmark/schemas/stage0-capture-manifest.schema.json",
+  "title": "CatPose Stage 0 capture manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "sequence_id", "subject_type", "animal_present", "capture_start_utc", "rig", "camera", "calibration", "target", "condition", "files"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "sequence_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"},
+    "subject_type": {"const": "rigid_target"},
+    "animal_present": {"const": false},
+    "capture_start_utc": {"type": "string", "format": "date-time"},
+    "operator_id": {"type": "string", "minLength": 1},
+    "rig": {
+      "type": "object", "additionalProperties": false,
+      "required": ["rig_id", "layout_id", "mirror_state_id"],
+      "properties": {
+        "rig_id": {"type": "string", "minLength": 1},
+        "layout_id": {"enum": ["A_symmetric_lateral", "B_lateral_pitched"]},
+        "mirror_state_id": {"type": "string", "minLength": 1},
+        "temperature_c": {"type": "number"},
+        "notes": {"type": "string"}
+      }
+    },
+    "camera": {
+      "type": "object", "additionalProperties": false,
+      "required": ["camera_id", "manufacturer", "model", "serial", "shutter_type", "lens_id", "resolution_px", "frame_rate_hz", "exposure_us", "gain_db", "focus_locked", "white_balance_locked", "timestamp_source", "pixel_format"],
+      "properties": {
+        "camera_id": {"type": "string", "minLength": 1},
+        "manufacturer": {"type": "string", "minLength": 1},
+        "model": {"type": "string", "minLength": 1},
+        "serial": {"type": "string", "minLength": 1},
+        "shutter_type": {"enum": ["global", "rolling"]},
+        "lens_id": {"type": "string", "minLength": 1},
+        "resolution_px": {"type": "array", "prefixItems": [{"type": "integer", "minimum": 1}, {"type": "integer", "minimum": 1}], "items": false},
+        "frame_rate_hz": {"type": "number", "exclusiveMinimum": 0},
+        "exposure_us": {"type": "number", "exclusiveMinimum": 0},
+        "gain_db": {"type": "number"},
+        "focus_locked": {"const": true},
+        "white_balance_locked": {"const": true},
+        "timestamp_source": {"type": "string", "minLength": 1},
+        "pixel_format": {"type": "string", "minLength": 1},
+        "codec": {"type": ["string", "null"]},
+        "firmware": {"type": ["string", "null"]}
+      }
+    },
+    "calibration": {
+      "type": "object", "additionalProperties": false,
+      "required": ["intrinsics_id", "mirror_planes_id", "target_geometry_id", "calibrated_at_utc"],
+      "properties": {
+        "intrinsics_id": {"type": "string", "minLength": 1},
+        "mirror_planes_id": {"type": "string", "minLength": 1},
+        "target_geometry_id": {"type": "string", "minLength": 1},
+        "calibrated_at_utc": {"type": "string", "format": "date-time"},
+        "minutes_since_calibration": {"type": "number", "minimum": 0}
+      }
+    },
+    "target": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target_id", "placement_region", "motion"],
+      "properties": {
+        "target_id": {"const": "catpose-stage0-trihedral-v0"},
+        "placement_region": {"enum": ["near_left_low", "near_centre_low", "near_right_low", "centre_left_mid", "centre_centre_mid", "centre_right_mid", "far_left_high", "far_centre_high", "far_right_high", "mirror_boundary", "custom"]},
+        "motion": {"enum": ["static", "linear", "rotational", "pendulum", "custom"]},
+        "motion_reference_id": {"type": ["string", "null"]},
+        "notes": {"type": "string"}
+      }
+    },
+    "condition": {
+      "type": "object", "additionalProperties": false,
+      "required": ["exposure_class", "lighting_id", "trial_index"],
+      "properties": {
+        "exposure_class": {"enum": ["motion_frozen", "consumer_like"]},
+        "lighting_id": {"type": "string", "minLength": 1},
+        "trial_index": {"type": "integer", "minimum": 0},
+        "rig_reassembled_since_calibration": {"type": "boolean"},
+        "notes": {"type": "string"}
+      }
+    },
+    "files": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["role", "path", "sha256", "byte_count"],
+        "properties": {
+          "role": {"enum": ["video", "frame_timestamps", "camera_metadata", "notes"]},
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "byte_count": {"type": "integer", "minimum": 0},
+          "frame_count": {"type": "integer", "minimum": 0}
+        }
+      }
+    },
+    "exclusions": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  }
+}

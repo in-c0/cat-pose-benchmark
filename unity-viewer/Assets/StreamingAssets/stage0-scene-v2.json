@@ -1,0 +1,23 @@
+{
+  "schema_version": "0.2.0",
+  "source_layout_schema_version": "0.2.0",
+  "layout_name": "A_symmetric_lateral",
+  "units": "metres",
+  "unity_conversion": "unity_xyz = [source_x, source_z, source_y]",
+  "capture_volume": {"min_m": {"x": -0.3, "y": -0.05, "z": 0.05}, "max_m": {"x": 0.3, "y": 0.65, "z": 0.65}},
+  "representative_point_m": {"x": 0.0, "y": 0.3, "z": 0.35000000000000003},
+  "mirrors": [
+    {"name": "left", "plane_point_m": {"x": -0.5, "y": 0.1, "z": 0.45}, "plane_normal": {"x": -0.939692621, "y": 0.342020143, "z": 0.0}, "vertical_axis": {"x": 0.0, "y": 0.0, "z": 1.0}, "size_m": {"x": 1.0, "y": 0.9}},
+    {"name": "right", "plane_point_m": {"x": 0.5, "y": 0.1, "z": 0.45}, "plane_normal": {"x": 0.939692621, "y": 0.342020143, "z": 0.0}, "vertical_axis": {"x": 0.0, "y": 0.0, "z": 1.0}, "size_m": {"x": 1.0, "y": 0.9}}
+  ],
+  "cameras": [
+    {"name": "physical", "kind": "physical", "position_m": {"x": 0.0, "y": -1.2, "z": 0.55}, "look_at_m": {"x": 0.0, "y": 0.3, "z": 0.32}},
+    {"name": "virtual-left", "kind": "virtual", "position_m": {"x": -1.718646113640407, "y": -0.5744639721357498, "z": 0.55}, "look_at_m": {"x": 0.0, "y": 0.3, "z": 0.35000000000000003}},
+    {"name": "virtual-right", "kind": "virtual", "position_m": {"x": 1.718646113640407, "y": -0.5744639721357498, "z": 0.55}, "look_at_m": {"x": 0.0, "y": 0.3, "z": 0.35000000000000003}}
+  ],
+  "rays": [
+    {"name": "direct-centre-ray", "kind": "direct", "points_m": [{"x": 0.0, "y": -1.2, "z": 0.55}, {"x": 0.0, "y": 0.3, "z": 0.35000000000000003}]},
+    {"name": "reflected-centre-ray-left", "kind": "reflected", "points_m": [{"x": 0.0, "y": -1.2, "z": 0.55}, {"x": -0.524302355301219, "y": 0.033229827491547015, "z": 0.41101341644914335}, {"x": 0.0, "y": 0.3, "z": 0.35000000000000003}]},
+    {"name": "reflected-centre-ray-right", "kind": "reflected", "points_m": [{"x": 0.0, "y": -1.2, "z": 0.55}, {"x": 0.524302355301219, "y": 0.033229827491547015, "z": 0.41101341644914335}, {"x": 0.0, "y": 0.3, "z": 0.35000000000000003}]}
+  ]
+}
