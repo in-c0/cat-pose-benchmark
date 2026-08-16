@@ -81,6 +81,7 @@ jobs:
           python -m temporal.heldout_identity_eval \
             /tmp/tomcats-candidates/multi-candidates.json \
             /tmp/tomcats-heldout-frames \
+            --clip-id commons-tomcats-conflict \
             --appearance-threshold 0.30 \
             --histogram-bins 8 \
             --seed-padding-fraction 0.05 \
