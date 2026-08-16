@@ -1,0 +1,109 @@
+name: SAM2 ear geometry smoke
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "detail/ear_mask_geometry.py"
+      - "detail/sam2_ear_prompt.py"
+      - "detail/fixtures/superanimal-jumping-right-ear-frame11.json"
+      - "bakeoff/materialize_clip.py"
+      - "bakeoff/clips/commons-cat-jumping-backwards.json"
+      - ".github/workflows/sam2-ear-real-cat-smoke.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    env:
+      SAM2_BUILD_CUDA: "0"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install CPU SAM2 stack
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            "torch==2.5.1" "torchvision==0.20.1" \
+            --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install \
+            "numpy==1.26.4" \
+            pillow \
+            scikit-image \
+            imageio-ffmpeg \
+            huggingface_hub
+          SAM2_BUILD_CUDA=0 python -m pip install \
+            "git+https://github.com/facebookresearch/sam2.git@2b90b9f5ceec907a1c18123530e92e794ad901a4"
+
+      - name: Materialize licence-approved source clip
+        run: |
+          set -o pipefail
+          python -m bakeoff.materialize_clip bakeoff/clips/commons-cat-jumping-backwards.json \
+            | tee /tmp/materialized.json
+
+      - name: Recreate sampled sequence and extract selected ear frame
+        run: |
+          FFMPEG="$(python -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')"
+          "$FFMPEG" -hide_banner -loglevel error -y \
+            -i bakeoff/media/cat-jumping-backwards.webm \
+            -t 8.0 -vf fps=1.5 -an /tmp/jumping-ear-sampled.mp4
+          "$FFMPEG" -hide_banner -loglevel error -y \
+            -i /tmp/jumping-ear-sampled.mp4 \
+            -vf "select=eq(n\,11)" -vsync 0 -frames:v 1 \
+            /tmp/ear-frame-0011.png
+          python - <<'PY'
+          from PIL import Image
+          image = Image.open('/tmp/ear-frame-0011.png')
+          print('ear frame size', image.size)
+          assert image.size == (1920, 1080), image.size
+          PY
+
+      - name: Prompt SAM2 and derive visible ear base geometry
+        run: |
+          set -o pipefail
+          python -m detail.sam2_ear_prompt \
+            /tmp/ear-frame-0011.png \
+            detail/fixtures/superanimal-jumping-right-ear-frame11.json \
+            --output-dir /tmp/ear-result \
+            --checkpoint facebook/sam2.1-hiera-tiny \
+            --device cpu \
+            | tee /tmp/ear-run.json
+
+      - name: Print diagnostics
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result = json.loads(Path('/tmp/ear-result/ear-result.json').read_text())
+          chosen = result['chosen_candidate']
+          print('chosen candidate', chosen['candidate_index'])
+          print('positive fraction', chosen['positive_prompt_inside_fraction'])
+          print('negative outside fraction', chosen['negative_prompt_outside_fraction'])
+          print('mask area fraction', chosen['mask_area_fraction'])
+          print(json.dumps(result['ear']['diagnostics'], indent=2, sort_keys=True))
+          PY
+
+      - name: Upload ear evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sam2-right-ear-geometry-smoke
+          if-no-files-found: warn
+          path: |
+            /tmp/materialized.json
+            /tmp/ear-frame-0011.png
+            /tmp/ear-run.json
+            /tmp/ear-result/ear-result.json
+            /tmp/ear-result/ear-mask.npy
+            /tmp/ear-result/ear-mask.png
+            /tmp/ear-result/ear-overlay.jpg
