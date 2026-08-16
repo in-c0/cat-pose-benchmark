@@ -1,0 +1,23 @@
+{
+  "schema_version": "0.1.0",
+  "clip_id": "commons-tomcats-conflict",
+  "source": {
+    "kind": "redistributable",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/50/Tomcats_conflict.webm",
+    "local_path": "bakeoff/media/tomcats-conflict.webm"
+  },
+  "licence": {
+    "status": "verified",
+    "identifier": "CC0-1.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Tomcats_conflict.webm",
+    "redistribution": "allowed",
+    "notes": "Own work by Commons user Drummyfish. Wikimedia Commons states that the file is made available under CC0 1.0 Universal Public Domain Dedication. Verified for held-out identity evaluation on 2026-08-16."
+  },
+  "slices": [
+    "multi_cat_identity",
+    "interaction",
+    "occlusion",
+    "reacquisition"
+  ],
+  "notes": "45.485 s, 640x480 video of two tomcats in a conflict situation. This clip was not used to tune the exploratory 0.30 appearance-JSD gate."
+}
