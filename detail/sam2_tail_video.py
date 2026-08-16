@@ -10,6 +10,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 from detail.mask_centerline import mask_to_tail_samples
+from detail.sam2_tail_prompt import run as run_image_seed
 
 
 def _load_prompt(path: Path) -> dict[str, Any]:
@@ -20,18 +21,6 @@ def _load_prompt(path: Path) -> dict[str, Any]:
     if len(prompt.get("positive_points", [])) < 2:
         raise ValueError("Tail base and tail tip positive prompts are required")
     return prompt
-
-
-def _prompt_arrays(prompt: dict[str, Any]) -> tuple[np.ndarray, np.ndarray]:
-    coordinates: list[list[float]] = []
-    labels: list[int] = []
-    for point in prompt["positive_points"]:
-        coordinates.append([float(point["x_px"]), float(point["y_px"])])
-        labels.append(1)
-    for point in prompt.get("negative_points", []):
-        coordinates.append([float(point["x_px"]), float(point["y_px"])])
-        labels.append(0)
-    return np.asarray(coordinates, dtype=np.float32), np.asarray(labels, dtype=np.int32)
 
 
 def _curve_xy(samples: list[dict[str, Any]]) -> list[tuple[float, float]]:
@@ -48,6 +37,15 @@ def _curve_length(samples: list[dict[str, Any]]) -> float:
 
 def _distance(a: tuple[float, float], b: tuple[float, float]) -> float:
     return math.hypot(a[0] - b[0], a[1] - b[1])
+
+
+def _mask_iou(left: np.ndarray, right: np.ndarray) -> float:
+    left_bool = left.astype(bool)
+    right_bool = right.astype(bool)
+    union = np.logical_or(left_bool, right_bool).sum()
+    if union == 0:
+        return 1.0
+    return float(np.logical_and(left_bool, right_bool).sum() / union)
 
 
 def _mask_from_logits(mask_logits: Any) -> np.ndarray:
@@ -106,7 +104,7 @@ def _render_overlay(
             draw.ellipse((x - 5, y - 5, x + 5, y + 5), fill=(0, 110, 255, 255))
 
     if label:
-        draw.rectangle((8, 8, 280, 36), fill=(0, 0, 0, 170))
+        draw.rectangle((8, 8, 340, 36), fill=(0, 0, 0, 170))
         draw.text((14, 13), label, fill=(255, 255, 255, 255))
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -170,7 +168,7 @@ def _track_direction(
                 mask,
                 base_xy=previous_base,
                 sample_count=sample_count,
-                provenance="sam2.1_video_propagated_mask_to_skeleton_v0",
+                provenance="sam2.1_video_propagated_mask_to_skeleton_v1",
             )
             root = (float(samples[0]["x_px"]), float(samples[0]["y_px"]))
             tip = (float(samples[-1]["x_px"]), float(samples[-1]["y_px"]))
@@ -198,7 +196,7 @@ def _track_direction(
                 samples,
                 overlay_path,
                 prompt=prompt if int(frame_idx) == start_frame_idx else None,
-                label=f"frame {int(frame_idx)} | {'rev' if reverse else 'fwd'}",
+                label=f"frame {int(frame_idx)} | {'reverse' if reverse else 'forward'}",
             )
             record["overlay"] = str(overlay_path.name)
         except Exception as exception:
@@ -213,11 +211,19 @@ def _track_direction(
 
 
 def _summary(
-    records: list[dict[str, Any]], *, seed_frame_idx: int, image_diagonal: float
+    records: list[dict[str, Any]],
+    *,
+    seed_frame_idx: int,
+    image_diagonal: float,
+    input_seed_area_fraction: float,
+    seed_mask_iou: float,
 ) -> dict[str, Any]:
     successful = [record for record in records if record.get("curve_status") == "ok"]
-    seed = next((record for record in successful if record["frame_index"] == seed_frame_idx), None)
-    seed_area = float(seed["mask_area_fraction"]) if seed else None
+    output_seed = next(
+        (record for record in successful if record["frame_index"] == seed_frame_idx),
+        None,
+    )
+    output_seed_area = float(output_seed["mask_area_fraction"]) if output_seed else None
 
     chronological_root_steps: list[float] = []
     chronological_tip_steps: list[float] = []
@@ -232,18 +238,27 @@ def _summary(
             chronological_tip_steps.append(_distance(tip, prior_tip) / image_diagonal)
         previous = record
 
-    suspicious_expansions = []
-    if seed_area is not None and seed_area > 0:
-        threshold = max(0.02, seed_area * 5.0)
-        suspicious_expansions = [
-            record["frame_index"]
-            for record in records
-            if float(record["mask_area_fraction"]) > threshold
-        ]
-    else:
-        threshold = None
+    expansion_threshold = max(0.01, input_seed_area_fraction * 4.0)
+    suspicious_expansions = [
+        record["frame_index"]
+        for record in records
+        if float(record["mask_area_fraction"]) > expansion_threshold
+    ]
+    minimum_curve_length_px = image_diagonal * 0.01
+    degenerate_curve_frames = [
+        record["frame_index"]
+        for record in successful
+        if float(record.get("curve_length_px", 0.0)) < minimum_curve_length_px
+    ]
 
     coverage = len(successful) / len(records) if records else 0.0
+    seed_preserved = seed_mask_iou >= 0.90
+    feasible = (
+        coverage >= 0.75
+        and seed_preserved
+        and not suspicious_expansions
+        and not degenerate_curve_frames
+    )
     return {
         "frames_total": len(records),
         "frames_with_curve": len(successful),
@@ -253,9 +268,14 @@ def _summary(
             for record in records
             if record.get("curve_status") != "ok"
         ],
-        "seed_mask_area_fraction": seed_area,
-        "suspicious_expansion_threshold": threshold,
+        "input_seed_mask_area_fraction": input_seed_area_fraction,
+        "video_seed_mask_area_fraction": output_seed_area,
+        "video_seed_vs_input_mask_iou": seed_mask_iou,
+        "video_seed_preserved": seed_preserved,
+        "suspicious_expansion_threshold": expansion_threshold,
         "suspicious_expansion_frames": suspicious_expansions,
+        "minimum_non_degenerate_curve_length_px": minimum_curve_length_px,
+        "degenerate_curve_frames": degenerate_curve_frames,
         "mean_chronological_root_step_fraction": (
             float(np.mean(chronological_root_steps)) if chronological_root_steps else None
         ),
@@ -268,13 +288,12 @@ def _summary(
         "max_chronological_tip_step_fraction": (
             float(np.max(chronological_tip_steps)) if chronological_tip_steps else None
         ),
-        "engineering_feasibility": (
-            "pass" if coverage >= 0.75 and not suspicious_expansions else "revise"
-        ),
+        "engineering_feasibility": "pass" if feasible else "revise",
         "interpretation_boundary": (
-            "Curve coverage and temporal displacement are failure-discovery metrics, not "
-            "landmark accuracy. Inter-frame displacement contains true cat motion and "
-            "projection change. Numerical accuracy requires independent visible-tail labels."
+            "Seed preservation, curve coverage, mask expansion and temporal displacement are "
+            "failure-discovery metrics, not landmark accuracy. Inter-frame displacement "
+            "contains true cat motion and projection change. Numerical accuracy requires "
+            "independent visible-tail labels."
         ),
     }
 
@@ -301,13 +320,27 @@ def run(
             f"Seed frame {seed_frame_idx} outside frame sequence of length {len(frame_names)}"
         )
 
-    seed_image = Image.open(frames_dir / frame_names[seed_frame_idx])
+    seed_image_path = frames_dir / frame_names[seed_frame_idx]
+    seed_image = Image.open(seed_image_path)
     expected_size = (
         int(prompt["source_frame"]["width_px"]),
         int(prompt["source_frame"]["height_px"]),
     )
     if seed_image.size != expected_size:
         raise ValueError(f"Seed image size {seed_image.size} != expected {expected_size}")
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    seed_dir = output_dir / "seed-image-mask"
+    image_seed_diagnostics = run_image_seed(
+        image_path=seed_image_path,
+        prompt_path=prompt_path,
+        output_dir=seed_dir,
+        checkpoint=checkpoint,
+        sample_count=sample_count,
+        device=device,
+    )
+    input_seed_mask = np.load(seed_dir / "tail-mask.npy").astype(bool)
+    input_seed_area_fraction = float(input_seed_mask.mean())
 
     predictor = SAM2VideoPredictor.from_pretrained(checkpoint, device=device)
     state = predictor.init_state(
@@ -316,32 +349,18 @@ def run(
         offload_state_to_cpu=True,
         async_loading_frames=False,
     )
-    points, labels = _prompt_arrays(prompt)
-    predictor.add_new_points_or_box(
+    _seed_idx, _obj_ids, seed_logits = predictor.add_new_mask(
         state,
         frame_idx=seed_frame_idx,
         obj_id=1,
-        points=points,
-        labels=labels,
-        clear_old_points=True,
+        mask=input_seed_mask,
     )
+    video_seed_mask = _mask_from_logits(seed_logits)
+    seed_mask_iou = _mask_iou(input_seed_mask, video_seed_mask)
 
     seed_base = (
         float(prompt["positive_points"][0]["x_px"]),
         float(prompt["positive_points"][0]["y_px"]),
-    )
-    output_dir.mkdir(parents=True, exist_ok=True)
-    forward = _track_direction(
-        predictor,
-        state,
-        frames_dir=frames_dir,
-        frame_names=frame_names,
-        start_frame_idx=seed_frame_idx,
-        reverse=False,
-        initial_base_xy=seed_base,
-        sample_count=sample_count,
-        prompt=prompt,
-        output_dir=output_dir,
     )
     reverse = _track_direction(
         predictor,
@@ -355,12 +374,30 @@ def run(
         prompt=prompt,
         output_dir=output_dir,
     )
+    forward = _track_direction(
+        predictor,
+        state,
+        frames_dir=frames_dir,
+        frame_names=frame_names,
+        start_frame_idx=seed_frame_idx,
+        reverse=False,
+        initial_base_xy=seed_base,
+        sample_count=sample_count,
+        prompt=prompt,
+        output_dir=output_dir,
+    )
 
     combined = dict(reverse)
     combined.update(forward)
     records = [combined[index] for index in sorted(combined)]
     image_diagonal = math.hypot(expected_size[0], expected_size[1])
-    summary = _summary(records, seed_frame_idx=seed_frame_idx, image_diagonal=image_diagonal)
+    summary = _summary(
+        records,
+        seed_frame_idx=seed_frame_idx,
+        image_diagonal=image_diagonal,
+        input_seed_area_fraction=input_seed_area_fraction,
+        seed_mask_iou=seed_mask_iou,
+    )
 
     overlay_paths = [
         output_dir / "overlays" / f"{record['frame_index']:05d}.jpg"
@@ -370,11 +407,13 @@ def run(
     _make_contact_sheet(overlay_paths, output_dir / "sequence-overlay.jpg")
 
     payload = {
-        "schema_version": "0.1.0",
+        "schema_version": "0.2.0",
         "clip_id": prompt["clip_id"],
         "checkpoint": checkpoint,
         "device": device,
         "seed_frame_index": seed_frame_idx,
+        "seed_method": "image_multimask_semantic_selection_then_video_add_new_mask",
+        "seed_image_diagnostics": image_seed_diagnostics,
         "seed_provenance": prompt["prompt_provenance"],
         "evidence_tier": "R3",
         "frames": records,
@@ -392,7 +431,7 @@ def run(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Propagate one automatic tail seed through a JPEG sequence with SAM2."
+        description="Propagate a tail-only SAM2 seed mask through a JPEG sequence."
     )
     parser.add_argument("frames_dir", type=Path)
     parser.add_argument("prompt", type=Path)
