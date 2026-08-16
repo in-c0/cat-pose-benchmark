@@ -53,6 +53,7 @@ def evaluate_heldout(
     *,
     frames_dir: Path,
     appearance_threshold: float,
+    clip_id: str,
     histogram_bins: int = 8,
     seed_padding_fraction: float = 0.05,
     seed_rule: str = "first_two_candidate_frame_leftmost",
@@ -64,12 +65,12 @@ def evaluate_heldout(
     is supplied externally and must remain frozen for held-out evaluation.
     """
 
+    if not clip_id:
+        raise ValueError("clip_id is required")
     seed_frame_index, seed_candidate = select_seed(multi_candidates, rule=seed_rule)
     seed_image = Image.open(_frame_path(frames_dir, seed_frame_index)).convert("RGB")
     seed_bbox = _expand_bbox(seed_candidate["bbox_xyxy"], seed_padding_fraction)
-    reference_histogram = _crop_histogram(
-        seed_image, seed_bbox, bins=histogram_bins
-    )
+    reference_histogram = _crop_histogram(seed_image, seed_bbox, bins=histogram_bins)
 
     output_frames: list[dict[str, Any]] = []
     previous_state = "target"
@@ -128,7 +129,7 @@ def evaluate_heldout(
 
     return {
         "schema_version": "0.1.0",
-        "clip_id": "commons-tomcats-conflict",
+        "clip_id": clip_id,
         "evidence_tier": "R3",
         "protocol": {
             "held_out": True,
@@ -231,6 +232,7 @@ def main() -> None:
     )
     parser.add_argument("multi_candidates", type=Path)
     parser.add_argument("frames_dir", type=Path)
+    parser.add_argument("--clip-id", required=True)
     parser.add_argument("--appearance-threshold", type=float, default=0.30)
     parser.add_argument("--histogram-bins", type=int, default=8)
     parser.add_argument("--seed-padding-fraction", type=float, default=0.05)
@@ -243,6 +245,7 @@ def main() -> None:
         json.loads(args.multi_candidates.read_text(encoding="utf-8")),
         frames_dir=args.frames_dir,
         appearance_threshold=args.appearance_threshold,
+        clip_id=args.clip_id,
         histogram_bins=args.histogram_bins,
         seed_padding_fraction=args.seed_padding_fraction,
     )
