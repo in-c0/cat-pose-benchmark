@@ -1,0 +1,131 @@
+name: Held-out Domestic catfight identity evaluation
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "temporal/heldout_identity_eval.py"
+      - "temporal/test_heldout_identity_eval.py"
+      - "bakeoff/clips/commons-domestic-catfight.json"
+      - "bakeoff/materialize_clip.py"
+      - ".github/workflows/domestic-catfight-heldout-identity.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install CPU DeepLabCut research stack
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            "torch==2.4.1" "torchvision==0.19.1" \
+            --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install "deeplabcut==3.0.1" pillow imageio-ffmpeg
+
+      - name: Materialize licence-approved dynamic held-out clip
+        run: |
+          set -o pipefail
+          python -m bakeoff.materialize_clip bakeoff/clips/commons-domestic-catfight.json \
+            | tee /tmp/materialized.json
+
+      - name: Build held-out one-fps 640px sequence
+        run: |
+          FFMPEG="$(python -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')"
+          mkdir -p /tmp/domestic-catfight-heldout-frames
+          "$FFMPEG" -hide_banner -loglevel error -y \
+            -i bakeoff/media/domestic-catfight.webm \
+            -vf "fps=1,scale=640:-2" \
+            -q:v 2 -start_number 0 \
+            /tmp/domestic-catfight-heldout-frames/%05d.jpg
+          "$FFMPEG" -hide_banner -loglevel error -y \
+            -framerate 1 \
+            -i /tmp/domestic-catfight-heldout-frames/%05d.jpg \
+            -c:v libx264 -pix_fmt yuv420p -r 1 \
+            /tmp/domestic-catfight-heldout-1fps.mp4
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          frames = sorted(Path('/tmp/domestic-catfight-heldout-frames').glob('*.jpg'))
+          print('held-out frames', len(frames))
+          assert len(frames) == 38, len(frames)
+          assert Image.open(frames[0]).size == (640, 360)
+          PY
+
+      - name: Generate up to two animal proposals per held-out frame
+        run: |
+          set -o pipefail
+          python -m temporal.superanimal_multi_candidates \
+            /tmp/domestic-catfight-heldout-1fps.mp4 \
+            --output-dir /tmp/domestic-catfight-candidates \
+            --device cpu \
+            --max-individuals 2 \
+            --frame-offset 0 \
+            --confidence 0.2 \
+            | tee /tmp/domestic-catfight-candidate-summary.json
+
+      - name: Apply frozen 0.30 identity gate without retuning
+        run: |
+          set -o pipefail
+          python -m temporal.heldout_identity_eval \
+            /tmp/domestic-catfight-candidates/multi-candidates.json \
+            /tmp/domestic-catfight-heldout-frames \
+            --clip-id commons-domestic-catfight \
+            --appearance-threshold 0.30 \
+            --histogram-bins 8 \
+            --seed-padding-fraction 0.05 \
+            --output /tmp/domestic-catfight-heldout-identity.json \
+            --overlays-dir /tmp/domestic-catfight-assignment-overlays \
+            --contact-sheet-dir /tmp/domestic-catfight-assignment-sheets \
+            | tee /tmp/domestic-catfight-heldout-summary.json
+
+      - name: Print held-out diagnostics
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          candidates = json.loads(Path('/tmp/domestic-catfight-candidates/multi-candidates.json').read_text())
+          result = json.loads(Path('/tmp/domestic-catfight-heldout-identity.json').read_text())
+          print('CANDIDATES')
+          print(json.dumps(candidates['summary'], indent=2, sort_keys=True))
+          print('HELD OUT')
+          print(json.dumps(result['protocol'], indent=2, sort_keys=True))
+          print(json.dumps(result['seed'], indent=2, sort_keys=True))
+          print(json.dumps(result['summary'], indent=2, sort_keys=True))
+          for frame in result['frames']:
+              selected = frame['selected_candidate']
+              print(
+                  frame['frame_index'], frame['state'], frame['transition'],
+                  'selected=', None if selected is None else selected['individual'],
+                  'jsd=', None if selected is None else round(selected['appearance_jsd'], 4),
+                  'candidate_count=', frame['candidate_count'],
+              )
+          PY
+
+      - name: Upload dynamic held-out identity evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: domestic-catfight-heldout-identity
+          if-no-files-found: warn
+          path: |
+            /tmp/materialized.json
+            /tmp/domestic-catfight-candidate-summary.json
+            /tmp/domestic-catfight-candidates/multi-candidates.json
+            /tmp/domestic-catfight-candidates/candidate-contact-sheet.jpg
+            /tmp/domestic-catfight-candidates/overlays/*.jpg
+            /tmp/domestic-catfight-heldout-summary.json
+            /tmp/domestic-catfight-heldout-identity.json
+            /tmp/domestic-catfight-assignment-overlays/*.jpg
+            /tmp/domestic-catfight-assignment-sheets/*.jpg
