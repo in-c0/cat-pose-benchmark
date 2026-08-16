@@ -1,0 +1,41 @@
+name: Temporal core tests
+
+on:
+  push:
+    paths:
+      - "temporal/**"
+      - ".github/workflows/temporal-core-tests.yml"
+  pull_request:
+    paths:
+      - "temporal/**"
+      - ".github/workflows/temporal-core-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install lightweight dependencies
+        run: |
+          python -m pip install --disable-pip-version-check \
+            numpy \
+            pandas \
+            pillow
+
+      - name: Run temporal unit tests
+        run: python -m unittest discover -s temporal -p 'test_*.py'
