@@ -7,6 +7,7 @@ on:
       - "detail/ear_mask_geometry.py"
       - "detail/sam2_ear_prompt.py"
       - "detail/fixtures/superanimal-jumping-right-ear-frame11.json"
+      - "detail/fixtures/superanimal-jumping-left-ear-frame11.json"
       - "bakeoff/materialize_clip.py"
       - "bakeoff/clips/commons-cat-jumping-backwards.json"
       - ".github/workflows/sam2-ear-real-cat-smoke.yml"
@@ -18,6 +19,10 @@ jobs:
   smoke:
     runs-on: ubuntu-22.04
     timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        side: [right, left]
     env:
       SAM2_BUILD_CUDA: "0"
 
@@ -73,7 +78,7 @@ jobs:
           set -o pipefail
           python -m detail.sam2_ear_prompt \
             /tmp/ear-frame-0011.png \
-            detail/fixtures/superanimal-jumping-right-ear-frame11.json \
+            detail/fixtures/superanimal-jumping-${{ matrix.side }}-ear-frame11.json \
             --output-dir /tmp/ear-result \
             --checkpoint facebook/sam2.1-hiera-tiny \
             --device cpu \
@@ -86,6 +91,7 @@ jobs:
           from pathlib import Path
           result = json.loads(Path('/tmp/ear-result/ear-result.json').read_text())
           chosen = result['chosen_candidate']
+          print('side', result['side'])
           print('chosen candidate', chosen['candidate_index'])
           print('positive fraction', chosen['positive_prompt_inside_fraction'])
           print('negative outside fraction', chosen['negative_prompt_outside_fraction'])
@@ -97,7 +103,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: sam2-right-ear-geometry-smoke
+          name: sam2-${{ matrix.side }}-ear-geometry-smoke
           if-no-files-found: warn
           path: |
             /tmp/materialized.json
