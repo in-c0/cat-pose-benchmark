@@ -1,0 +1,99 @@
+{
+  "schema_version": "0.1.0",
+  "clip_id": "commons-cat-jumping-backwards-ear-screen",
+  "side": "left",
+  "source_frame": {
+    "smoke_frame_index": 11,
+    "timestamp_s": 7.333333333333333,
+    "width_px": 1920,
+    "height_px": 1080
+  },
+  "positive_points": [
+    {
+      "semantic_name": "left_ear_base",
+      "x_px": 642.8046875,
+      "y_px": 604.5234375,
+      "score": 0.6697397828102112
+    },
+    {
+      "semantic_name": "left_ear_tip",
+      "x_px": 601.6328125,
+      "y_px": 579.8203125,
+      "score": 0.8057321310043335
+    }
+  ],
+  "negative_points": [
+    {
+      "semantic_name": "right_ear_base",
+      "x_px": 708.6796875,
+      "y_px": 596.2890625,
+      "score": 0.7038330435752869
+    },
+    {
+      "semantic_name": "right_ear_tip",
+      "x_px": 725.1484375,
+      "y_px": 555.1171875,
+      "score": 0.8652909398078918
+    },
+    {
+      "semantic_name": "right_eye",
+      "x_px": 626.3359375,
+      "y_px": 620.9921875,
+      "score": 0.46321046352386475
+    },
+    {
+      "semantic_name": "left_eye",
+      "x_px": 626.3359375,
+      "y_px": 629.2265625,
+      "score": 0.8645226955413818
+    },
+    {
+      "semantic_name": "nose",
+      "x_px": 609.8671875,
+      "y_px": 662.1640625,
+      "score": 0.8453946113586426
+    },
+    {
+      "semantic_name": "neck_base",
+      "x_px": 692.2109375,
+      "y_px": 686.8671875,
+      "score": 0.8250740766525269
+    }
+  ],
+  "face_reference_points": [
+    {"semantic_name": "right_eye", "x_px": 626.3359375, "y_px": 620.9921875},
+    {"semantic_name": "left_eye", "x_px": 626.3359375, "y_px": 629.2265625},
+    {"semantic_name": "nose", "x_px": 609.8671875, "y_px": 662.1640625}
+  ],
+  "selection": {
+    "method": "max_min_ear_base_tip_confidence_with_separation_gate_v0",
+    "selected": {
+      "frame_index": 11,
+      "side": "left",
+      "ear_base_score": 0.6697397828102112,
+      "ear_tip_score": 0.8057321310043335,
+      "minimum_endpoint_score": 0.6697397828102112,
+      "endpoint_separation_px": 48.01424450911677,
+      "endpoint_separation_fraction": 0.02179585466024109
+    }
+  },
+  "prompt_provenance": {
+    "model": "superanimal_quadruped",
+    "model_version": "3.0.1",
+    "checkpoint": "deeplabcut-modelzoo:superanimal_quadruped/hrnet_w32",
+    "checkpoint_status": "research_only",
+    "derived_data_status": "research_only_until_issue_9_review",
+    "evidence_tier": "R3",
+    "github_actions_run": 31891814198,
+    "artifact_id": 9248762634,
+    "artifact_digest": "sha256:917afea0d1cb60224194d04095d66c13a618354371125bdd2e9c1381291c6acf",
+    "note": "Machine-generated endpoint seed from the prior 12-frame SuperAnimal run. It is not independent ground truth."
+  },
+  "segmentation_model": {
+    "repository": "facebookresearch/sam2",
+    "checkpoint": "facebook/sam2.1-hiera-tiny",
+    "code_license": "Apache-2.0",
+    "checkpoint_license": "Apache-2.0"
+  },
+  "scientific_boundary": "This fixture is R3 model-derived research evidence. The target is visible ear surface geometry; no latent cartilage or unique 3D ear plane is claimed."
+}
