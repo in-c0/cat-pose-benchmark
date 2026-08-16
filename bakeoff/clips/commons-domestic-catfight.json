@@ -1,0 +1,25 @@
+{
+  "schema_version": "0.1.0",
+  "clip_id": "commons-domestic-catfight",
+  "source": {
+    "kind": "redistributable",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b0/Domestic_catfight.webm",
+    "local_path": "bakeoff/media/domestic-catfight.webm"
+  },
+  "licence": {
+    "status": "verified",
+    "identifier": "CC0-1.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Domestic_catfight.webm",
+    "redistribution": "allowed",
+    "notes": "Own work by Commons user Panini!. Wikimedia Commons states that the file is made available under CC0 1.0 Universal Public Domain Dedication. Verified for held-out identity evaluation on 2026-08-16."
+  },
+  "slices": [
+    "multi_cat_identity",
+    "close_contact",
+    "interaction",
+    "occlusion",
+    "motion_blur",
+    "reacquisition"
+  ],
+  "notes": "38.207 s, 1920x1080 original video of two domestic cats fighting. This clip was not used to tune the exploratory 0.30 appearance-JSD gate. Evaluation workflows may downsample after materialization for compute efficiency; the source licence/provenance remains attached to the original file."
+}
