@@ -17,6 +17,11 @@ from context.ct1_capture_cli import (
     predictor_fingerprint,
 )
 from fusion.m1_cohort_manifest import SENSOR_EVIDENCE_CUTOFF_MS, build_manifest
+from fusion.v1_pose_package import (
+    POSE_PACKAGE_SCHEMA_REF,
+    pose_package_metadata,
+    validate_pose_package,
+)
 from programme.validate_intent_event import validate_instance
 
 SIDECAR_VERSION = "M1.3-sensor-sidecar-v0"
@@ -148,6 +153,10 @@ def build_reservation(
         raise ValueError(f"unsupported M1 sidecar modality: {modality}")
     if not schema_ref.strip():
         raise ValueError("schema_ref must not be empty")
+    if modality == "visual_pose" and schema_ref != POSE_PACKAGE_SCHEMA_REF:
+        raise ValueError(
+            f"visual_pose sidecars must use schema_ref {POSE_PACKAGE_SCHEMA_REF}"
+        )
     if not 0 <= start_offset_ms < end_offset_ms <= SENSOR_EVIDENCE_CUTOFF_MS:
         raise ValueError(
             f"sensor evidence must stay inside frozen 0-{SENSOR_EVIDENCE_CUTOFF_MS} ms window"
@@ -199,6 +208,13 @@ def verify_reservation(sidecar: dict[str, Any]) -> None:
         raise ValueError("sidecar modality is not supported")
     if sidecar.get("artifact_kind") != ALLOWED_MODALITIES[sidecar["modality"]]:
         raise ValueError("sidecar artifact_kind does not match modality")
+    if (
+        sidecar.get("modality") == "visual_pose"
+        and sidecar.get("schema_ref") != POSE_PACKAGE_SCHEMA_REF
+    ):
+        raise ValueError(
+            f"visual_pose sidecar schema_ref must be {POSE_PACKAGE_SCHEMA_REF}"
+        )
     start = sidecar.get("start_offset_ms")
     end = sidecar.get("end_offset_ms")
     if not isinstance(start, int) or not isinstance(end, int):
@@ -231,17 +247,15 @@ def _inspect_wav(path: Path) -> dict[str, Any]:
     }
 
 
-def _inspect_pose_json(path: Path) -> dict[str, Any]:
+def _inspect_pose_json(path: Path, sidecar: dict[str, Any]) -> dict[str, Any]:
     try:
         payload = _load_json(path)
     except (json.JSONDecodeError, UnicodeDecodeError) as exc:
-        raise ValueError(f"V1 pose sidecar must be valid JSON: {exc}") from exc
-    if not isinstance(payload, (dict, list)):
-        raise ValueError("V1 pose sidecar JSON must contain an object or array")
-    return {
-        "container": "json",
-        "json_root_type": "object" if isinstance(payload, dict) else "array",
-    }
+        raise ValueError(f"V1 pose package must be valid JSON: {exc}") from exc
+    errors = validate_pose_package(payload, sidecar=sidecar)
+    if errors:
+        raise ValueError("V1 pose package is invalid: " + "; ".join(errors))
+    return pose_package_metadata(payload)
 
 
 def seal_sidecar(sidecar: dict[str, Any], artifact_path: Path) -> dict[str, Any]:
@@ -261,7 +275,7 @@ def seal_sidecar(sidecar: dict[str, Any], artifact_path: Path) -> dict[str, Any]
                 "WAV duration is shorter than the reserved evidence interval"
             )
     else:
-        media_metadata = _inspect_pose_json(artifact_path)
+        media_metadata = _inspect_pose_json(artifact_path, sidecar)
 
     sealed = copy.deepcopy(sidecar)
     sealed["state"] = "sealed"
@@ -308,6 +322,20 @@ def verify_sealed_sidecar(sidecar: dict[str, Any], event: dict[str, Any], lock: 
         raise ValueError("sealed sensor artifact hash changed after sealing")
     if path.stat().st_size != seal.get("byte_length"):
         raise ValueError("sealed sensor artifact byte length changed after sealing")
+
+    if sidecar["modality"] == "visual_pose":
+        try:
+            payload = _load_json(path)
+        except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+            raise ValueError(f"sealed V1 pose package is no longer readable JSON: {exc}") from exc
+        pose_errors = validate_pose_package(payload, sidecar=sidecar, event=event)
+        if pose_errors:
+            raise ValueError(
+                "sealed V1 pose package does not match CT1 event: " + "; ".join(pose_errors)
+            )
+        if seal.get("media_metadata") != pose_package_metadata(payload):
+            raise ValueError("sealed V1 pose package metadata no longer matches artifact")
+
     expected_sealed_record_hash = _sha256_payload(
         {
             "reservation_sha256": sidecar["reservation_sha256"],
