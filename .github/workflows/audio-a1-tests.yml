@@ -9,6 +9,8 @@ on:
       - "context/**"
       - "programme/**"
       - "schemas/intent-event.schema.json"
+      - "scripts/start-h0-capture.ps1"
+      - ".gitignore"
       - ".github/workflows/audio-a1-tests.yml"
   pull_request:
     paths:
@@ -18,6 +20,8 @@ on:
       - "context/**"
       - "programme/**"
       - "schemas/intent-event.schema.json"
+      - "scripts/start-h0-capture.ps1"
+      - ".gitignore"
       - ".github/workflows/audio-a1-tests.yml"
 
 permissions:
