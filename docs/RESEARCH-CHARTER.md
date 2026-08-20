@@ -1,9 +1,20 @@
-# Research charter
+# V1 research charter — visual pose and motion benchmark
 
-**Status:** direction v0.1, approved for specification work  
-**Date:** 2026-08-04
+**Status:** direction v0.2, approved for specification work  
+**Original date:** 2026-08-04  
+**Programme-scope revision:** 2026-08-21
 
-## Programme objective
+## Programme relationship
+
+This charter governs **V1 — Pose & motion benchmark**, one thread inside the broader
+[Feline intent research programme](FELINE-INTENT-RESEARCH.md).
+
+It does not define the complete cat-intent problem. Audio, environmental context,
+human-input/response, temporal routines, personalisation, intervention/outcome,
+latent-state discovery and multimodal fusion are separate sibling threads with their
+own hypotheses and validation requirements.
+
+## Thread objective
 
 Create an open, reproducible visual-intelligence benchmark for domestic cats that
 measures pose, face, ears, tail, contact, and scene-relative motion over time, while
@@ -12,7 +23,7 @@ representing uncertainty honestly.
 The benchmark is intended to support three connected outcomes:
 
 1. a credible open research contribution;
-2. a monocular consumer application with playful, non-medical outputs;
+2. a calibrated visual evidence channel for downstream multimodal feline-state research;
 3. an edge-deployed camera product and real-time Unity visualisation demonstrating the
    full data-to-device workflow.
 
@@ -98,7 +109,7 @@ Derivatives inherit and amplify source uncertainty.
 
 ## Primary contributions
 
-The intended first paper should contribute:
+The intended first V1 paper should contribute:
 
 1. an open capture protocol for simultaneous feline views using a compact catadioptric
    portal;
@@ -110,9 +121,10 @@ The intended first paper should contribute:
 5. an open Unity inspection tool for synchronized media, geometry, uncertainty, and
    model comparison.
 
-## Non-goals for v0
+## Non-goals for V1
 
 - Literal translation of feline vocalisation or intent
+- Programme-wide multimodal intent inference
 - Pain, illness, welfare, or diagnostic claims
 - A universal feline ethogram classifier
 - Full-room metric 4D reconstruction as a prerequisite
@@ -120,10 +132,12 @@ The intended first paper should contribute:
 - Claiming model-generated pseudo-labels as independent ground truth
 - Recovering exact internal skeletal anatomy from ordinary RGB alone
 
+These are scope boundaries, not declarations that other programme threads are invalid.
+
 ## Benchmark acceptance gates
 
 The exact thresholds remain open until a pilot establishes realistic noise floors, but
-v0 must define and freeze them before the main collection.
+V1 must define and freeze them before the main collection.
 
 At minimum, the benchmark must demonstrate:
 
@@ -166,7 +180,12 @@ Pause collection and revise the design if any of the following occurs:
 
 ## Product relationship
 
-The consumer translator, puck, and future analyser are downstream demonstrations of the
-same visual-intelligence stack. They must not weaken the benchmark’s scientific claims.
-Entertainment outputs should be explicitly playful; health-related outputs require a
-separate evidence, ethics, and regulatory programme.
+The consumer translator, puck, and future analyser are downstream consumers of multiple
+research threads. V1 contributes calibrated visual evidence; it is not the translator's
+sole representation and should not be evaluated as if it were.
+
+Any human-facing interpretation should remain probabilistic and should inherit
+uncertainty from its evidence sources. Programme-level semantic claims require their own
+predictive, intervention, multimodal and personalisation validation.
+
+Health-related outputs require a separate evidence, ethics, and regulatory programme.
