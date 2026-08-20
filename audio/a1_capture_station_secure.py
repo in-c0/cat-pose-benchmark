@@ -1,19 +1,23 @@
 from __future__ import annotations
 
 import argparse
+import json
 import webbrowser
+from datetime import datetime
 from http import HTTPStatus
 from http.server import ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import unquote, urlsplit
 
 from audio.a1_capture_station import (
     ALLOWED_HOSTS,
     CaptureHandler,
     CaptureStore,
 )
+from fusion.m1_cohort_manifest import SENSOR_EVIDENCE_CUTOFF_MS
 
 SECURE_SERVER_VERSION = "A1.2-browser-capture-secure-v0"
+TARGET_HORIZON_MS = 60_000
 JSON_POST_PATHS = {
     "/api/start",
 }
@@ -22,6 +26,8 @@ JSON_POST_PREFIXES = (
     "/api/finalize/",
 )
 AUDIO_POST_PREFIX = "/api/audio/"
+RESERVE_PREFIX = "/api/reserve-audio/"
+FINALIZE_PREFIX = "/api/finalize/"
 
 
 def _normalise_hostname(hostname: str | None) -> str:
@@ -96,13 +102,40 @@ def validate_post_request(
     # method/path handling remains with the core handler so they produce 404.
 
 
+def _parse_event_start(value: str) -> datetime:
+    started = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if started.tzinfo is None:
+        raise ValueError("stored event start timestamp must be timezone-aware")
+    return started
+
+
+def validate_mutation_timing(
+    *,
+    path: str,
+    event_start_time: str,
+    now: datetime | None = None,
+) -> None:
+    """Enforce prospective station phases at the HTTP mutation boundary."""
+    current = now or datetime.now().astimezone()
+    if current.tzinfo is None:
+        raise ValueError("current timestamp must be timezone-aware")
+    started = _parse_event_start(event_start_time)
+    elapsed_ms = (current - started).total_seconds() * 1000.0
+
+    if path.startswith(RESERVE_PREFIX) and elapsed_ms > SENSOR_EVIDENCE_CUTOFF_MS:
+        raise ValueError("A1 reservation arrived after the frozen 5000 ms evidence cutoff")
+    if path.startswith(FINALIZE_PREFIX) and elapsed_ms < TARGET_HORIZON_MS:
+        raise ValueError("CT1 outcome cannot be finalized before the frozen 60000 ms horizon")
+
+
 class SecureCaptureHandler(CaptureHandler):
     """Same-origin HTTP shell around the tested local capture state machine.
 
     Loopback binding is necessary but not sufficient: browsers can issue some
     cross-origin requests to localhost even when response reading is blocked by
     SOP/CORS. Host + Origin + Content-Type checks therefore run before every
-    state-changing core-handler call.
+    state-changing core-handler call. Prospective timing gates are also enforced
+    server-side rather than relying solely on disabled browser buttons.
     """
 
     server_version = "A1CaptureStationSecure/0"
@@ -121,6 +154,24 @@ class SecureCaptureHandler(CaptureHandler):
             return False
         return True
 
+    def _validate_timing_for_path(self, path: str) -> None:
+        prefix = None
+        if path.startswith(RESERVE_PREFIX):
+            prefix = RESERVE_PREFIX
+        elif path.startswith(FINALIZE_PREFIX):
+            prefix = FINALIZE_PREFIX
+        if prefix is None:
+            return
+        event_id = unquote(path[len(prefix) :])
+        event_path = self.store.event_path(event_id)
+        if not event_path.exists():
+            return  # core handler will return its normal 404
+        event = json.loads(event_path.read_text(encoding="utf-8"))
+        validate_mutation_timing(
+            path=path,
+            event_start_time=event["time"]["start_time"],
+        )
+
     def do_GET(self) -> None:
         if not self._validate_host_only():
             return
@@ -134,15 +185,17 @@ class SecureCaptureHandler(CaptureHandler):
     def do_POST(self) -> None:
         if not self._validate_host_only():
             return
+        path = urlsplit(self.path).path
         try:
             validate_post_request(
-                path=urlsplit(self.path).path,
+                path=path,
                 host_header=self.headers.get("Host"),
                 origin_header=self.headers.get("Origin"),
                 sec_fetch_site=self.headers.get("Sec-Fetch-Site"),
                 content_type=self.headers.get("Content-Type"),
                 server_port=self._server_port(),
             )
+            self._validate_timing_for_path(path)
         except ValueError as exc:
             self._reject_security(str(exc))
             return
@@ -169,10 +222,11 @@ def serve_secure(
     if not 1 <= port <= 65535:
         raise ValueError("port must be in 1..65535")
     server = ThreadingHTTPServer((host, port), secure_handler_for(store))
-    url = f"http://{host}:{server.server_address[1]}/"
+    display_host = f"[{host}]" if ":" in host else host
+    url = f"http://{display_host}:{server.server_address[1]}/"
     print(f"A1.2 secure capture station: {url}")
     print(f"Local data directory: {store.root}")
-    print("Host/Origin/Content-Type checks are enabled; no model inference is performed.")
+    print("Host/Origin/Content-Type/timing checks are enabled; no model inference is performed.")
     if open_browser_window:
         webbrowser.open(url)
     try:
