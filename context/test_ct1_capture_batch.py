@@ -41,6 +41,24 @@ def write_pair(directory: Path, event: dict, lock: dict) -> Path:
     return path
 
 
+def write_derived_m1_copy(directory: Path, event: dict) -> Path:
+    derived = copy.deepcopy(event)
+    derived["provenance"]["annotation_source"] = "mixed"
+    derived["provenance"]["lineage"].append(
+        "M1.3 derived sensor composition from immutable CT1 event using 1 sealed sidecar(s)"
+    )
+    derived["provenance"].setdefault("software_versions", {})[
+        "m1_sensor_sidecar"
+    ] = "M1.3-sensor-sidecar-v0"
+    derived["notes"] = (
+        (derived.get("notes") or "")
+        + " Derived M1 event adds sealed local sensor evidence; raw/local paths are not embedded."
+    ).strip()
+    path = directory / f"{event['event_id']}.a1.m1.json"
+    path.write_text(json.dumps(derived, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
 class CT1CaptureBatchTests(unittest.TestCase):
     def test_status_counts_open_finalized_and_unknown_without_model_analysis(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -53,6 +71,7 @@ class CT1CaptureBatchTests(unittest.TestCase):
             report = inspect_directory(directory)
             self.assertFalse(report["performance_analysis_performed"])
             self.assertEqual(4, report["counts"]["event_files"])
+            self.assertEqual(0, report["counts"]["derived_m1_event_files_ignored"])
             self.assertEqual(3, report["counts"]["finalized_events"])
             self.assertEqual(3, report["counts"]["bundle_ready_events"])
             self.assertEqual(1, report["counts"]["open_events"])
@@ -74,7 +93,29 @@ class CT1CaptureBatchTests(unittest.TestCase):
             events, manifest = bundle_ready_events(directory)
             self.assertEqual(["batch-000", "batch-002"], [event["event_id"] for event in events])
             self.assertEqual(2, manifest["n_events"])
+            self.assertEqual([], manifest["ignored_derived_m1_event_paths"])
             self.assertFalse(manifest["performance_analysis_performed"])
+
+    def test_m1_derived_copy_is_visible_but_not_counted_as_second_h0_event(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            event, lock = make_event(0, finalized=True, terminated=True)
+            canonical_path = write_pair(directory, event, lock)
+            derived_path = write_derived_m1_copy(directory, event)
+
+            report = inspect_directory(directory)
+            self.assertEqual(1, report["counts"]["event_files"])
+            self.assertEqual(1, report["counts"]["derived_m1_event_files_ignored"])
+            self.assertEqual(1, report["counts"]["finalized_events"])
+            self.assertEqual(1, report["counts"]["bundle_ready_events"])
+            self.assertEqual(0, report["counts"]["invalid_or_tampered_events"])
+            self.assertEqual([str(derived_path)], report["ignored_derived_m1_event_paths"])
+            self.assertEqual(str(canonical_path), report["records"][0]["path"])
+
+            events, manifest = bundle_ready_events(directory)
+            self.assertEqual(["batch-000"], [item["event_id"] for item in events])
+            self.assertEqual(1, manifest["n_events"])
+            self.assertEqual([str(derived_path)], manifest["ignored_derived_m1_event_paths"])
 
     def test_tampered_finalized_event_blocks_bundle(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
