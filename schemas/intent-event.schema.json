@@ -1,0 +1,293 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cat-pose-benchmark.example/schemas/intent-event.schema.json",
+  "title": "Feline Intent Programme Event",
+  "description": "Programme-wide episode record joining multimodal observations, context, hypotheses, interventions, outcomes, uncertainty, provenance, and privacy without requiring a human intent label.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "event_id",
+    "subject_id",
+    "household_id",
+    "session_id",
+    "episode_id",
+    "time",
+    "observations",
+    "context",
+    "hypotheses",
+    "human_actions",
+    "interventions",
+    "outcomes",
+    "missing_modalities",
+    "provenance",
+    "privacy"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "event_id": {"type": "string", "minLength": 1},
+    "subject_id": {"type": "string", "minLength": 1},
+    "household_id": {"type": "string", "minLength": 1},
+    "session_id": {"type": "string", "minLength": 1},
+    "episode_id": {"type": "string", "minLength": 1},
+    "time": {"$ref": "#/$defs/time_window"},
+    "observations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/observation_ref"}
+    },
+    "context": {"$ref": "#/$defs/context"},
+    "hypotheses": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/hypothesis"}
+    },
+    "human_actions": {"type": "array", "items": {"$ref": "#/$defs/action"}},
+    "interventions": {"type": "array", "items": {"$ref": "#/$defs/intervention"}},
+    "outcomes": {"type": "array", "items": {"$ref": "#/$defs/outcome"}},
+    "missing_modalities": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/modality"}
+    },
+    "uncertainty": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "episode_confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "notes": {"type": "string"}
+      }
+    },
+    "provenance": {"$ref": "#/$defs/provenance"},
+    "privacy": {"$ref": "#/$defs/privacy"},
+    "notes": {"type": "string"}
+  },
+  "$defs": {
+    "modality": {
+      "enum": [
+        "visual_pose",
+        "visual_microstate",
+        "audio_vocalisation",
+        "audio_environment",
+        "object_environment",
+        "temporal_routine",
+        "social_proxemic",
+        "physiology",
+        "human_input",
+        "intervention",
+        "outcome",
+        "other"
+      ]
+    },
+    "time_window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start_time", "end_time", "start_offset_ms", "end_offset_ms"],
+      "properties": {
+        "start_time": {"type": "string", "format": "date-time"},
+        "end_time": {"type": "string", "format": "date-time"},
+        "start_offset_ms": {"type": "integer", "minimum": 0},
+        "end_offset_ms": {"type": "integer", "minimum": 0},
+        "clock_source": {"type": "string", "minLength": 1},
+        "uncertainty_ms": {"type": "number", "minimum": 0}
+      }
+    },
+    "observation_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["observation_ref", "modality", "schema_ref", "record_ids", "start_offset_ms", "end_offset_ms"],
+      "properties": {
+        "observation_ref": {"type": "string", "minLength": 1},
+        "modality": {"$ref": "#/$defs/modality"},
+        "schema_ref": {"type": "string", "minLength": 1},
+        "record_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "source_uri": {"type": "string"},
+        "start_offset_ms": {"type": "integer", "minimum": 0},
+        "end_offset_ms": {"type": "integer", "minimum": 0},
+        "features": {"type": "object", "additionalProperties": true},
+        "uncertainty": {"type": "object", "additionalProperties": true}
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["location", "objects", "social"],
+      "properties": {
+        "location": {"type": ["string", "null"]},
+        "objects": {"type": "array", "items": {"$ref": "#/$defs/context_object"}},
+        "social": {"type": "array", "items": {"$ref": "#/$defs/social_entity"}},
+        "environment": {"type": "object", "additionalProperties": true},
+        "routine": {"type": "object", "additionalProperties": true}
+      }
+    },
+    "context_object": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["object_id", "object_type"],
+      "properties": {
+        "object_id": {"type": "string", "minLength": 1},
+        "object_type": {"type": "string", "minLength": 1},
+        "state": {"type": "object", "additionalProperties": true},
+        "relation_to_subject": {"type": "string"}
+      }
+    },
+    "social_entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_id", "entity_type"],
+      "properties": {
+        "entity_id": {"type": "string", "minLength": 1},
+        "entity_type": {"enum": ["human", "cat", "other_animal", "unknown"]},
+        "relationship": {"type": "string"},
+        "distance_m": {"type": "number", "minimum": 0},
+        "orientation": {"type": "string"}
+      }
+    },
+    "hypothesis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hypothesis_id", "kind", "probability", "source"],
+      "properties": {
+        "hypothesis_id": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["human_label", "latent_state", "unknown"]},
+        "label": {"type": "string", "minLength": 1},
+        "state_ref": {"type": "string", "minLength": 1},
+        "probability": {"type": "number", "minimum": 0, "maximum": 1},
+        "source": {"enum": ["prior", "model", "human", "derived"]},
+        "calibration_model": {"type": "string"},
+        "evidence_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"kind": {"const": "human_label"}}, "required": ["kind"]},
+          "then": {"required": ["label"]}
+        },
+        {
+          "if": {"properties": {"kind": {"const": "latent_state"}}, "required": ["kind"]},
+          "then": {"required": ["state_ref"]}
+        },
+        {
+          "if": {"properties": {"kind": {"const": "unknown"}}, "required": ["kind"]},
+          "then": {"not": {"anyOf": [{"required": ["label"]}, {"required": ["state_ref"]}]}}
+        }
+      ]
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action_id", "action_type", "offset_ms"],
+      "properties": {
+        "action_id": {"type": "string", "minLength": 1},
+        "action_type": {"type": "string", "minLength": 1},
+        "offset_ms": {"type": "integer", "minimum": 0},
+        "actor_id": {"type": "string"},
+        "target_id": {"type": "string"},
+        "parameters": {"type": "object", "additionalProperties": true}
+      }
+    },
+    "intervention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["intervention_id", "action_ref", "candidate_hypotheses", "predictions", "safety_class"],
+      "properties": {
+        "intervention_id": {"type": "string", "minLength": 1},
+        "action_ref": {"type": "string", "minLength": 1},
+        "candidate_hypotheses": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "predictions": {
+          "type": "array",
+          "minItems": 2,
+          "items": {"$ref": "#/$defs/intervention_prediction"}
+        },
+        "selection_policy": {"type": "string"},
+        "safety_class": {"const": "ordinary_low_risk_household_action"}
+      }
+    },
+    "intervention_prediction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hypothesis_ref", "expected_response"],
+      "properties": {
+        "hypothesis_ref": {"type": "string", "minLength": 1},
+        "expected_response": {"type": "string", "minLength": 1},
+        "response_window_ms": {"type": "integer", "minimum": 0}
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["outcome_id", "outcome_type", "start_offset_ms", "observation_source"],
+      "properties": {
+        "outcome_id": {"type": "string", "minLength": 1},
+        "outcome_type": {
+          "enum": ["immediate_response", "signalling_termination", "delayed_outcome", "no_observable_change", "contradictory", "unknown"]
+        },
+        "start_offset_ms": {"type": "integer", "minimum": 0},
+        "end_offset_ms": {"type": "integer", "minimum": 0},
+        "observation_source": {"enum": ["direct_observation", "sensor", "human_annotation", "derived"]},
+        "description": {"type": "string"},
+        "supports_hypotheses": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "contradicts_hypotheses": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "signalling_terminated": {"type": ["boolean", "null"]}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_ids", "lineage", "annotation_source"],
+      "properties": {
+        "source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "lineage": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "annotation_source": {"enum": ["observed", "human_annotated", "model_inferred", "synthetic", "derived", "mixed"]},
+        "annotator_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "software_versions": {"type": "object", "additionalProperties": {"type": "string"}}
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["data_class", "consent_status"],
+      "properties": {
+        "data_class": {"enum": ["synthetic", "public", "consented_research", "private_household"]},
+        "consent_status": {"enum": ["not_applicable", "recorded", "pending", "restricted"]},
+        "consent_record_id": {"type": "string"},
+        "retention_policy": {"type": "string"},
+        "contains_human_audio": {"type": "boolean"},
+        "contains_human_image": {"type": "boolean"}
+      }
+    }
+  }
+}

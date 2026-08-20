@@ -1,0 +1,175 @@
+{
+  "schema_version": "0.1.0",
+  "event_id": "evt-mm-001",
+  "subject_id": "cat-pseudonym-007",
+  "household_id": "hh-003",
+  "session_id": "sess-mm-001",
+  "episode_id": "ep-mm-022",
+  "time": {
+    "start_time": "2026-08-21T01:20:00Z",
+    "end_time": "2026-08-21T01:20:15Z",
+    "start_offset_ms": 0,
+    "end_offset_ms": 15000,
+    "clock_source": "session-monotonic-clock",
+    "uncertainty_ms": 20
+  },
+  "observations": [
+    {
+      "observation_ref": "pose-segment-022",
+      "modality": "visual_pose",
+      "schema_ref": "schemas/observation.schema.json",
+      "record_ids": ["obs-v1-2201", "obs-v1-2202"],
+      "start_offset_ms": 0,
+      "end_offset_ms": 9000
+    },
+    {
+      "observation_ref": "call-segment-022",
+      "modality": "audio_vocalisation",
+      "schema_ref": "programme/audio-observation-v0.1",
+      "record_ids": ["clip-022"],
+      "start_offset_ms": 900,
+      "end_offset_ms": 2300,
+      "features": {"call_count": 2}
+    },
+    {
+      "observation_ref": "door-state-022",
+      "modality": "object_environment",
+      "schema_ref": "programme/context-observation-v0.1",
+      "record_ids": ["ctx-door-022"],
+      "start_offset_ms": 0,
+      "end_offset_ms": 15000,
+      "features": {"door": "closed"}
+    }
+  ],
+  "context": {
+    "location": "hallway",
+    "objects": [
+      {
+        "object_id": "door-balcony",
+        "object_type": "door",
+        "state": {"open": false},
+        "relation_to_subject": "subject-facing"
+      }
+    ],
+    "social": [
+      {
+        "entity_id": "human-01",
+        "entity_type": "human",
+        "relationship": "household_member",
+        "distance_m": 1.4
+      }
+    ]
+  },
+  "hypotheses": [
+    {
+      "hypothesis_id": "h-access",
+      "kind": "human_label",
+      "label": "request access through door",
+      "probability": 0.42,
+      "source": "model",
+      "calibration_model": "passive-mm-v0",
+      "evidence_refs": ["pose-segment-022", "call-segment-022", "door-state-022"]
+    },
+    {
+      "hypothesis_id": "h-attention",
+      "kind": "human_label",
+      "label": "social attention",
+      "probability": 0.31,
+      "source": "model",
+      "calibration_model": "passive-mm-v0",
+      "evidence_refs": ["pose-segment-022", "call-segment-022"]
+    },
+    {
+      "hypothesis_id": "h-unknown",
+      "kind": "unknown",
+      "probability": 0.27,
+      "source": "model",
+      "calibration_model": "passive-mm-v0",
+      "evidence_refs": ["pose-segment-022", "call-segment-022"]
+    }
+  ],
+  "human_actions": [
+    {
+      "action_id": "act-open-door",
+      "action_type": "open_door",
+      "offset_ms": 8200,
+      "actor_id": "human-01",
+      "target_id": "door-balcony",
+      "parameters": {"opened": true}
+    }
+  ],
+  "interventions": [
+    {
+      "intervention_id": "int-022",
+      "action_ref": "act-open-door",
+      "candidate_hypotheses": ["h-access", "h-attention", "h-unknown"],
+      "predictions": [
+        {
+          "hypothesis_ref": "h-access",
+          "expected_response": "subject crosses threshold or signalling terminates",
+          "response_window_ms": 5000
+        },
+        {
+          "hypothesis_ref": "h-attention",
+          "expected_response": "subject remains near human and continues social signalling",
+          "response_window_ms": 5000
+        },
+        {
+          "hypothesis_ref": "h-unknown",
+          "expected_response": "no preregistered directional prediction",
+          "response_window_ms": 5000
+        }
+      ],
+      "selection_policy": "safe-discriminative-manual-v0",
+      "safety_class": "ordinary_low_risk_household_action"
+    }
+  ],
+  "outcomes": [
+    {
+      "outcome_id": "out-022-a",
+      "outcome_type": "immediate_response",
+      "start_offset_ms": 8800,
+      "end_offset_ms": 10200,
+      "observation_source": "direct_observation",
+      "description": "Subject crossed doorway after opening.",
+      "supports_hypotheses": ["h-access"],
+      "contradicts_hypotheses": ["h-attention"],
+      "signalling_terminated": null
+    },
+    {
+      "outcome_id": "out-022-b",
+      "outcome_type": "signalling_termination",
+      "start_offset_ms": 10200,
+      "end_offset_ms": 15000,
+      "observation_source": "direct_observation",
+      "description": "Pre-intervention vocal/pacing sequence did not recur within the declared window.",
+      "supports_hypotheses": ["h-access"],
+      "signalling_terminated": true
+    }
+  ],
+  "missing_modalities": [
+    "visual_microstate",
+    "audio_environment",
+    "temporal_routine",
+    "physiology"
+  ],
+  "uncertainty": {"episode_confidence": 0.71},
+  "provenance": {
+    "source_ids": ["video-022", "clip-022", "context-log-022"],
+    "lineage": [
+      "synchronised household capture",
+      "V1/A1/context feature extraction",
+      "prospective I1 intervention record"
+    ],
+    "annotation_source": "mixed",
+    "annotator_ids": ["annotator-pseudonym-1"]
+  },
+  "privacy": {
+    "data_class": "private_household",
+    "consent_status": "recorded",
+    "consent_record_id": "consent-hh003-v1",
+    "retention_policy": "research-protocol-v0",
+    "contains_human_audio": true,
+    "contains_human_image": true
+  }
+}
