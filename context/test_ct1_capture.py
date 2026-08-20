@@ -8,11 +8,13 @@ from context.fixtures.ct1_synthetic_events import build_events
 
 try:
     from context.ct1_capture import context_snapshot, validate_capture_event
+    from context.ct1_strict_features import extract_strict_ct1_row
     from context.fixtures.ct1_capture_template import build_capture_event
 except ModuleNotFoundError:  # Isolated local development copy; repository CI has programme/.
     context_snapshot = None
     validate_capture_event = None
     build_capture_event = None
+    extract_strict_ct1_row = None
 
 
 @unittest.skipIf(validate_capture_event is None, "shared programme validator unavailable in isolated local copy")
@@ -20,21 +22,23 @@ class CT1CaptureTests(unittest.TestCase):
     def test_preoutcome_template_is_capture_ready(self) -> None:
         assert build_capture_event is not None
         assert validate_capture_event is not None
+        assert extract_strict_ct1_row is not None
         event = build_capture_event(include_outcome=False)
         self.assertEqual([], validate_capture_event(event))
 
-        row = extract_ct1_row(event, [], require_timestamped_context=True)
+        row = extract_strict_ct1_row(event, [])
         self.assertEqual("timestamped_object_environment_snapshot", row["leakage_audit"]["context_source"])
         self.assertEqual("hallway", row["features"]["location"])
         self.assertIsNone(row["target_signalling_terminated"])
 
     def test_completed_template_keeps_outcome_label_only(self) -> None:
         assert build_capture_event is not None
+        assert extract_strict_ct1_row is not None
         event = build_capture_event(include_outcome=False)
         completed = build_capture_event(include_outcome=True)
 
-        row_before = extract_ct1_row(event, [], require_timestamped_context=True)
-        row_after = extract_ct1_row(completed, [], require_timestamped_context=True)
+        row_before = extract_strict_ct1_row(event, [])
+        row_after = extract_strict_ct1_row(completed, [])
         self.assertEqual(row_before["features"], row_after["features"])
         self.assertIsNone(row_before["target_signalling_terminated"])
         self.assertTrue(row_after["target_signalling_terminated"])
@@ -76,11 +80,12 @@ class CT1CaptureTests(unittest.TestCase):
         self.assertTrue(any("expected exactly one" in error for error in errors), errors)
 
     def test_ct1_1_event_requires_snapshot_only_in_strict_mode(self) -> None:
+        assert extract_strict_ct1_row is not None
         event = build_events()[0]
         relaxed = extract_ct1_row(event, [])
-        self.assertEqual("top_level_context", relaxed["leakage_audit"]["context_source"])
+        self.assertNotIn("context_source", relaxed["leakage_audit"])
         with self.assertRaises(ValueError):
-            extract_ct1_row(event, [], require_timestamped_context=True)
+            extract_strict_ct1_row(event, [])
 
 
 if __name__ == "__main__":
