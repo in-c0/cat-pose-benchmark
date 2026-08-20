@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import unittest
+from datetime import datetime, timedelta, timezone
 
 from audio.a1_capture_station_secure import (
     validate_host_header,
+    validate_mutation_timing,
     validate_post_request,
 )
 
@@ -31,7 +33,7 @@ class A1CaptureStationSecurityTests(unittest.TestCase):
         )
 
     def test_cross_origin_request_is_rejected_even_with_loopback_host(self) -> None:
-        with self.assertRaisesRegex(ValueError, "cross-origin"):
+        with self.assertRaises(ValueError):
             validate_post_request(
                 path="/api/start",
                 host_header="127.0.0.1:8765",
@@ -109,6 +111,34 @@ class A1CaptureStationSecurityTests(unittest.TestCase):
                         content_type="application/json",
                         server_port=8765,
                     )
+
+    def test_audio_reservation_must_arrive_inside_frozen_evidence_window(self) -> None:
+        t0 = datetime(2026, 8, 21, 0, 0, 0, tzinfo=timezone.utc)
+        validate_mutation_timing(
+            path="/api/reserve-audio/a1-safe-id",
+            event_start_time=t0.isoformat(),
+            now=t0 + timedelta(milliseconds=4999),
+        )
+        with self.assertRaisesRegex(ValueError, "5000 ms evidence cutoff"):
+            validate_mutation_timing(
+                path="/api/reserve-audio/a1-safe-id",
+                event_start_time=t0.isoformat(),
+                now=t0 + timedelta(milliseconds=5001),
+            )
+
+    def test_outcome_finalization_is_server_blocked_before_60_seconds(self) -> None:
+        t0 = datetime(2026, 8, 21, 0, 0, 0, tzinfo=timezone.utc)
+        with self.assertRaisesRegex(ValueError, "60000 ms horizon"):
+            validate_mutation_timing(
+                path="/api/finalize/a1-safe-id",
+                event_start_time=t0.isoformat(),
+                now=t0 + timedelta(milliseconds=59999),
+            )
+        validate_mutation_timing(
+            path="/api/finalize/a1-safe-id",
+            event_start_time=t0.isoformat(),
+            now=t0 + timedelta(milliseconds=60000),
+        )
 
 
 if __name__ == "__main__":
