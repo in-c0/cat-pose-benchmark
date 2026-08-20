@@ -1,0 +1,121 @@
+name: A1.0b unlabelled personalisation
+
+on:
+  pull_request:
+    paths:
+      - "audio/unlabelled_personalisation.py"
+      - "audio/test_unlabelled_personalisation.py"
+      - ".github/workflows/a1-unlabelled-personalisation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install research dependencies
+        run: python -m pip install --disable-pip-version-check numpy scipy librosa scikit-learn
+
+      - name: Run unlabelled personalisation unit tests
+        run: python -m unittest audio.test_unlabelled_personalisation
+
+      - name: Acquire checksum-verified CatMeows archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_MD5="b5fa911bcd6514e39dfef6876f747df4"
+          ZENODO_URL="https://zenodo.org/records/4008297/files/dataset.zip?download=1"
+          UNIMI_URL="https://air.unimi.it/retrieve/handle/2434/911765/1991879/dataset%281%29.zip"
+          USER_AGENT="cat-pose-benchmark-research/0.1 (+https://github.com/in-c0/cat-pose-benchmark)"
+
+          mkdir -p /tmp/catmeows /tmp/a1-personalisation
+          if ! curl --fail --location --retry 3 --retry-delay 5 --retry-all-errors \
+              --user-agent "$USER_AGENT" "$ZENODO_URL" -o /tmp/catmeows-dataset.zip; then
+            curl --fail --location --retry 3 --retry-delay 5 --retry-all-errors \
+              --user-agent "$USER_AGENT" "$UNIMI_URL" -o /tmp/catmeows-dataset.zip
+          fi
+          echo "$EXPECTED_MD5  /tmp/catmeows-dataset.zip" | md5sum --check --strict
+          unzip -q /tmp/catmeows-dataset.zip -d /tmp/catmeows
+          test "$(find /tmp/catmeows -type f -iname '*.wav' | wc -l | tr -d ' ')" = "440"
+
+      - name: Build manifest, audit and acoustic features
+        run: |
+          set -euo pipefail
+          python -m audio.catmeows_manifest /tmp/catmeows --output /tmp/catmeows-manifest.csv
+          python -m audio.personalisation_audit /tmp/catmeows-manifest.csv \
+            --output /tmp/a1-personalisation/p0-feasibility.json
+          python -m audio.acoustic_features \
+            /tmp/catmeows-manifest.csv /tmp/catmeows \
+            --output /tmp/catmeows-features.csv
+
+      - name: Run frozen P2 unlabelled adaptation curve
+        run: |
+          python -m audio.unlabelled_personalisation \
+            /tmp/catmeows-features.csv /tmp/a1-personalisation/p0-feasibility.json \
+            --repeats 20 --seed 20260821 --shrinkage-tau 4 \
+            --output /tmp/a1-personalisation/p2-unlabelled.json
+
+      - name: Print aggregate and fold-direction results
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path('/tmp/a1-personalisation/p2-unlabelled.json').read_text())
+          print('## A1.0b P2 unlabelled personalisation')
+          print('preregistered_primary_folds:', report['n_preregistered_primary_folds'])
+          print('feature_set:', report['feature_set'])
+          print('repeats_per_budget:', report['repeats_per_budget'])
+          print('shrinkage_tau:', report['shrinkage_tau'])
+
+          for budget, result in report['by_budget'].items():
+              print(f'\n### budget={budget}; folds={result["supported_folds"]}; test_clips={result.get("n_test_clips", 0)}')
+              if not result['supported_folds']:
+                  continue
+              for model_name, metrics in result['models'].items():
+                  print(
+                      f"{model_name}: balanced_accuracy={metrics['balanced_accuracy']:.4f}, "
+                      f"macro_f1={metrics['macro_f1']:.4f}, log_loss={metrics['log_loss']:.4f}, "
+                      f"brier={metrics['multiclass_brier']:.4f}, ece={metrics['top_label_ece']:.4f}"
+                  )
+              for model_name, delta in result['delta_vs_population'].items():
+                  print(
+                      f"delta {model_name}: balanced_accuracy={delta['balanced_accuracy']:+.4f}, "
+                      f"macro_f1={delta['macro_f1']:+.4f}, log_loss={delta['log_loss']:+.4f}, "
+                      f"brier={delta['multiclass_brier']:+.4f}, ece={delta['top_label_ece']:+.4f}"
+                  )
+
+              eligible = [fold for fold in report['folds'] if fold['by_budget'].get(budget, {}).get('supported')]
+              for model_name in ['centered_unshrunk', 'centered_shrinkage']:
+                  key = f'{model_name}_delta_vs_population'
+                  improved_logloss = sum(fold['by_budget'][budget][key]['log_loss'] < 0 for fold in eligible)
+                  improved_brier = sum(fold['by_budget'][budget][key]['multiclass_brier'] < 0 for fold in eligible)
+                  improved_balacc = sum(fold['by_budget'][budget][key]['balanced_accuracy'] > 0 for fold in eligible)
+                  print(
+                      f"fold_direction {model_name}: logloss_better={improved_logloss}/{len(eligible)}, "
+                      f"brier_better={improved_brier}/{len(eligible)}, "
+                      f"balanced_accuracy_better={improved_balacc}/{len(eligible)}"
+                  )
+          PY
+
+      - name: Upload aggregate reports only
+        uses: actions/upload-artifact@v4
+        with:
+          name: a1-unlabelled-personalisation-reports
+          path: |
+            /tmp/a1-personalisation/p0-feasibility.json
+            /tmp/a1-personalisation/p2-unlabelled.json
+          retention-days: 7
+          if-no-files-found: error
