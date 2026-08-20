@@ -111,17 +111,24 @@ try {
 
     # Lightweight import preflight: this exercises the canonical secure launcher import
     # without opening a port or starting any analysis/model code.
-    & $python.Exe @($python.Prefix) -c "from audio.a1_capture_station_secure import SECURE_SERVER_VERSION; print('preflight:', SECURE_SERVER_VERSION)"
+    $preflightArgs = @($python.Prefix) + @(
+        '-c',
+        "from audio.a1_capture_station_secure import SECURE_SERVER_VERSION; print('preflight:', SECURE_SERVER_VERSION)"
+    )
+    & $python.Exe @preflightArgs
     if ($LASTEXITCODE -ne 0) {
         throw "Secure capture-station import preflight failed."
     }
 
-    & $python.Exe @($python.Prefix) -m audio.a1_capture_station_secure `
-        --output-dir $OutputDir `
-        --subject-id $SubjectId `
-        --household-id $HouseholdId `
-        --session-id $SessionId `
-        --open-browser
+    $launchArgs = @($python.Prefix) + @(
+        '-m', 'audio.a1_capture_station_secure',
+        '--output-dir', $OutputDir,
+        '--subject-id', $SubjectId,
+        '--household-id', $HouseholdId,
+        '--session-id', $SessionId,
+        '--open-browser'
+    )
+    & $python.Exe @launchArgs
     if ($LASTEXITCODE -ne 0) {
         throw "Secure capture station exited with code $LASTEXITCODE."
     }
