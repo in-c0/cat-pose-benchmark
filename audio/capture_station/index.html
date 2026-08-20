@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>A1.2 Local Capture Station</title>
+  <style>
+    :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, sans-serif; }
+    body { max-width: 820px; margin: 0 auto; padding: 28px 20px 80px; line-height: 1.45; }
+    h1 { margin-bottom: .25rem; }
+    .muted { opacity: .72; }
+    .card { border: 1px solid color-mix(in srgb, currentColor 24%, transparent); border-radius: 12px; padding: 16px; margin-top: 16px; }
+    label { display: block; margin: 12px 0 6px; font-weight: 600; }
+    textarea, input, button { font: inherit; }
+    textarea { width: 100%; min-height: 110px; box-sizing: border-box; padding: 10px; }
+    button { padding: 10px 14px; margin: 5px 6px 5px 0; cursor: pointer; }
+    button[disabled] { cursor: not-allowed; opacity: .45; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .status { white-space: pre-wrap; background: color-mix(in srgb, currentColor 7%, transparent); padding: 12px; border-radius: 8px; min-height: 1.5em; }
+    .good { font-weight: 700; }
+    code { word-break: break-word; }
+  </style>
+</head>
+<body>
+  <h1>A1.2 Local Capture Station</h1>
+  <p class="muted">Prospective context + first 5 s vocal audio. Localhost only. No model inference, translation, or cloud upload.</p>
+
+  <section class="card">
+    <strong>Configured pseudonymous IDs</strong>
+    <div id="config" class="status">Loading…</div>
+  </section>
+
+  <section class="card">
+    <h2>1. Prediction-time context</h2>
+    <label for="location">Location</label>
+    <input id="location" value="hallway" autocomplete="off" />
+
+    <label for="objects">Objects JSON array</label>
+    <textarea id="objects">[]</textarea>
+
+    <label for="social">Social JSON array</label>
+    <textarea id="social">[]</textarea>
+
+    <label for="environment">Environment JSON object</label>
+    <textarea id="environment">{}</textarea>
+
+    <label><input id="human-audio" type="checkbox" /> Human speech/audio may be present in the microphone capture</label>
+  </section>
+
+  <section class="card">
+    <h2>2. Arm microphone</h2>
+    <div class="row">
+      <button id="arm">Arm microphone</button>
+      <button id="disarm" disabled>Disarm</button>
+      <span id="mic-state">Not armed</span>
+    </div>
+    <p class="muted">Arming requests browser microphone permission but does not start an episode. Audio is captured only after the Start button below.</p>
+  </section>
+
+  <section class="card">
+    <h2>3. Natural episode</h2>
+    <button id="start" disabled>Start episode + capture first 5 s</button>
+    <div id="capture-status" class="status">No active episode.</div>
+    <p class="muted">Do not provoke or delay ordinary care to manufacture an episode.</p>
+  </section>
+
+  <section class="card">
+    <h2>4. Outcome at 60 s</h2>
+    <div id="countdown" class="status">No active outcome window.</div>
+    <div class="row">
+      <button class="outcome" data-outcome="terminated" disabled>Terminated by 60 s</button>
+      <button class="outcome" data-outcome="continued" disabled>Still continuing at 60 s</button>
+      <button class="outcome" data-outcome="unknown" disabled>Unknown / could not observe</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Local records</h2>
+    <button id="refresh">Refresh status</button>
+    <button id="resume">Resume latest open episode</button>
+    <div id="records" class="status">Loading…</div>
+  </section>
+
+  <script src="/app.js" type="module"></script>
+</body>
+</html>
