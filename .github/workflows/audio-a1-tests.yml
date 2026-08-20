@@ -4,10 +4,20 @@ on:
   push:
     paths:
       - "audio/**"
+      - "fusion/m1_sensor_sidecar.py"
+      - "fusion/m1_cohort_manifest.py"
+      - "context/**"
+      - "programme/**"
+      - "schemas/intent-event.schema.json"
       - ".github/workflows/audio-a1-tests.yml"
   pull_request:
     paths:
       - "audio/**"
+      - "fusion/m1_sensor_sidecar.py"
+      - "fusion/m1_cohort_manifest.py"
+      - "context/**"
+      - "programme/**"
+      - "schemas/intent-event.schema.json"
       - ".github/workflows/audio-a1-tests.yml"
 
 permissions:
@@ -29,8 +39,13 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install acoustic baseline dependencies
-        run: python -m pip install --disable-pip-version-check numpy scipy librosa scikit-learn
+      - name: Install A1 dependencies
+        run: python -m pip install --disable-pip-version-check numpy scipy librosa scikit-learn jsonschema
 
       - name: Run A1 unit tests
         run: python -m unittest discover -s audio -p 'test_*.py'
+
+      - name: Check capture-station JavaScript syntax
+        run: |
+          node --check audio/capture_station/app.js
+          node --check audio/capture_station/recorder-worklet.js
