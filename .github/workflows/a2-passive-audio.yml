@@ -1,0 +1,60 @@
+name: A2 passive audio projection
+
+on:
+  pull_request:
+    paths:
+      - "audio/a2_*"
+      - "audio/A2-PROTOCOL.md"
+      - "audio/test_a2_projection.py"
+      - ".github/workflows/a2-passive-audio.yml"
+  push:
+    branches: [main]
+    paths:
+      - "audio/a2_*"
+      - "audio/A2-PROTOCOL.md"
+      - "audio/test_a2_projection.py"
+      - ".github/workflows/a2-passive-audio.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install A2 dependencies
+        run: python -m pip install --disable-pip-version-check numpy jsonschema
+      - name: Run A2 projection regressions
+        run: python -m unittest audio.test_a2_projection
+      - name: Build software-only score packet
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from audio.test_a2_projection import build_packet
+          Path('/tmp/a2-score-packet.json').write_text(
+              json.dumps(build_packet(), indent=2, sort_keys=True) + '\n',
+              encoding='utf-8',
+          )
+          PY
+      - name: Smoke-test A2 CLI and claims boundary
+        run: |
+          python -m audio.a2_projection /tmp/a2-score-packet.json --output /tmp/a2-projection.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('/tmp/a2-projection.json').read_text(encoding='utf-8'))
+          assert report['semantic_ground_truth'] is False, report
+          assert report['intent_inference_performed'] is False, report
+          assert report['performance_analysis_performed'] is False, report
+          assert report['source_audio_artifact_sha256'] == 'a' * 64, report
+          assert report['projection_groups']['surface_contact_proxy']['matched_source_classes'] == ['Scratch'], report
+          print('A2 software-only passive-context projection smoke passed')
+          PY
