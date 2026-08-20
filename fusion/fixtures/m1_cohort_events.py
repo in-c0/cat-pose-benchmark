@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from context.fixtures.ct1_capture_template import build_capture_event
+from fusion.v1_pose_package import POSE_PACKAGE_SCHEMA_REF, POSE_PACKAGE_VERSION
 
 
 def _shift_event(event: dict[str, Any], index: int, suffix: str) -> dict[str, Any]:
@@ -30,18 +31,65 @@ def _shift_event(event: dict[str, Any], index: int, suffix: str) -> dict[str, An
     return event
 
 
+def _visual_fixture_features(event: dict[str, Any], end_offset_ms: int) -> dict[str, Any]:
+    return {
+        "sensor_sidecar_version": "M1.3-sensor-sidecar-v0",
+        "artifact_kind": "pose_features_json",
+        "artifact_sha256": "a" * 64,
+        "artifact_byte_length": 512,
+        "media_metadata": {
+            "container": "json",
+            "package_version": POSE_PACKAGE_VERSION,
+            "event_id": event["event_id"],
+            "episode_id": event["episode_id"],
+            "sequence_id": f"v1-sequence:{event['event_id']}",
+            "subject_id": event["subject_id"],
+            "evidence_window_ms": {
+                "start_offset_ms": 0,
+                "end_offset_ms": end_offset_ms,
+            },
+            "sample_count": 1,
+            "observation_count": 1,
+            "observation_class_counts": {"surface_landmark": 1},
+            "evidence_tier_counts": {"S2": 1},
+            "quality_counts": {"bronze": 1},
+            "producer": {
+                "kind": "learned_model",
+                "name": "synthetic-cohort-fixture",
+                "version": "0.0-test",
+                "model_family": "synthetic-fixture-family",
+                "weights_sha256": "b" * 64,
+                "code_revision": "synthetic-fixture",
+            },
+            "producer_fingerprint_sha256": "c" * 64,
+            "source_media_count": 1,
+        },
+        "reservation_sha256": "d" * 64,
+        "sealed_record_sha256": "e" * 64,
+        "reserved_at": event["time"]["start_time"],
+        "reserved_at_offset_ms": 0,
+        "local_path_included": False,
+    }
+
+
 def _add_sensor(event: dict[str, Any], modality: str, *, end_offset_ms: int = 3000) -> None:
     token = "v1" if modality == "visual_pose" else "a1"
     ref = f"{token}:{event['event_id']}"
+    if modality == "visual_pose":
+        schema_ref = POSE_PACKAGE_SCHEMA_REF
+        features = _visual_fixture_features(event, end_offset_ms)
+    else:
+        schema_ref = f"synthetic/{token}-fixture-v0"
+        features = {"synthetic_fixture": True}
     event["observations"].append(
         {
             "observation_ref": ref,
             "modality": modality,
-            "schema_ref": f"synthetic/{token}-fixture-v0",
+            "schema_ref": schema_ref,
             "record_ids": [f"synthetic-{token}-record:{event['event_id']}"],
             "start_offset_ms": 0,
             "end_offset_ms": end_offset_ms,
-            "features": {"synthetic_fixture": True},
+            "features": features,
         }
     )
     event["missing_modalities"] = [
