@@ -30,7 +30,9 @@ ROUNDTRIP_VERSION = "S0B-unity-roundtrip-v0"
 PINNED_UNITY_EDITOR_VERSION = "6000.3.18f1"
 RUNTIME_SOURCE_UNITY = "unity_editor"
 RUNTIME_SOURCE_MOCK = "python_mock_unity_contract"
-DEFAULT_TOLERANCE = 1e-5
+# Unity Transform/Vector math is float32. At ~300 px, one float ULP is already
+# about 3e-5 px; this tolerance covers representation differences only, not pose error.
+DEFAULT_TOLERANCE = 5e-5
 PAW_NAMES = (
     "left_front_paw_center",
     "right_front_paw_center",
@@ -44,37 +46,17 @@ def _vec2(values: list[float]) -> dict[str, float]:
 
 
 def _vec3(values: list[float]) -> dict[str, float]:
-    return {
-        "x": float(values[0]),
-        "y": float(values[1]),
-        "z": float(values[2]),
-    }
+    return {"x": float(values[0]), "y": float(values[1]), "z": float(values[2])}
 
 
-def _as_vec2(value: Any, path: str, errors: list[str]) -> list[float] | None:
+def _parse_vec(
+    value: Any, keys: tuple[str, ...], path: str, errors: list[str]
+) -> list[float] | None:
     if not isinstance(value, dict):
-        errors.append(f"{path}: expected object {{x,y}}")
+        errors.append(f"{path}: expected object with {','.join(keys)}")
         return None
     result: list[float] = []
-    for key in ("x", "y"):
-        item = value.get(key)
-        if not isinstance(item, (int, float)) or isinstance(item, bool):
-            errors.append(f"{path}.{key}: expected finite number")
-            return None
-        item = float(item)
-        if not math.isfinite(item):
-            errors.append(f"{path}.{key}: expected finite number")
-            return None
-        result.append(item)
-    return result
-
-
-def _as_vec3(value: Any, path: str, errors: list[str]) -> list[float] | None:
-    if not isinstance(value, dict):
-        errors.append(f"{path}: expected object {{x,y,z}}")
-        return None
-    result: list[float] = []
-    for key in ("x", "y", "z"):
+    for key in keys:
         item = value.get(key)
         if not isinstance(item, (int, float)) or isinstance(item, bool):
             errors.append(f"{path}.{key}: expected finite number")
@@ -104,8 +86,7 @@ def _compare_scalar(
     actual = float(actual)
     if not math.isfinite(actual):
         errors.append(f"{path}: expected finite number")
-        return
-    if not _close(actual, expected, tolerance):
+    elif not _close(actual, expected, tolerance):
         errors.append(f"{path}: expected {expected!r}, got {actual!r}")
 
 
@@ -116,19 +97,13 @@ def _compare_vec(
     tolerance: float,
     errors: list[str],
 ) -> None:
-    parsed = (
-        _as_vec2(actual, path, errors)
-        if len(expected) == 2
-        else _as_vec3(actual, path, errors)
-    )
+    keys = ("x", "y") if len(expected) == 2 else ("x", "y", "z")
+    parsed = _parse_vec(actual, keys, path, errors)
     if parsed is None:
         return
-    for index, (value, target) in enumerate(zip(parsed, expected)):
+    for key, value, target in zip(keys, parsed, expected):
         if not _close(value, target, tolerance):
-            axis = ("x", "y", "z")[index]
-            errors.append(
-                f"{path}.{axis}: expected {target!r}, got {value!r}"
-            )
+            errors.append(f"{path}.{key}: expected {target!r}, got {value!r}")
 
 
 def _require_exact(actual: Any, expected: Any, path: str, errors: list[str]) -> None:
@@ -137,11 +112,7 @@ def _require_exact(actual: Any, expected: Any, path: str, errors: list[str]) -> 
 
 
 def build_mock_unity_export() -> dict[str, Any]:
-    """Build the raw Unity-side contract without claiming Unity executed it.
-
-    This is used only to test the Python comparator and JSON shape. The runtime_source
-    deliberately prevents it from satisfying the real Unity acceptance gate.
-    """
+    """Build the raw contract without claiming that Unity executed it."""
     frames: list[dict[str, Any]] = []
     for frame_index in range(FRAME_COUNT):
         landmarks = []
@@ -159,19 +130,12 @@ def build_mock_unity_export() -> dict[str, Any]:
         frames.append(
             {
                 "frame_index": frame_index,
-                "timestamp_ns": START_TIMESTAMP_NS
-                + frame_index * 100_000_000,
-                "root_world_m": _vec3(
-                    root_position_world(frame_index * DT_SECONDS)
-                ),
-                "occluder_world_m": _vec3(
-                    occluder_center_world(frame_index)
-                ),
+                "timestamp_ns": START_TIMESTAMP_NS + frame_index * 100_000_000,
+                "root_world_m": _vec3(root_position_world(frame_index * DT_SECONDS)),
+                "occluder_world_m": _vec3(occluder_center_world(frame_index)),
                 "landmarks": landmarks,
                 "tail_world_m": [_vec3(point) for point in tail_world],
-                "tail_image_px": [
-                    _vec2(world_to_image(point)) for point in tail_world
-                ],
+                "tail_image_px": [_vec2(world_to_image(point)) for point in tail_world],
                 "contacts": [
                     {
                         "paw_name": paw_name,
@@ -207,6 +171,42 @@ def build_mock_unity_export() -> dict[str, Any]:
     }
 
 
+def _index_named(
+    items: Any,
+    *,
+    name_key: str,
+    expected_names: set[str],
+    path: str,
+    errors: list[str],
+) -> dict[str, dict[str, Any]]:
+    if not isinstance(items, list):
+        errors.append(f"{path}: expected array")
+        return {}
+    result: dict[str, dict[str, Any]] = {}
+    for index, item in enumerate(items):
+        item_path = f"{path}.{index}"
+        if not isinstance(item, dict):
+            errors.append(f"{item_path}: expected object")
+            continue
+        name = item.get(name_key)
+        if not isinstance(name, str) or not name:
+            errors.append(f"{item_path}.{name_key}: expected non-empty string")
+            continue
+        if name in result:
+            label = "landmark name" if name_key == "name" else name_key
+            errors.append(f"{path}: duplicate {label} {name!r}")
+            continue
+        result[name] = item
+    missing = sorted(expected_names - set(result))
+    extra = sorted(set(result) - expected_names)
+    if missing:
+        label = "names" if name_key == "name" else "paw names"
+        errors.append(f"{path}: missing {label} {missing}")
+    if extra:
+        errors.append(f"{path}: unexpected names {extra}")
+    return result
+
+
 def compare_unity_export(
     payload: Any,
     *,
@@ -219,54 +219,30 @@ def compare_unity_export(
     if tolerance <= 0 or not math.isfinite(tolerance):
         return ["tolerance: must be a positive finite number"]
 
-    _require_exact(
-        payload.get("export_version"),
-        UNITY_EXPORT_VERSION,
-        "export_version",
-        errors,
-    )
-    _require_exact(
-        payload.get("unity_editor_version"),
-        PINNED_UNITY_EDITOR_VERSION,
-        "unity_editor_version",
-        errors,
-    )
-    _require_exact(
-        payload.get("reference_bundle_version"),
-        BUNDLE_VERSION,
-        "reference_bundle_version",
-        errors,
-    )
-    _require_exact(payload.get("sequence_id"), SEQUENCE_ID, "sequence_id", errors)
-    _require_exact(payload.get("subject_id"), SUBJECT_ID, "subject_id", errors)
-    _require_exact(
-        payload.get("start_timestamp_ns"),
-        START_TIMESTAMP_NS,
-        "start_timestamp_ns",
-        errors,
-    )
-    _require_exact(payload.get("frame_count"), FRAME_COUNT, "frame_count", errors)
+    for key, expected in (
+        ("export_version", UNITY_EXPORT_VERSION),
+        ("unity_editor_version", PINNED_UNITY_EDITOR_VERSION),
+        ("reference_bundle_version", BUNDLE_VERSION),
+        ("sequence_id", SEQUENCE_ID),
+        ("subject_id", SUBJECT_ID),
+        ("start_timestamp_ns", START_TIMESTAMP_NS),
+        ("frame_count", FRAME_COUNT),
+    ):
+        _require_exact(payload.get(key), expected, key, errors)
 
     runtime_source = payload.get("runtime_source")
     if require_unity_runtime:
-        _require_exact(
-            runtime_source,
-            RUNTIME_SOURCE_UNITY,
-            "runtime_source: actual gate requires 'unity_editor'",
-            errors,
-        )
+        if runtime_source != RUNTIME_SOURCE_UNITY:
+            errors.append(
+                "runtime_source: actual gate requires 'unity_editor'; "
+                f"got {runtime_source!r}"
+            )
     elif runtime_source not in {RUNTIME_SOURCE_UNITY, RUNTIME_SOURCE_MOCK}:
         errors.append(
             "runtime_source: expected 'unity_editor' or 'python_mock_unity_contract'"
         )
 
-    _compare_scalar(
-        payload.get("dt_seconds"),
-        DT_SECONDS,
-        "dt_seconds",
-        tolerance,
-        errors,
-    )
+    _compare_scalar(payload.get("dt_seconds"), DT_SECONDS, "dt_seconds", tolerance, errors)
 
     camera = payload.get("camera")
     if not isinstance(camera, dict):
@@ -276,13 +252,7 @@ def compare_unity_export(
         _require_exact(camera.get("width_px"), CAMERA["width_px"], "camera.width_px", errors)
         _require_exact(camera.get("height_px"), CAMERA["height_px"], "camera.height_px", errors)
         for field in ("fx_px", "fy_px", "cx_px", "cy_px"):
-            _compare_scalar(
-                camera.get(field),
-                CAMERA[field],
-                f"camera.{field}",
-                tolerance,
-                errors,
-            )
+            _compare_scalar(camera.get(field), CAMERA[field], f"camera.{field}", tolerance, errors)
         _compare_vec(
             camera.get("position_world_m"),
             CAMERA["position_world_m"],
@@ -306,9 +276,8 @@ def compare_unity_export(
     if len(frames) != FRAME_COUNT:
         errors.append(f"frames: expected {FRAME_COUNT} entries, got {len(frames)}")
 
-    expected_landmark_names = set(LANDMARKS_LOCAL_M)
-    expected_contact_names = set(PAW_NAMES)
-
+    expected_landmarks = set(LANDMARKS_LOCAL_M)
+    expected_paws = set(PAW_NAMES)
     for frame_index, frame in enumerate(frames[:FRAME_COUNT]):
         path = f"frames.{frame_index}"
         if not isinstance(frame, dict):
@@ -336,131 +305,78 @@ def compare_unity_export(
             errors,
         )
 
-        landmarks = frame.get("landmarks")
-        if not isinstance(landmarks, list):
-            errors.append(f"{path}.landmarks: expected array")
-        else:
-            by_name: dict[str, dict[str, Any]] = {}
-            for landmark_index, landmark in enumerate(landmarks):
-                landmark_path = f"{path}.landmarks.{landmark_index}"
-                if not isinstance(landmark, dict):
-                    errors.append(f"{landmark_path}: expected object")
-                    continue
-                name = landmark.get("name")
-                if not isinstance(name, str) or not name:
-                    errors.append(f"{landmark_path}.name: expected non-empty string")
-                    continue
-                if name in by_name:
-                    errors.append(f"{path}.landmarks: duplicate landmark name {name!r}")
-                    continue
-                by_name[name] = landmark
-            missing = sorted(expected_landmark_names - set(by_name))
-            extra = sorted(set(by_name) - expected_landmark_names)
-            if missing:
-                errors.append(f"{path}.landmarks: missing names {missing}")
-            if extra:
-                errors.append(f"{path}.landmarks: unexpected names {extra}")
-            for name in sorted(expected_landmark_names & set(by_name)):
-                landmark = by_name[name]
-                expected_world = landmark_world(name, frame_index)
+        landmarks = _index_named(
+            frame.get("landmarks"),
+            name_key="name",
+            expected_names=expected_landmarks,
+            path=f"{path}.landmarks",
+            errors=errors,
+        )
+        for name in sorted(expected_landmarks & set(landmarks)):
+            expected_world = landmark_world(name, frame_index)
+            _compare_vec(
+                landmarks[name].get("world_m"),
+                expected_world,
+                f"{path}.landmarks[{name}].world_m",
+                tolerance,
+                errors,
+            )
+            _compare_vec(
+                landmarks[name].get("image_px"),
+                world_to_image(expected_world),
+                f"{path}.landmarks[{name}].image_px",
+                tolerance,
+                errors,
+            )
+            _require_exact(
+                landmarks[name].get("visibility"),
+                visibility_for_landmark(name, frame_index)[0],
+                f"{path}.landmarks[{name}].visibility",
+                errors,
+            )
+
+        expected_tail = tail_curve_world(frame_index)
+        for field, transform in (
+            ("tail_world_m", lambda point: point),
+            ("tail_image_px", world_to_image),
+        ):
+            values = frame.get(field)
+            if not isinstance(values, list):
+                errors.append(f"{path}.{field}: expected array")
+                continue
+            if len(values) != len(expected_tail):
+                errors.append(
+                    f"{path}.{field}: expected {len(expected_tail)} points, got {len(values)}"
+                )
+            for point_index, expected_world in enumerate(expected_tail[: len(values)]):
                 _compare_vec(
-                    landmark.get("world_m"),
-                    expected_world,
-                    f"{path}.landmarks[{name}].world_m",
+                    values[point_index],
+                    transform(expected_world),
+                    f"{path}.{field}.{point_index}",
                     tolerance,
                     errors,
                 )
-                _compare_vec(
-                    landmark.get("image_px"),
-                    world_to_image(expected_world),
-                    f"{path}.landmarks[{name}].image_px",
-                    tolerance,
-                    errors,
+
+        contacts = _index_named(
+            frame.get("contacts"),
+            name_key="paw_name",
+            expected_names=expected_paws,
+            path=f"{path}.contacts",
+            errors=errors,
+        )
+        for paw_name in sorted(expected_paws & set(contacts)):
+            value = contacts[paw_name].get("floor_contact")
+            if not isinstance(value, bool):
+                errors.append(
+                    f"{path}.contacts[{paw_name}].floor_contact: expected boolean"
                 )
+            else:
                 _require_exact(
-                    landmark.get("visibility"),
-                    visibility_for_landmark(name, frame_index)[0],
-                    f"{path}.landmarks[{name}].visibility",
+                    value,
+                    paw_contact(paw_name, frame_index),
+                    f"{path}.contacts[{paw_name}].floor_contact",
                     errors,
                 )
-
-        expected_tail_world = tail_curve_world(frame_index)
-        tail_world = frame.get("tail_world_m")
-        if not isinstance(tail_world, list):
-            errors.append(f"{path}.tail_world_m: expected array")
-        else:
-            if len(tail_world) != len(expected_tail_world):
-                errors.append(
-                    f"{path}.tail_world_m: expected {len(expected_tail_world)} points, got {len(tail_world)}"
-                )
-            for point_index, expected in enumerate(expected_tail_world):
-                if point_index >= len(tail_world):
-                    break
-                _compare_vec(
-                    tail_world[point_index],
-                    expected,
-                    f"{path}.tail_world_m.{point_index}",
-                    tolerance,
-                    errors,
-                )
-
-        tail_image = frame.get("tail_image_px")
-        if not isinstance(tail_image, list):
-            errors.append(f"{path}.tail_image_px: expected array")
-        else:
-            if len(tail_image) != len(expected_tail_world):
-                errors.append(
-                    f"{path}.tail_image_px: expected {len(expected_tail_world)} points, got {len(tail_image)}"
-                )
-            for point_index, expected_world in enumerate(expected_tail_world):
-                if point_index >= len(tail_image):
-                    break
-                _compare_vec(
-                    tail_image[point_index],
-                    world_to_image(expected_world),
-                    f"{path}.tail_image_px.{point_index}",
-                    tolerance,
-                    errors,
-                )
-
-        contacts = frame.get("contacts")
-        if not isinstance(contacts, list):
-            errors.append(f"{path}.contacts: expected array")
-        else:
-            by_paw: dict[str, dict[str, Any]] = {}
-            for contact_index, contact in enumerate(contacts):
-                contact_path = f"{path}.contacts.{contact_index}"
-                if not isinstance(contact, dict):
-                    errors.append(f"{contact_path}: expected object")
-                    continue
-                paw_name = contact.get("paw_name")
-                if not isinstance(paw_name, str) or not paw_name:
-                    errors.append(f"{contact_path}.paw_name: expected non-empty string")
-                    continue
-                if paw_name in by_paw:
-                    errors.append(f"{path}.contacts: duplicate paw_name {paw_name!r}")
-                    continue
-                by_paw[paw_name] = contact
-            missing = sorted(expected_contact_names - set(by_paw))
-            extra = sorted(set(by_paw) - expected_contact_names)
-            if missing:
-                errors.append(f"{path}.contacts: missing paw names {missing}")
-            if extra:
-                errors.append(f"{path}.contacts: unexpected paw names {extra}")
-            for paw_name in sorted(expected_contact_names & set(by_paw)):
-                value = by_paw[paw_name].get("floor_contact")
-                if not isinstance(value, bool):
-                    errors.append(
-                        f"{path}.contacts[{paw_name}].floor_contact: expected boolean"
-                    )
-                else:
-                    _require_exact(
-                        value,
-                        paw_contact(paw_name, frame_index),
-                        f"{path}.contacts[{paw_name}].floor_contact",
-                        errors,
-                    )
-
     return errors
 
 
@@ -479,9 +395,7 @@ def build_report(
     return {
         "roundtrip_version": ROUNDTRIP_VERSION,
         "contract_valid": not mismatches,
-        "unity_runtime_verified": (
-            not mismatches and runtime_source == RUNTIME_SOURCE_UNITY
-        ),
+        "unity_runtime_verified": not mismatches and runtime_source == RUNTIME_SOURCE_UNITY,
         "performance_analysis_performed": False,
         "tolerance": tolerance,
         "mismatch_count": len(mismatches),
