@@ -1,0 +1,33 @@
+name: A1 audio manifest and split tests
+
+on:
+  push:
+    paths:
+      - "audio/**"
+      - ".github/workflows/audio-a1-tests.yml"
+  pull_request:
+    paths:
+      - "audio/**"
+      - ".github/workflows/audio-a1-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run A1 metadata and split tests
+        run: python -m unittest audio.test_catmeows_manifest
