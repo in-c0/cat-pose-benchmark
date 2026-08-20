@@ -16,10 +16,22 @@ TARGET_HORIZON_MS = 60_000
 SENSOR_EVIDENCE_CUTOFF_MS = 5_000
 PRIMARY_ABLATION_ROWS = ("B0", "V", "A", "BV", "BA", "VA", "BVA", "BVA-V", "BVA-A")
 SENSOR_MODALITIES = {"V1": "visual_pose", "A1": "audio_vocalisation"}
+# Duplicated here intentionally to avoid a circular import: m1_sensor_sidecar imports
+# this cohort module. If the public sidecar version changes, the cohort marker must be
+# advanced in the same change.
+EXPECTED_SENSOR_SIDECAR_VERSION = "M1.3-sensor-sidecar-v0"
 
 
 def _digest_ids(ids: list[str]) -> str:
     return hashlib.sha256("\n".join(sorted(ids)).encode("utf-8")).hexdigest()
+
+
+def _is_sha256(value: Any) -> bool:
+    return (
+        isinstance(value, str)
+        and len(value) == 64
+        and all(character in "0123456789abcdefABCDEF" for character in value)
+    )
 
 
 def _termination_label(event: dict[str, Any]) -> tuple[bool | None, list[str]]:
@@ -55,33 +67,48 @@ def _termination_label(event: dict[str, Any]) -> tuple[bool | None, list[str]]:
     return value, errors
 
 
-def _valid_v1_package_provenance(observation: dict[str, Any]) -> bool:
-    """Require the public-shaped markers emitted by a validated V1 sidecar seal.
+def _valid_v1_package_provenance(
+    observation: dict[str, Any], event: dict[str, Any]
+) -> bool:
+    """Require the public markers emitted by a validated V1 sidecar composition.
 
-    The full package is validated when sealed/composed. M1.2 operates on derived #18
-    events and therefore independently requires the canonical schema plus immutable
-    seal/package metadata instead of accepting modality name alone.
+    The full local package is validated when sealed/composed. M1.2 sees only the
+    public-shaped derived #18 event, so it independently requires the canonical
+    package schema, immutable sidecar hashes, exact package/event identity and the
+    non-empty package summary. A hand-authored modality name alone cannot satisfy V1.
     """
     if observation.get("schema_ref") != POSE_PACKAGE_SCHEMA_REF:
         return False
     features = observation.get("features")
     if not isinstance(features, dict):
         return False
+    if features.get("sensor_sidecar_version") != EXPECTED_SENSOR_SIDECAR_VERSION:
+        return False
     if features.get("artifact_kind") != "pose_features_json":
         return False
     if features.get("local_path_included") is not False:
         return False
-    artifact_sha = features.get("artifact_sha256")
-    sealed_sha = features.get("sealed_record_sha256")
-    if not isinstance(artifact_sha, str) or len(artifact_sha) != 64:
+    if not _is_sha256(features.get("artifact_sha256")):
         return False
-    if not isinstance(sealed_sha, str) or len(sealed_sha) != 64:
+    if not _is_sha256(features.get("reservation_sha256")):
         return False
+    if not _is_sha256(features.get("sealed_record_sha256")):
+        return False
+
     metadata = features.get("media_metadata")
     if not isinstance(metadata, dict):
         return False
     if metadata.get("package_version") != POSE_PACKAGE_VERSION:
         return False
+    if metadata.get("event_id") != event.get("event_id"):
+        return False
+    if metadata.get("episode_id") != event.get("episode_id"):
+        return False
+    if metadata.get("subject_id") != event.get("subject_id"):
+        return False
+    if not isinstance(metadata.get("sequence_id"), str) or not metadata["sequence_id"]:
+        return False
+
     window = metadata.get("evidence_window_ms")
     if not isinstance(window, dict):
         return False
@@ -92,6 +119,10 @@ def _valid_v1_package_provenance(observation: dict[str, Any]) -> bool:
     if not isinstance(metadata.get("observation_count"), int) or metadata["observation_count"] < 1:
         return False
     if not isinstance(metadata.get("sample_count"), int) or metadata["sample_count"] < 1:
+        return False
+    if not isinstance(metadata.get("source_media_count"), int) or metadata["source_media_count"] < 1:
+        return False
+    if not _is_sha256(metadata.get("producer_fingerprint_sha256")):
         return False
     return True
 
@@ -109,7 +140,7 @@ def _sensor_support(
         if int(observation.get("end_offset_ms", 0)) > SENSOR_EVIDENCE_CUTOFF_MS:
             late.append(ref)
             continue
-        if modality == "visual_pose" and not _valid_v1_package_provenance(observation):
+        if modality == "visual_pose" and not _valid_v1_package_provenance(observation, event):
             invalid_provenance.append(ref)
             continue
         eligible.append(ref)
