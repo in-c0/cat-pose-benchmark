@@ -1,4 +1,4 @@
-name: A1 audio manifest and split tests
+name: A1 audio tests
 
 on:
   push:
@@ -29,5 +29,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Run A1 metadata and split tests
-        run: python -m unittest audio.test_catmeows_manifest
+      - name: Install acoustic baseline dependencies
+        run: python -m pip install --disable-pip-version-check numpy scipy librosa scikit-learn
+
+      - name: Run A1 unit tests
+        run: python -m unittest discover -s audio -p 'test_*.py'
