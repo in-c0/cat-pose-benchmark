@@ -1,0 +1,39 @@
+name: I1 intervention protocol tests
+
+on:
+  push:
+    paths:
+      - "intervention/**"
+      - ".github/workflows/intervention-i1-tests.yml"
+  pull_request:
+    paths:
+      - "intervention/**"
+      - ".github/workflows/intervention-i1-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install validation dependency
+        run: python -m pip install --disable-pip-version-check jsonschema
+
+      - name: Run I1 validation tests
+        run: python -m unittest intervention.test_i1_plan
+
+      - name: Validate public example
+        run: python -m intervention.validate_i1_plan intervention/examples/i1-plan-access-vs-social.json
