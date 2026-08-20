@@ -32,10 +32,10 @@ Serve the page through the included localhost server. Do not open the HTML direc
 
 ## Start the station
 
-From the repository root:
+Use the same-origin-hardened launcher from the repository root:
 
 ```bash
-python -m audio.a1_capture_station \
+python -m audio.a1_capture_station_secure \
   --output-dir local-data/a1-naturalistic \
   --subject-id cat-01 \
   --household-id hh-01 \
@@ -49,7 +49,7 @@ Default URL:
 http://127.0.0.1:8765/
 ```
 
-The first implementation rejects non-loopback bind addresses.
+The first implementation rejects non-loopback bind addresses. The lower-level `audio.a1_capture_station` module contains the tested capture state machine and core HTTP implementation; the documented operator entry point is the hardened wrapper above.
 
 ## Before an episode
 
@@ -107,6 +107,11 @@ These local household files are not intended for the public repository.
 ## Privacy and network boundary
 
 - server binds to loopback only;
+- the documented launcher validates the HTTP `Host` header against loopback names and the actual bound port;
+- every state-changing request requires a matching same-origin `Origin` header;
+- cross-site `Sec-Fetch-Site` values are rejected when supplied by the browser;
+- JSON endpoints require `application/json`, and audio upload requires a WAV media type, preventing simple cross-origin form/text POSTs from reaching mutation handlers;
+- `OPTIONS`/preflight requests are not enabled as an alternate cross-origin path;
 - no cloud upload path is implemented;
 - no permissive CORS endpoint is implemented;
 - microphone permission is controlled by the browser and must be explicitly granted;
@@ -115,6 +120,8 @@ These local household files are not intended for the public repository.
 - the A1 sidecar records whether human audio may be present;
 - raw local file paths are removed from the derived M1 event by the sidecar composer;
 - `restricted`/`private_household` is not silently upgraded to research consent.
+
+Loopback binding by itself is not treated as a browser security boundary. The same-origin wrapper exists because browsers can issue some requests to localhost even when CORS prevents them from reading responses, and DNS rebinding can make Host validation relevant.
 
 ## Clock interpretation
 
