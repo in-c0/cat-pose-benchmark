@@ -1,0 +1,101 @@
+{
+  "spec_version": "M1.1-v0",
+  "source_issue": 21,
+  "implementation_issue": 41,
+  "first_compatible_target": {
+    "name": "signalling_terminated",
+    "horizon_seconds": 60,
+    "label_role": "observable_outcome_only"
+  },
+  "primary_metric": "log_loss",
+  "required_metrics": [
+    "log_loss",
+    "brier",
+    "ece",
+    "balanced_accuracy",
+    "macro_f1"
+  ],
+  "primary_same_episode_rows": [
+    "B0",
+    "V",
+    "A",
+    "BV",
+    "BA",
+    "VA",
+    "BVA"
+  ],
+  "required_rows": {
+    "B0": {
+      "available_inputs": ["context_routine"],
+      "mode": "predictive"
+    },
+    "V": {
+      "available_inputs": ["V1"],
+      "mode": "predictive"
+    },
+    "A": {
+      "available_inputs": ["A1"],
+      "mode": "predictive"
+    },
+    "BV": {
+      "available_inputs": ["context_routine", "V1"],
+      "mode": "predictive"
+    },
+    "BA": {
+      "available_inputs": ["context_routine", "A1"],
+      "mode": "predictive"
+    },
+    "VA": {
+      "available_inputs": ["V1", "A1"],
+      "mode": "predictive"
+    },
+    "BVA": {
+      "available_inputs": ["context_routine", "V1", "A1"],
+      "mode": "predictive"
+    },
+    "BVA-V": {
+      "available_inputs": ["context_routine", "A1"],
+      "mode": "dropout_stress",
+      "stress_of": "BVA",
+      "dropped_modalities": ["V1"]
+    },
+    "BVA-A": {
+      "available_inputs": ["context_routine", "V1"],
+      "mode": "dropout_stress",
+      "stress_of": "BVA",
+      "dropped_modalities": ["A1"]
+    }
+  },
+  "required_leakage_probes": [
+    "subject_identity",
+    "household_owner",
+    "time_routine",
+    "location",
+    "device_source",
+    "modality_presence_missingness"
+  ],
+  "required_missing_modality_diagnostics": [
+    "complete_modality",
+    "naturally_missing",
+    "visual_dropout",
+    "audio_dropout",
+    "missingness_target_probe"
+  ],
+  "allowed_group_aware_resampling_units": [
+    "subject",
+    "household",
+    "day",
+    "session"
+  ],
+  "advancement": {
+    "must_beat_strongest_constituent_on_log_loss": true,
+    "max_undisclosed_ece_degradation": 0.02,
+    "requires_supported_group_aware_uncertainty": true,
+    "requires_all_rows_and_diagnostics": true
+  },
+  "claims_boundary": {
+    "forbidden_primary_target": "true_intent",
+    "feature_importance_is_incremental_information": false,
+    "negative_ablations_must_remain_public": true
+  }
+}
