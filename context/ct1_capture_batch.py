@@ -37,8 +37,27 @@ def _parse_time(value: str) -> datetime:
     return dt
 
 
-def discover_event_paths(directory: Path) -> list[Path]:
-    paths: list[Path] = []
+def _is_m1_sensor_derived_event(payload: Any) -> bool:
+    """Return True only for records explicitly produced by M1 sensor composition.
+
+    CT1 H0 counts canonical prospective capture records, not enriched analysis
+    copies of the same episode. The M1 composer stamps its own software-version
+    provenance on derived records, which is a more stable discriminator than a
+    station-specific filename suffix.
+    """
+    if not isinstance(payload, dict):
+        return False
+    provenance = payload.get("provenance")
+    if not isinstance(provenance, dict):
+        return False
+    software_versions = provenance.get("software_versions")
+    return isinstance(software_versions, dict) and bool(
+        software_versions.get("m1_sensor_sidecar")
+    )
+
+
+def _event_json_paths(directory: Path) -> list[tuple[Path, dict[str, Any]]]:
+    records: list[tuple[Path, dict[str, Any]]] = []
     for path in sorted(directory.rglob("*.json")):
         if path.name.endswith(".ct1-lock.json"):
             continue
@@ -46,9 +65,30 @@ def discover_event_paths(directory: Path) -> list[Path]:
             payload = _load_json(path)
         except (OSError, json.JSONDecodeError):
             continue
-        if isinstance(payload, dict) and payload.get("schema_version") == "0.1.0" and payload.get("event_id"):
-            paths.append(path)
-    return paths
+        if (
+            isinstance(payload, dict)
+            and payload.get("schema_version") == "0.1.0"
+            and payload.get("event_id")
+        ):
+            records.append((path, payload))
+    return records
+
+
+def discover_event_paths(directory: Path) -> list[Path]:
+    return [
+        path
+        for path, payload in _event_json_paths(directory)
+        if not _is_m1_sensor_derived_event(payload)
+    ]
+
+
+def discover_derived_event_paths(directory: Path) -> list[Path]:
+    """Return M1-derived copies ignored by CT1 H0 discovery for audit visibility."""
+    return [
+        path
+        for path, payload in _event_json_paths(directory)
+        if _is_m1_sensor_derived_event(payload)
+    ]
 
 
 def inspect_event(path: Path) -> dict[str, Any]:
@@ -124,7 +164,9 @@ def inspect_event(path: Path) -> dict[str, Any]:
 
 
 def inspect_directory(directory: Path) -> dict[str, Any]:
-    records = [inspect_event(path) for path in discover_event_paths(directory)]
+    event_paths = discover_event_paths(directory)
+    derived_paths = discover_derived_event_paths(directory)
+    records = [inspect_event(path) for path in event_paths]
     event_ids = [record["event_id"] for record in records]
     duplicate_ids = sorted({event_id for event_id in event_ids if event_ids.count(event_id) > 1})
 
@@ -138,6 +180,7 @@ def inspect_directory(directory: Path) -> dict[str, Any]:
         "directory": str(directory),
         "counts": {
             "event_files": len(records),
+            "derived_m1_event_files_ignored": len(derived_paths),
             "open_events": sum(not record["finalized"] for record in records),
             "finalized_events": len(finalized),
             "bundle_ready_events": len(ready),
@@ -146,6 +189,7 @@ def inspect_directory(directory: Path) -> dict[str, Any]:
             "continued": sum(record["outcome_state"] == "continued" for record in ready),
             "unknown": sum(record["outcome_state"] == "unknown" for record in ready),
         },
+        "ignored_derived_m1_event_paths": [str(path) for path in derived_paths],
         "duplicate_event_ids": duplicate_ids,
         "h0_target": {
             "strict_valid_finalized_target": 10,
@@ -160,6 +204,7 @@ def inspect_directory(directory: Path) -> dict[str, Any]:
 
 def bundle_ready_events(directory: Path) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     paths = discover_event_paths(directory)
+    derived_paths = discover_derived_event_paths(directory)
     records = [inspect_event(path) for path in paths]
     event_ids = [record["event_id"] for record in records]
     duplicates = sorted({event_id for event_id in event_ids if event_ids.count(event_id) > 1})
@@ -181,6 +226,7 @@ def bundle_ready_events(directory: Path) -> tuple[list[dict[str, Any]], dict[str
         "performance_analysis_performed": False,
         "n_events": len(events),
         "event_ids": [event["event_id"] for event in events],
+        "ignored_derived_m1_event_paths": [str(path) for path in derived_paths],
         "entries": [
             {
                 "event_id": record["event_id"],
@@ -200,6 +246,10 @@ def status_command(args: argparse.Namespace) -> None:
     if args.output:
         _write_json(args.output, report)
     print(json.dumps(report["counts"], indent=2, sort_keys=True))
+    if report["ignored_derived_m1_event_paths"]:
+        print(
+            f"ignored {len(report['ignored_derived_m1_event_paths'])} M1-derived event copy/copies"
+        )
     if report["duplicate_event_ids"]:
         print(f"duplicate event IDs: {report['duplicate_event_ids']}")
     for record in report["records"]:
