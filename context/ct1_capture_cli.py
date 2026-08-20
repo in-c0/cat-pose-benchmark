@@ -5,7 +5,7 @@ import copy
 import hashlib
 import json
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -19,6 +19,13 @@ def _iso(dt: datetime) -> str:
     if dt.tzinfo is None:
         raise ValueError("capture timestamp must be timezone-aware")
     return dt.isoformat()
+
+
+def _parse_iso(value: str) -> datetime:
+    dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if dt.tzinfo is None:
+        raise ValueError("stored capture timestamp must be timezone-aware")
+    return dt
 
 
 def _load_json(path: Path) -> Any:
@@ -35,11 +42,15 @@ def _canonical_json(payload: Any) -> bytes:
 
 
 def _fingerprint_projection(event: dict[str, Any]) -> dict[str, Any]:
-    """Fields frozen at t0 for CT1.3 capture integrity.
+    """Fields frozen at t0 for current-episode CT1 predictor integrity.
 
-    Outcomes and `missing_modalities` are intentionally excluded because finalize
-    appends the former and updates the latter. Everything that can affect current
-    CT1 predictors or episode identity is frozen.
+    `human_actions` are excluded from this t0 projection because CT1 explicitly
+    excludes current-episode actions from current predictors. They are instead
+    protected by a separate append-log hash so that, once recorded, they cannot
+    be rewritten before they become routine/history evidence for later episodes.
+
+    Outcomes and `missing_modalities` are also excluded because finalization
+    appends the former and updates the latter.
     """
     return {
         "schema_version": event["schema_version"],
@@ -52,7 +63,6 @@ def _fingerprint_projection(event: dict[str, Any]) -> dict[str, Any]:
         "observations": event["observations"],
         "context": event["context"],
         "hypotheses": event["hypotheses"],
-        "human_actions": event["human_actions"],
         "interventions": event["interventions"],
         "provenance": event["provenance"],
         "privacy": event["privacy"],
@@ -62,6 +72,10 @@ def _fingerprint_projection(event: dict[str, Any]) -> dict[str, Any]:
 
 def predictor_fingerprint(event: dict[str, Any]) -> str:
     return hashlib.sha256(_canonical_json(_fingerprint_projection(event))).hexdigest()
+
+
+def action_log_fingerprint(event: dict[str, Any]) -> str:
+    return hashlib.sha256(_canonical_json(event.get("human_actions", []))).hexdigest()
 
 
 def default_lock_path(event_path: Path) -> Path:
@@ -186,7 +200,7 @@ def build_started_event(
         ],
         "provenance": {
             "source_ids": [source_id],
-            "lineage": ["CT1.3 local manual start/finalize capture"],
+            "lineage": ["CT1.3 local manual start/action/finalize capture"],
             "annotation_source": "human_annotated",
             "software_versions": {"ct1_capture_cli": LOCK_VERSION},
         },
@@ -207,6 +221,8 @@ def build_lock(event: dict[str, Any]) -> dict[str, Any]:
         "created_at": event["time"]["start_time"],
         "capture_window_seconds": CAPTURE_WINDOW_SECONDS,
         "predictor_fingerprint_sha256": predictor_fingerprint(event),
+        "action_log_fingerprint_sha256": action_log_fingerprint(event),
+        "action_count": len(event.get("human_actions", [])),
         "frozen_fields": sorted(_fingerprint_projection(event)),
         "finalized": False,
     }
@@ -217,12 +233,67 @@ def verify_lock(event: dict[str, Any], lock: dict[str, Any]) -> None:
         raise ValueError("unsupported CT1 capture lock version")
     if lock.get("event_id") != event.get("event_id"):
         raise ValueError("lock event_id does not match event")
-    expected = lock.get("predictor_fingerprint_sha256")
-    actual = predictor_fingerprint(event)
-    if expected != actual:
-        raise ValueError("frozen t0 predictor fingerprint changed; refusing finalization")
+    if lock.get("predictor_fingerprint_sha256") != predictor_fingerprint(event):
+        raise ValueError("frozen t0 predictor fingerprint changed; refusing mutation")
+    if lock.get("action_log_fingerprint_sha256") != action_log_fingerprint(event):
+        raise ValueError("append-only action log fingerprint changed; refusing mutation")
+    if lock.get("action_count") != len(event.get("human_actions", [])):
+        raise ValueError("append-only action count changed; refusing mutation")
     if lock.get("finalized") is True:
         raise ValueError("capture has already been finalized")
+
+
+def _elapsed_offset_ms(event: dict[str, Any], now: datetime) -> int:
+    if now.tzinfo is None:
+        raise ValueError("action timestamp must be timezone-aware")
+    elapsed = int(round((now - _parse_iso(event["time"]["start_time"])).total_seconds() * 1000))
+    return elapsed
+
+
+def append_action(
+    event: dict[str, Any],
+    lock: dict[str, Any],
+    *,
+    action_type: str,
+    offset_ms: int,
+    actor_id: str | None = None,
+    target_id: str | None = None,
+    parameters: dict[str, Any] | None = None,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    verify_lock(event, lock)
+    if not action_type.strip():
+        raise ValueError("action_type must not be empty")
+    if not 0 <= offset_ms <= CAPTURE_WINDOW_SECONDS * 1000:
+        raise ValueError("action offset must fall inside the frozen 0-60 s episode window")
+
+    updated = copy.deepcopy(event)
+    index = len(updated["human_actions"]) + 1
+    action: dict[str, Any] = {
+        "action_id": f"act:{event['event_id']}:{index:03d}",
+        "action_type": action_type,
+        "offset_ms": offset_ms,
+    }
+    if actor_id:
+        action["actor_id"] = actor_id
+    if target_id:
+        action["target_id"] = target_id
+    if parameters:
+        action["parameters"] = copy.deepcopy(parameters)
+    updated["human_actions"].append(action)
+    updated["missing_modalities"] = [
+        item for item in updated["missing_modalities"] if item != "human_input"
+    ]
+
+    if predictor_fingerprint(updated) != lock["predictor_fingerprint_sha256"]:
+        raise AssertionError("action append altered frozen CT1 t0 predictor fields")
+    errors = validate_capture_event(updated)
+    if errors:
+        raise ValueError("event with appended action is invalid: " + "; ".join(errors))
+
+    updated_lock = copy.deepcopy(lock)
+    updated_lock["action_log_fingerprint_sha256"] = action_log_fingerprint(updated)
+    updated_lock["action_count"] = len(updated["human_actions"])
+    return updated, updated_lock
 
 
 def finalize_event(
@@ -264,9 +335,10 @@ def finalize_event(
         item for item in completed["missing_modalities"] if item != "outcome"
     ]
 
-    # The current-event predictor projection must remain byte-for-byte equivalent.
     if predictor_fingerprint(completed) != lock["predictor_fingerprint_sha256"]:
         raise AssertionError("finalization altered frozen CT1 predictor fields")
+    if action_log_fingerprint(completed) != lock["action_log_fingerprint_sha256"]:
+        raise AssertionError("finalization altered append-only action log")
 
     errors = validate_capture_event(completed)
     if errors:
@@ -285,6 +357,15 @@ def _load_context(path: Path) -> dict[str, Any]:
     payload = _load_json(path)
     if not isinstance(payload, dict):
         raise ValueError("context file must contain one JSON object")
+    return payload
+
+
+def _load_parameters(path: Path | None) -> dict[str, Any] | None:
+    if path is None:
+        return None
+    payload = _load_json(path)
+    if not isinstance(payload, dict):
+        raise ValueError("action parameters file must contain one JSON object")
     return payload
 
 
@@ -318,7 +399,32 @@ def start_command(args: argparse.Namespace) -> None:
     print(f"started CT1.3 capture {event['event_id']}")
     print(f"event: {event_path}")
     print(f"lock:  {lock_path}")
-    print("At the end of the frozen 60 s window, finalize as terminated, continued, or unknown.")
+    print("During the 60 s window, log ordinary human actions if relevant; then finalize the outcome.")
+
+
+def action_command(args: argparse.Namespace) -> None:
+    event_path: Path = args.event
+    lock_path = args.lock or default_lock_path(event_path)
+    event = _load_json(event_path)
+    lock = _load_json(lock_path)
+    if not isinstance(event, dict) or not isinstance(lock, dict):
+        raise ValueError("event and lock files must contain JSON objects")
+
+    offset_ms = args.offset_ms
+    if offset_ms is None:
+        offset_ms = _elapsed_offset_ms(event, datetime.now().astimezone())
+    updated, updated_lock = append_action(
+        event,
+        lock,
+        action_type=args.action_type,
+        offset_ms=offset_ms,
+        actor_id=args.actor_id,
+        target_id=args.target_id,
+        parameters=_load_parameters(args.parameters),
+    )
+    _write_json(event_path, updated)
+    _write_json(lock_path, updated_lock)
+    print(f"appended action {updated['human_actions'][-1]['action_id']} at {offset_ms} ms")
 
 
 def finalize_command(args: argparse.Namespace) -> None:
@@ -341,7 +447,7 @@ def finalize_command(args: argparse.Namespace) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Start/finalize a local CT1.3 context-only naturalistic capture"
+        description="Start/action/finalize a local CT1.3 context-only naturalistic capture"
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -356,6 +462,16 @@ def build_parser() -> argparse.ArgumentParser:
     start.add_argument("--clock-uncertainty-ms", type=float, default=1000.0)
     start.add_argument("--consent-record-id")
     start.set_defaults(func=start_command)
+
+    action = sub.add_parser("action", help="append one ordinary timestamped action during the window")
+    action.add_argument("--event", type=Path, required=True)
+    action.add_argument("--lock", type=Path)
+    action.add_argument("--action-type", required=True)
+    action.add_argument("--offset-ms", type=int)
+    action.add_argument("--actor-id")
+    action.add_argument("--target-id")
+    action.add_argument("--parameters", type=Path)
+    action.set_defaults(func=action_command)
 
     finalize = sub.add_parser("finalize", help="append only the frozen-window outcome")
     finalize.add_argument("--event", type=Path, required=True)
