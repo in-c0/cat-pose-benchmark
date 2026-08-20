@@ -1,0 +1,127 @@
+name: A1.0c identity invariance
+
+on:
+  pull_request:
+    paths:
+      - "audio/identity_invariance.py"
+      - "audio/test_identity_invariance.py"
+      - ".github/workflows/a1-identity-invariance.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install research dependencies
+        run: python -m pip install --disable-pip-version-check numpy scipy librosa scikit-learn
+
+      - name: Run identity-invariance unit tests
+        run: python -m unittest audio.test_identity_invariance
+
+      - name: Acquire checksum-verified CatMeows archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_MD5="b5fa911bcd6514e39dfef6876f747df4"
+          ZENODO_URL="https://zenodo.org/records/4008297/files/dataset.zip?download=1"
+          UNIMI_URL="https://air.unimi.it/retrieve/handle/2434/911765/1991879/dataset%281%29.zip"
+          USER_AGENT="cat-pose-benchmark-research/0.1 (+https://github.com/in-c0/cat-pose-benchmark)"
+
+          mkdir -p /tmp/catmeows /tmp/a1-identity
+          if ! curl --fail --location --retry 3 --retry-delay 5 --retry-all-errors \
+              --user-agent "$USER_AGENT" "$ZENODO_URL" -o /tmp/catmeows-dataset.zip; then
+            curl --fail --location --retry 3 --retry-delay 5 --retry-all-errors \
+              --user-agent "$USER_AGENT" "$UNIMI_URL" -o /tmp/catmeows-dataset.zip
+          fi
+          echo "$EXPECTED_MD5  /tmp/catmeows-dataset.zip" | md5sum --check --strict
+          unzip -q /tmp/catmeows-dataset.zip -d /tmp/catmeows
+          test "$(find /tmp/catmeows -type f -iname '*.wav' | wc -l | tr -d ' ')" = "440"
+
+      - name: Build manifest and acoustic features
+        run: |
+          set -euo pipefail
+          python -m audio.catmeows_manifest /tmp/catmeows --output /tmp/catmeows-manifest.csv
+          python -m audio.acoustic_features \
+            /tmp/catmeows-manifest.csv /tmp/catmeows \
+            --output /tmp/catmeows-features.csv
+
+      - name: Run frozen full 21-cat A1.0c experiment
+        run: |
+          python -m audio.identity_invariance /tmp/catmeows-features.csv \
+            --pseudo-repeats 20 --pseudo-seed 20260823 \
+            --shrinkage-tau 4 \
+            --bootstrap-reps 2000 --bootstrap-seed 20260824 \
+            --output /tmp/a1-identity/a1-identity-invariance.json
+
+      - name: Print primary and specificity results
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path('/tmp/a1-identity/a1-identity-invariance.json').read_text())
+          print('## A1.0c full cross-cat identity invariance')
+          print('n_cats:', report['n_cats'], 'n_rows:', report['n_rows'])
+          print('pseudo_repeats:', report['pseudo_control']['repeats'])
+
+          for model, metrics in report['pooled_metrics'].items():
+              print(
+                  f"{model}: balanced_accuracy={metrics['balanced_accuracy']:.4f}, "
+                  f"macro_f1={metrics['macro_f1']:.4f}, log_loss={metrics['log_loss']:.4f}, "
+                  f"brier={metrics['multiclass_brier']:.4f}, ece={metrics['top_label_ece']:.4f}"
+              )
+
+          print('\n## true centered specificity against 20 pseudo-identity controls')
+          specificity = report['pseudo_specificity']['true_centered_zero_shot']
+          for metric in ['balanced_accuracy', 'log_loss', 'multiclass_brier']:
+              row = specificity[metric]
+              print(
+                  f"{metric}: true_delta={row['true_delta_vs_raw']:+.4f}, "
+                  f"pseudo_mean_delta={row['pseudo_delta_mean']:+.4f}, "
+                  f"pseudo_range=[{row['pseudo_delta_min']:+.4f}, {row['pseudo_delta_max']:+.4f}], "
+                  f"pseudo_as_or_more_fraction={row['pseudo_as_or_more_improved_fraction']:.3f}"
+              )
+
+          print('\n## cat-equal robustness')
+          for comparison_name in ['true_centered_vs_raw', 'true_shrinkage_vs_raw', 'pseudo_mean_vs_raw']:
+              comparison = report['cat_equal_robustness'][comparison_name]
+              print(comparison_name)
+              for metric in ['balanced_accuracy', 'log_loss', 'multiclass_brier']:
+                  row = comparison['metrics'][metric]
+                  print(
+                      f"  {metric}: mean_delta={row['mean_delta']:+.4f}, "
+                      f"median_delta={row['median_delta']:+.4f}, "
+                      f"ci95={row['bootstrap_mean_ci95']}"
+                  )
+
+          ratios = [fold['identity_structure'] for fold in report['folds']]
+          for key in [
+              'raw_between_cat_variance_ratio',
+              'true_centered_between_cat_variance_ratio',
+              'true_shrinkage_between_cat_variance_ratio',
+              'pseudo_centered_between_cat_variance_ratio_mean',
+          ]:
+              values = [row[key] for row in ratios]
+              print(f"identity_ratio {key}: mean={sum(values)/len(values):.6f}")
+          PY
+
+      - name: Upload aggregate report only
+        uses: actions/upload-artifact@v4
+        with:
+          name: a1-identity-invariance-report
+          path: /tmp/a1-identity/a1-identity-invariance.json
+          retention-days: 7
+          if-no-files-found: error
