@@ -1,0 +1,132 @@
+name: A1 real CatMeows research run
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/a1-catmeows-research.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  catmeows-a1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install research dependencies
+        run: python -m pip install --disable-pip-version-check numpy scipy librosa scikit-learn
+
+      - name: Acquire CatMeows from authoritative source and verify Zenodo checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_MD5="b5fa911bcd6514e39dfef6876f747df4"
+          ZENODO_URL="https://zenodo.org/records/4008297/files/dataset.zip?download=1"
+          UNIMI_URL="https://air.unimi.it/retrieve/handle/2434/911765/1991879/dataset%281%29.zip"
+          USER_AGENT="cat-pose-benchmark-research/0.1 (+https://github.com/in-c0/cat-pose-benchmark)"
+
+          mkdir -p /tmp/catmeows /tmp/a1-reports
+          SOURCE_URL="$ZENODO_URL"
+          if ! curl --fail --location --retry 3 --retry-delay 5 --retry-all-errors \
+              --user-agent "$USER_AGENT" "$ZENODO_URL" -o /tmp/catmeows-dataset.zip; then
+            echo "Zenodo acquisition failed; trying the University of Milan institutional repository."
+            SOURCE_URL="$UNIMI_URL"
+            curl --fail --location --retry 3 --retry-delay 5 --retry-all-errors \
+              --user-agent "$USER_AGENT" "$UNIMI_URL" -o /tmp/catmeows-dataset.zip
+          fi
+
+          echo "$EXPECTED_MD5  /tmp/catmeows-dataset.zip" | md5sum --check --strict
+          unzip -q /tmp/catmeows-dataset.zip -d /tmp/catmeows
+
+          WAV_COUNT="$(find /tmp/catmeows -type f -iname '*.wav' | wc -l | tr -d ' ')"
+          test "$WAV_COUNT" = "440"
+          echo "Verified $WAV_COUNT WAV files."
+
+          python - <<PY
+          import json
+          from pathlib import Path
+          Path('/tmp/a1-reports/provenance.json').write_text(json.dumps({
+              'dataset': 'CatMeows v1.0.2',
+              'doi': '10.5281/zenodo.4008297',
+              'source_url': '$SOURCE_URL',
+              'verified_md5': '$EXPECTED_MD5',
+              'wav_count': int('$WAV_COUNT'),
+              'terms_boundary': 'scientific research and non-commercial purposes; raw audio not redistributed',
+          }, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+          PY
+
+      - name: Build metadata manifest and acoustic features
+        run: |
+          set -euo pipefail
+          python -m audio.catmeows_manifest /tmp/catmeows --output /tmp/catmeows-manifest.csv
+          test "$(($(wc -l < /tmp/catmeows-manifest.csv) - 1))" = "440"
+          python -m audio.acoustic_features \
+            /tmp/catmeows-manifest.csv /tmp/catmeows \
+            --output /tmp/catmeows-features.csv
+
+      - name: Run A1.0 supervised baselines
+        run: |
+          set -euo pipefail
+          python -m audio.acoustic_baselines /tmp/catmeows-features.csv \
+            --group-key cat_id --output /tmp/a1-reports/a1-baselines-cross-cat.json
+          python -m audio.acoustic_baselines /tmp/catmeows-features.csv \
+            --group-key owner_id --output /tmp/a1-reports/a1-baselines-cross-owner.json
+
+      - name: Run A1.1 latent acoustic structure analyses
+        run: |
+          set -euo pipefail
+          for FEATURES in interpretable mfcc all_acoustic; do
+            python -m audio.cluster_stability /tmp/catmeows-features.csv \
+              --feature-set "$FEATURES" --k-min 2 --k-max 8 --repeats 20 \
+              --output "/tmp/a1-reports/a1-clusters-${FEATURES}.json"
+          done
+
+      - name: Print compact aggregate results
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('/tmp/a1-reports')
+          for filename in ['a1-baselines-cross-cat.json', 'a1-baselines-cross-owner.json']:
+              report = json.loads((root / filename).read_text())
+              print(f'\n## {filename}')
+              for name, model in report['models'].items():
+                  m = model['overall']
+                  print(
+                      f"{name}: balanced_accuracy={m['balanced_accuracy']:.4f}, "
+                      f"macro_f1={m['macro_f1']:.4f}, log_loss={m['log_loss']:.4f}, "
+                      f"brier={m['multiclass_brier']:.4f}, ece={m['top_label_ece']:.4f}"
+                  )
+
+          for feature_set in ['interpretable', 'mfcc', 'all_acoustic']:
+              report = json.loads((root / f'a1-clusters-{feature_set}.json').read_text())
+              print(f'\n## clusters: {feature_set}')
+              for k, row in report['by_k'].items():
+                  ami = row['metadata_adjusted_mutual_information']
+                  print(
+                      f"k={k}: silhouette={row['silhouette']:.4f}, "
+                      f"stability_ari={row['subsample_stability_mean_pairwise_ari']:.4f}, "
+                      f"AMI_context={ami.get('context', float('nan')):.4f}, "
+                      f"AMI_cat={ami.get('cat_id', float('nan')):.4f}, "
+                      f"AMI_owner={ami.get('owner_id', float('nan')):.4f}"
+                  )
+          PY
+
+      - name: Upload aggregate reports only
+        uses: actions/upload-artifact@v4
+        with:
+          name: a1-catmeows-aggregate-reports
+          path: /tmp/a1-reports/*.json
+          retention-days: 7
+          if-no-files-found: error
