@@ -37,9 +37,17 @@ This tooling does **not** infer acquisition timing from file creation/modificati
 
 - event modality: `visual_pose`
 - artifact kind: `pose_features_json`
-- the sealed artifact must be valid JSON with an object or array root.
+- required sidecar schema ref: `fusion/v1_pose_package.schema.json`;
+- sealed artifact must satisfy the V1→M1 pose-package schema and semantic validator;
+- package event/episode and evidence window must match the reservation exactly;
+- package samples must contain real pose/motion observations valid under `schemas/observation.schema.json`;
+- every observation must retain value, uncertainty, visibility, evidence tier, quality, source IDs and lineage;
+- learned-model producers must identify their model family and exact weights SHA-256;
+- composition rechecks the package subject against the actual finalized CT1 event.
 
-Raw video is **not** accepted as `visual_pose`. A camera recording is not automatically a pose observation; it must first be converted to the V1 representation under its own provenance.
+Raw video is **not** accepted as `visual_pose`. A camera recording is not automatically a pose observation; it must first be converted to the V1 representation under its own provenance. Synthetic X1 and unlabelled U0 observations also do not count as prospective real V1 evidence for the initial M1 comparison.
+
+See `fusion/V1-POSE-PACKAGE-CONTRACT.md` for the full boundary.
 
 ## Privacy declaration
 
@@ -88,11 +96,11 @@ python -m fusion.m1_sensor_sidecar reserve \
   --event local-data/h0/episode-001.json \
   --output local-data/h0/episode-001.v1-sidecar.json \
   --modality visual_pose \
-  --schema-ref schemas/observation.schema.json \
+  --schema-ref fusion/v1_pose_package.schema.json \
   --human-content none
 ```
 
-The default evidence interval is 0–5000 ms. A narrower interval can be supplied using `--start-offset-ms` and `--end-offset-ms`, but it must remain within the frozen 5-second window.
+The default evidence interval is 0–5000 ms. A narrower interval can be supplied using `--start-offset-ms` and `--end-offset-ms`, but it must remain within the frozen 5-second window and the V1 package must declare the same exact interval.
 
 ## 3. Seal the actual local artifacts
 
@@ -112,7 +120,7 @@ python -m fusion.m1_sensor_sidecar seal \
   --artifact local-data/pose/episode-001.json
 ```
 
-`seal` records the artifact hash and metadata. If the local artifact is edited afterwards, composition fails.
+`seal` records the artifact hash and metadata. A valid V1 seal also records package/sample/observation counts, evidence-tier and quality counts, the evidence window and producer fingerprint. These are provenance summaries, not pose-performance scores. If the local artifact is edited afterwards, composition fails.
 
 ## 4. Finalize CT1 outcome
 
@@ -146,6 +154,7 @@ Before writing the derived record, composition verifies:
 - reservation integrity;
 - frozen 0–5 s offsets;
 - sealed media hash and size;
+- V1 package subject/event/episode/timing/provenance consistency where applicable;
 - unique observation refs;
 - #18 event validity;
 - CT1.2 context validity.
@@ -156,11 +165,14 @@ It then prints M1.2 readiness. A single A1 sidecar may make A1 available without
 
 A reservation is prospective provenance, not proof that an external recorder was synchronized correctly. Until a capture backend writes a trusted acquisition timestamp/clock directly, the operator must ensure the artifact genuinely corresponds to the reservation. Do not backfill unrelated media into a reserved sidecar.
 
+A V1 package passing its validator is also not proof of pose accuracy. It means only that the estimate is non-empty, temporally scoped, provenance-bearing and uncertainty-aware enough to enter the future held-out M1 comparison.
+
 This layer does not:
 
 - capture audio/video in the background;
 - infer an intent;
 - convert raw video into pose;
+- validate V1 pose accuracy;
 - upload private media;
 - modify the original CT1 event;
 - turn a one-household record into population evidence.
