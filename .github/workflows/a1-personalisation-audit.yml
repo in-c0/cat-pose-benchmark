@@ -1,0 +1,81 @@
+name: A1.0b personalisation feasibility audit
+
+on:
+  pull_request:
+    paths:
+      - "audio/personalisation_audit.py"
+      - "audio/test_personalisation_audit.py"
+      - ".github/workflows/a1-personalisation-audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Run audit unit tests
+        run: python -m unittest audio.test_personalisation_audit
+
+      - name: Acquire checksum-verified CatMeows archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_MD5="b5fa911bcd6514e39dfef6876f747df4"
+          ZENODO_URL="https://zenodo.org/records/4008297/files/dataset.zip?download=1"
+          UNIMI_URL="https://air.unimi.it/retrieve/handle/2434/911765/1991879/dataset%281%29.zip"
+          USER_AGENT="cat-pose-benchmark-research/0.1 (+https://github.com/in-c0/cat-pose-benchmark)"
+
+          mkdir -p /tmp/catmeows /tmp/a1-personalisation
+          if ! curl --fail --location --retry 3 --retry-delay 5 --retry-all-errors \
+              --user-agent "$USER_AGENT" "$ZENODO_URL" -o /tmp/catmeows-dataset.zip; then
+            curl --fail --location --retry 3 --retry-delay 5 --retry-all-errors \
+              --user-agent "$USER_AGENT" "$UNIMI_URL" -o /tmp/catmeows-dataset.zip
+          fi
+          echo "$EXPECTED_MD5  /tmp/catmeows-dataset.zip" | md5sum --check --strict
+          unzip -q /tmp/catmeows-dataset.zip -d /tmp/catmeows
+          test "$(find /tmp/catmeows -type f -iname '*.wav' | wc -l | tr -d ' ')" = "440"
+
+      - name: Build manifest and run P0 feasibility audit
+        run: |
+          set -euo pipefail
+          python -m audio.catmeows_manifest /tmp/catmeows --output /tmp/catmeows-manifest.csv
+          python -m audio.personalisation_audit /tmp/catmeows-manifest.csv \
+            --output /tmp/a1-personalisation/p0-feasibility.json
+
+      - name: Print decision summary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path('/tmp/a1-personalisation/p0-feasibility.json').read_text())
+          summary = report['summary']
+          print('## A1.0b P0 feasibility')
+          for key, value in summary.items():
+              print(f'{key}: {value}')
+          print('\n## primary-feasible cats/folds')
+          for cat_id, cat in report['cats'].items():
+              feasible = [fold for fold in cat['folds'] if fold['primary_feasible']]
+              if feasible:
+                  print(cat_id, [(f['test_session'], f['n_test'], f['n_adaptation'], f['max_labelled_budget_per_test_context']) for f in feasible])
+          PY
+
+      - name: Upload aggregate feasibility report only
+        uses: actions/upload-artifact@v4
+        with:
+          name: a1-personalisation-feasibility
+          path: /tmp/a1-personalisation/p0-feasibility.json
+          retention-days: 7
+          if-no-files-found: error
