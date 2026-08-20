@@ -53,3 +53,18 @@ jobs:
         run: |
           node --check audio/capture_station/app.js
           node --check audio/capture_station/recorder-worklet.js
+
+      - name: Parse H0 PowerShell launcher
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path 'scripts/start-h0-capture.ps1'),
+            [ref]$tokens,
+            [ref]$errors
+          ) | Out-Null
+          if ($errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Error $_.Message }
+            exit 1
+          }
