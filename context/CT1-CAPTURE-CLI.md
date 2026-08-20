@@ -2,16 +2,17 @@
 
 Status: capture-support tooling for the preregistered first-household pilot in #37.
 
-This CLI is designed to reduce manual editing during the H0 instrumentation tranche. It records structured context only; it does **not** record audio, video, health data, or infer an intent.
+This CLI is designed to reduce manual editing during the H0 instrumentation tranche. It records structured context and ordinary timestamped human actions only; it does **not** record audio, video, health data, or infer an intent.
 
 ## Capture model
 
-Each episode has two operations:
+Each episode has three operations:
 
 1. `start` — freezes the prediction-time context snapshot at `t0`, fixes the 60 s outcome window, writes the #18/CT1.2 event, and writes a sidecar SHA-256 lock over all current-event predictor/identity fields.
-2. `finalize` — verifies that the frozen fingerprint still matches, then appends only the end-of-window termination outcome as `terminated`, `continued`, or `unknown`.
+2. `action` — optionally appends an ordinary human action with an in-window timestamp. Actions are not current-episode CT1 predictors, but they can become routine/history evidence for later episodes. The append log has its own hash so recorded actions cannot be retrospectively rewritten.
+3. `finalize` — verifies both the frozen `t0` fingerprint and append-only action-log hash, then appends the end-of-window termination outcome as `terminated`, `continued`, or `unknown`.
 
-If any frozen field was edited after `start`, finalization fails closed.
+If any frozen field or previously recorded action is edited after capture, the next mutation fails closed.
 
 ## Context input
 
@@ -51,9 +52,33 @@ python -m context.ct1_capture_cli start \
 The tool writes:
 
 - the prospective event JSON;
-- `episode-001.json.ct1-lock.json` containing the frozen predictor fingerprint.
+- `episode-001.json.ct1-lock.json` containing the frozen predictor fingerprint and action-log fingerprint.
 
 The 60 s window is fixed at start time. The event is already strict-valid before an outcome exists.
+
+## Log an ordinary action during the window
+
+If a relevant ordinary action occurs, log it at the time it happens:
+
+```bash
+python -m context.ct1_capture_cli action \
+  --event local-data/h0/episode-001.json \
+  --action-type open_door \
+  --actor-id human-01 \
+  --target-id door-balcony
+```
+
+If `--offset-ms` is omitted, the CLI calculates elapsed time from the frozen event start. For deterministic import/testing, an explicit offset may be supplied:
+
+```bash
+python -m context.ct1_capture_cli action \
+  --event local-data/h0/episode-001.json \
+  --action-type present_toy \
+  --target-id toy-01 \
+  --offset-ms 12500
+```
+
+Only actions inside the frozen 0–60 s episode window are accepted. Do not create actions for experimental discrimination unless the episode separately follows the prospective I1 protocol in #20.
 
 ## Finalize after the frozen window
 
@@ -101,4 +126,5 @@ The H0 path is intentionally performance-blind. Do not fit CT1 predictors or ins
 - Do not manufacture signalling episodes through deprivation, denied access, restraint, startle, or distress.
 - Ordinary care takes precedence over completing the 60 s window.
 - `unknown`/excluded episodes remain part of the audit trail.
+- Recorded ordinary actions are observational metadata, not evidence that an intervention revealed an intent.
 - This instrumentation does not establish literal feline language, emotion, pain, disease, or universal semantics.
