@@ -1,0 +1,60 @@
+{
+  "version": "0.1.0",
+  "hypotheses": [
+    "access_location",
+    "social_contact",
+    "play_engagement",
+    "routine_food_related",
+    "object_interest",
+    "latent_state",
+    "unknown"
+  ],
+  "actions": {
+    "offer_social_contact": {
+      "description": "Offer voluntary attention/contact; cat may disengage freely."
+    },
+    "present_toy": {
+      "description": "Present or activate an ordinary familiar toy."
+    },
+    "open_permitted_access": {
+      "description": "Open an access route the cat is ordinarily permitted to use."
+    },
+    "interact_relevant_object": {
+      "description": "Interact with the non-food object implicated by the episode."
+    },
+    "continue_due_feeding_routine": {
+      "description": "Continue a feeding routine that is already due; never advance, delay, multiply, or withhold feeding for discrimination.",
+      "required_parameters": ["feeding_due"]
+    },
+    "brief_no_action_observation": {
+      "description": "Short observation-only interval when no necessary care/access is pending.",
+      "required_parameters": ["duration_ms", "necessary_care_pending"]
+    }
+  },
+  "observables": [
+    "approach_withdrawal",
+    "target_orientation",
+    "threshold_crossed",
+    "social_contact_engagement",
+    "toy_engagement",
+    "object_engagement",
+    "vocalisation_continuation",
+    "signalling_termination",
+    "location_transition"
+  ],
+  "windows": {
+    "immediate_0_5s": [0, 5000],
+    "short_5_30s": [5000, 30000],
+    "episode_30_60s": [30000, 60000]
+  },
+  "hard_stop_conditions": [
+    "distress_or_panic",
+    "aggression_escalation",
+    "persistent_avoidance",
+    "deprivation_or_delayed_necessity",
+    "restraint_or_forced_contact",
+    "unsafe_access",
+    "aversive_stimulus",
+    "medical_or_veterinary_interference"
+  ]
+}

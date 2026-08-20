@@ -1,0 +1,87 @@
+{
+  "plan_version": "0.1.0",
+  "plan_id": "i1-plan-example-access-social",
+  "event_id": "event-example-001",
+  "phase": "I1.0",
+  "recorded_offset_ms": 2200,
+  "selection_policy": "naturalistic",
+  "action": {
+    "action_id": "action-open-door",
+    "action_type": "open_permitted_access",
+    "scheduled_offset_ms": 5000,
+    "parameters": {
+      "target_id": "door-balcony",
+      "access_already_permitted": true
+    }
+  },
+  "hypotheses": [
+    {
+      "hypothesis_id": "h-access",
+      "kind": "access_location",
+      "probability": 0.5
+    },
+    {
+      "hypothesis_id": "h-social",
+      "kind": "social_contact",
+      "probability": 0.3
+    },
+    {
+      "hypothesis_id": "h-unknown",
+      "kind": "unknown",
+      "probability": 0.2
+    }
+  ],
+  "predictions": [
+    {
+      "hypothesis_ref": "h-access",
+      "observables": [
+        {
+          "observable": "threshold_crossed",
+          "window": "immediate_0_5s",
+          "expectation": "crosses or begins crossing the opened threshold",
+          "probability": 0.8
+        },
+        {
+          "observable": "signalling_termination",
+          "window": "short_5_30s",
+          "expectation": "pre-intervention signalling sequence terminates",
+          "probability": 0.7
+        }
+      ]
+    },
+    {
+      "hypothesis_ref": "h-social",
+      "observables": [
+        {
+          "observable": "threshold_crossed",
+          "window": "immediate_0_5s",
+          "expectation": "does not preferentially cross the threshold",
+          "probability": 0.2
+        },
+        {
+          "observable": "target_orientation",
+          "window": "short_5_30s",
+          "expectation": "orientation remains primarily toward the human",
+          "probability": 0.7
+        }
+      ]
+    },
+    {
+      "hypothesis_ref": "h-unknown",
+      "observables": [
+        {
+          "observable": "signalling_termination",
+          "window": "short_5_30s",
+          "expectation": "no strong prediction; response may remain unexplained"
+        }
+      ]
+    }
+  ],
+  "safety": {
+    "eligible": true,
+    "safety_class": "ordinary_low_risk_household_action",
+    "stop_conditions_acknowledged": true,
+    "necessary_care_pending": false,
+    "notes": "Door is routinely permitted and supervised."
+  }
+}

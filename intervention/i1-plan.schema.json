@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cat-pose-benchmark.example/intervention/i1-plan.schema.json",
+  "title": "I1 Prospective Intervention Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "plan_version",
+    "plan_id",
+    "event_id",
+    "phase",
+    "recorded_offset_ms",
+    "action",
+    "hypotheses",
+    "predictions",
+    "safety"
+  ],
+  "properties": {
+    "plan_version": {"const": "0.1.0"},
+    "plan_id": {"type": "string", "minLength": 1},
+    "event_id": {"type": "string", "minLength": 1},
+    "phase": {"enum": ["I1.0", "I1.1", "I1.2"]},
+    "recorded_offset_ms": {"type": "integer", "minimum": 0},
+    "selection_policy": {
+      "enum": ["naturalistic", "balanced_safe_schedule", "randomized_safe_set", "expected_information_gain"]
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action_id", "action_type", "scheduled_offset_ms", "parameters"],
+      "properties": {
+        "action_id": {"type": "string", "minLength": 1},
+        "action_type": {
+          "enum": [
+            "offer_social_contact",
+            "present_toy",
+            "open_permitted_access",
+            "interact_relevant_object",
+            "continue_due_feeding_routine",
+            "brief_no_action_observation"
+          ]
+        },
+        "scheduled_offset_ms": {"type": "integer", "minimum": 0},
+        "parameters": {"type": "object", "additionalProperties": true}
+      }
+    },
+    "hypotheses": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["hypothesis_id", "kind", "probability"],
+        "properties": {
+          "hypothesis_id": {"type": "string", "minLength": 1},
+          "kind": {
+            "enum": [
+              "access_location",
+              "social_contact",
+              "play_engagement",
+              "routine_food_related",
+              "object_interest",
+              "latent_state",
+              "unknown"
+            ]
+          },
+          "state_ref": {"type": "string", "minLength": 1},
+          "probability": {"type": "number", "minimum": 0, "maximum": 1}
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"kind": {"const": "latent_state"}}, "required": ["kind"]},
+            "then": {"required": ["state_ref"]}
+          }
+        ]
+      }
+    },
+    "predictions": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["hypothesis_ref", "observables"],
+        "properties": {
+          "hypothesis_ref": {"type": "string", "minLength": 1},
+          "observables": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["observable", "window", "expectation"],
+              "properties": {
+                "observable": {
+                  "enum": [
+                    "approach_withdrawal",
+                    "target_orientation",
+                    "threshold_crossed",
+                    "social_contact_engagement",
+                    "toy_engagement",
+                    "object_engagement",
+                    "vocalisation_continuation",
+                    "signalling_termination",
+                    "location_transition"
+                  ]
+                },
+                "window": {"enum": ["immediate_0_5s", "short_5_30s", "episode_30_60s", "declared_delayed"]},
+                "expectation": {"type": "string", "minLength": 1},
+                "probability": {"type": "number", "minimum": 0, "maximum": 1}
+              }
+            }
+          }
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eligible", "safety_class", "stop_conditions_acknowledged"],
+      "properties": {
+        "eligible": {"const": true},
+        "safety_class": {"const": "ordinary_low_risk_household_action"},
+        "stop_conditions_acknowledged": {"const": true},
+        "necessary_care_pending": {"type": "boolean"},
+        "notes": {"type": "string"}
+      }
+    }
+  }
+}
