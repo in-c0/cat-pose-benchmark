@@ -1,9 +1,19 @@
+const CONTEXT_DEFAULTS_KEY = "catpose.ct1.context-defaults.v1";
+
 const els = {
   config: document.querySelector("#config"),
   location: document.querySelector("#location"),
-  objects: document.querySelector("#objects"),
-  social: document.querySelector("#social"),
+  doorState: document.querySelector("#door-state"),
+  toyPresent: document.querySelector("#toy-present"),
+  foodAreaPresent: document.querySelector("#food-area-present"),
+  humanCount: document.querySelector("#human-count"),
+  nearestHumanDistance: document.querySelector("#nearest-human-distance"),
+  otherCatCount: document.querySelector("#other-cat-count"),
+  extraObjects: document.querySelector("#extra-objects"),
+  extraSocial: document.querySelector("#extra-social"),
   environment: document.querySelector("#environment"),
+  contextPreview: document.querySelector("#context-preview"),
+  defaultsState: document.querySelector("#defaults-state"),
   humanAudio: document.querySelector("#human-audio"),
   arm: document.querySelector("#arm"),
   disarm: document.querySelector("#disarm"),
@@ -17,6 +27,20 @@ const els = {
   records: document.querySelector("#records"),
 };
 
+const contextInputs = [
+  els.location,
+  els.doorState,
+  els.toyPresent,
+  els.foodAreaPresent,
+  els.humanCount,
+  els.nearestHumanDistance,
+  els.otherCatCount,
+  els.extraObjects,
+  els.extraSocial,
+  els.environment,
+  els.humanAudio,
+];
+
 let config = null;
 let stream = null;
 let audioContext = null;
@@ -26,6 +50,7 @@ let captureWaiter = null;
 let activeEvent = null;
 let countdownTimer = null;
 let lastStatus = null;
+let contextValid = false;
 
 async function fetchJSON(url, options = {}) {
   const response = await fetch(url, options);
@@ -63,13 +88,175 @@ function parseJSONField(element, expected, label) {
   return value;
 }
 
+function parseIntegerField(element, label, maximum = 10) {
+  const raw = element.value.trim();
+  const value = Number(raw);
+  if (!Number.isInteger(value) || value < 0 || value > maximum) {
+    throw new Error(`${label} must be an integer from 0 to ${maximum}`);
+  }
+  return value;
+}
+
+function parseOptionalDistance(element, humanCount) {
+  if (humanCount === 0) return null;
+  const raw = element.value.trim();
+  if (!raw) return null;
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value < 0 || value > 100) {
+    throw new Error("Nearest human distance must be blank or a number from 0 to 100 metres");
+  }
+  return value;
+}
+
+function ensureUniqueIds(items, key, label) {
+  const seen = new Set();
+  for (const item of items) {
+    const value = item?.[key];
+    if (typeof value !== "string" || !value.trim()) {
+      throw new Error(`${label} entries require a non-empty ${key}`);
+    }
+    if (seen.has(value)) throw new Error(`${label} contains duplicate ${key}: ${value}`);
+    seen.add(value);
+  }
+}
+
+function structuredObjects() {
+  const objects = [];
+  const doorState = els.doorState.value;
+  if (doorState !== "absent") {
+    const state = {};
+    if (doorState === "open") state.open = true;
+    if (doorState === "closed") state.open = false;
+    objects.push({ object_id: "door-primary", object_type: "door", state });
+  }
+  if (els.toyPresent.checked) {
+    objects.push({ object_id: "toy-context", object_type: "toy" });
+  }
+  if (els.foodAreaPresent.checked) {
+    objects.push({ object_id: "food-area-context", object_type: "food_area" });
+  }
+  return objects;
+}
+
+function structuredSocial(humanCount, nearestHumanDistance, otherCatCount) {
+  const social = [];
+  for (let index = 0; index < humanCount; index += 1) {
+    const entity = {
+      entity_id: `human-context-${index + 1}`,
+      entity_type: "human",
+    };
+    if (index === 0 && nearestHumanDistance !== null) {
+      entity.distance_m = nearestHumanDistance;
+    }
+    social.push(entity);
+  }
+  for (let index = 0; index < otherCatCount; index += 1) {
+    social.push({
+      entity_id: `other-cat-context-${index + 1}`,
+      entity_type: "cat",
+    });
+  }
+  return social;
+}
+
 function currentContext() {
+  const humanCount = parseIntegerField(els.humanCount, "Humans present");
+  const otherCatCount = parseIntegerField(els.otherCatCount, "Other cats present");
+  const nearestHumanDistance = parseOptionalDistance(els.nearestHumanDistance, humanCount);
+  const extraObjects = parseJSONField(els.extraObjects, "array", "Extra objects");
+  const extraSocial = parseJSONField(els.extraSocial, "array", "Extra social entities");
+  const environment = parseJSONField(els.environment, "object", "Environment");
+  const objects = [...structuredObjects(), ...extraObjects];
+  const social = [...structuredSocial(humanCount, nearestHumanDistance, otherCatCount), ...extraSocial];
+  ensureUniqueIds(objects, "object_id", "Objects");
+  ensureUniqueIds(social, "entity_id", "Social entities");
   return {
     location: els.location.value.trim() || null,
-    objects: parseJSONField(els.objects, "array", "Objects"),
-    social: parseJSONField(els.social, "array", "Social"),
-    environment: parseJSONField(els.environment, "object", "Environment"),
+    objects,
+    social,
+    environment,
   };
+}
+
+function contextDefaultsPayload() {
+  return {
+    version: 1,
+    location: els.location.value,
+    door_state: els.doorState.value,
+    toy_present: els.toyPresent.checked,
+    food_area_present: els.foodAreaPresent.checked,
+    human_count: els.humanCount.value,
+    nearest_human_distance: els.nearestHumanDistance.value,
+    other_cat_count: els.otherCatCount.value,
+    human_audio_may_be_present: els.humanAudio.checked,
+    extra_objects_json: els.extraObjects.value,
+    extra_social_json: els.extraSocial.value,
+    environment_json: els.environment.value,
+  };
+}
+
+function saveContextDefaults() {
+  try {
+    localStorage.setItem(CONTEXT_DEFAULTS_KEY, JSON.stringify(contextDefaultsPayload()));
+    els.defaultsState.textContent = "Context defaults saved in this browser only.";
+  } catch (error) {
+    els.defaultsState.textContent = `Browser defaults not saved: ${error.message || error}`;
+  }
+}
+
+function restoreContextDefaults() {
+  let saved = null;
+  try {
+    const raw = localStorage.getItem(CONTEXT_DEFAULTS_KEY);
+    if (raw) saved = JSON.parse(raw);
+  } catch (error) {
+    els.defaultsState.textContent = `Browser defaults unavailable: ${error.message || error}`;
+    return;
+  }
+  if (!saved || saved.version !== 1) return;
+  if (typeof saved.location === "string") els.location.value = saved.location;
+  if (["absent", "unknown", "open", "closed"].includes(saved.door_state)) {
+    els.doorState.value = saved.door_state;
+  }
+  els.toyPresent.checked = saved.toy_present === true;
+  els.foodAreaPresent.checked = saved.food_area_present === true;
+  if (typeof saved.human_count === "string") els.humanCount.value = saved.human_count;
+  if (typeof saved.nearest_human_distance === "string") {
+    els.nearestHumanDistance.value = saved.nearest_human_distance;
+  }
+  if (typeof saved.other_cat_count === "string") els.otherCatCount.value = saved.other_cat_count;
+  els.humanAudio.checked = saved.human_audio_may_be_present === true;
+  if (typeof saved.extra_objects_json === "string") els.extraObjects.value = saved.extra_objects_json;
+  if (typeof saved.extra_social_json === "string") els.extraSocial.value = saved.extra_social_json;
+  if (typeof saved.environment_json === "string") els.environment.value = saved.environment_json;
+}
+
+function updateStartButton() {
+  els.start.disabled = !audioContext || Boolean(activeEvent) || !contextValid;
+}
+
+function updateContextState() {
+  const humanCount = Number(els.humanCount.value);
+  els.nearestHumanDistance.disabled = !Number.isInteger(humanCount) || humanCount <= 0;
+  try {
+    const context = currentContext();
+    contextValid = true;
+    const door = els.doorState.value;
+    const nearest = els.nearestHumanDistance.disabled || !els.nearestHumanDistance.value.trim()
+      ? "unknown"
+      : `${Number(els.nearestHumanDistance.value).toFixed(1)}m`;
+    const extraObjectCount = parseJSONField(els.extraObjects, "array", "Extra objects").length;
+    const extraSocialCount = parseJSONField(els.extraSocial, "array", "Extra social entities").length;
+    const environmentKeys = Object.keys(context.environment).length;
+    els.contextPreview.textContent =
+      `location=${context.location || "unknown"} · door=${door} · toy=${els.toyPresent.checked ? "yes" : "no"} · food_area=${els.foodAreaPresent.checked ? "yes" : "no"}\n` +
+      `humans=${humanCount} · nearest_human=${nearest} · other_cats=${Number(els.otherCatCount.value)} · extras(objects=${extraObjectCount}, social=${extraSocialCount}) · environment_keys=${environmentKeys}`;
+    saveContextDefaults();
+  } catch (error) {
+    contextValid = false;
+    els.contextPreview.textContent = `CONTEXT ERROR: ${error.message || error}`;
+  }
+  updateStartButton();
 }
 
 function writeASCII(view, offset, value) {
@@ -181,7 +368,7 @@ async function armMicrophone() {
   els.micState.textContent = `Armed · ${audioContext.sampleRate} Hz mono PCM`;
   els.arm.disabled = true;
   els.disarm.disabled = false;
-  els.start.disabled = Boolean(activeEvent);
+  updateStartButton();
 }
 
 async function disarmMicrophone() {
@@ -197,7 +384,7 @@ async function disarmMicrophone() {
   els.micState.textContent = "Not armed";
   els.arm.disabled = false;
   els.disarm.disabled = true;
-  els.start.disabled = true;
+  updateStartButton();
 }
 
 function setOutcomeEnabled(enabled) {
@@ -208,7 +395,7 @@ function beginOutcomeClock(eventId, t0EpochMs) {
   if (countdownTimer) clearInterval(countdownTimer);
   activeEvent = { eventId, t0EpochMs };
   setOutcomeEnabled(false);
-  els.start.disabled = true;
+  updateStartButton();
 
   const tick = () => {
     const elapsed = performance.timeOrigin + performance.now() - t0EpochMs;
@@ -229,6 +416,7 @@ function beginOutcomeClock(eventId, t0EpochMs) {
 
 async function startEpisode() {
   if (!audioContext || !recorderNode) throw new Error("Arm the microphone first");
+  if (!contextValid) throw new Error("Fix prediction-time context before starting an episode");
   if (activeEvent) throw new Error("An episode is already active");
   if (audioContext.state !== "running") await audioContext.resume();
 
@@ -292,7 +480,7 @@ async function finalizeOutcome(outcome) {
   els.captureStatus.textContent +=
     `\nFinalized · A1 enriched event: ${result.a1_enriched_event_written ? "yes" : "no"}`;
   activeEvent = null;
-  els.start.disabled = !audioContext;
+  updateStartButton();
   await refreshStatus();
 }
 
@@ -330,7 +518,7 @@ els.arm.addEventListener("click", () => armMicrophone().catch(reportError));
 els.disarm.addEventListener("click", () => disarmMicrophone().catch(reportError));
 els.start.addEventListener("click", () => startEpisode().catch((error) => {
   reportError(error);
-  if (!activeEvent) els.start.disabled = !audioContext;
+  if (!activeEvent) updateStartButton();
 }));
 els.refresh.addEventListener("click", () => refreshStatus().catch(reportError));
 els.resume.addEventListener("click", () => {
@@ -339,12 +527,18 @@ els.resume.addEventListener("click", () => {
 for (const button of els.outcomes) {
   button.addEventListener("click", () => finalizeOutcome(button.dataset.outcome).catch(reportError));
 }
+for (const element of contextInputs) {
+  element.addEventListener("input", updateContextState);
+  element.addEventListener("change", updateContextState);
+}
 
 async function init() {
   config = await fetchJSON("/api/config");
   els.config.textContent =
     `subject=${config.subject_id}\nhousehold=${config.household_id}\nsession=${config.session_id}\n` +
     `A1 evidence cutoff=${config.sensor_cutoff_ms} ms · outcome horizon=${config.target_horizon_ms} ms`;
+  restoreContextDefaults();
+  updateContextState();
   await refreshStatus();
 }
 
