@@ -1,0 +1,36 @@
+{
+  "bundle_version": "S0A-proxy-handshake-v0",
+  "fixture_kind": "S0A-canonical-regression-manifest-v0",
+  "frame_count": 5,
+  "left_ear_visibility": [
+    "visible",
+    "visible",
+    "fully_occluded",
+    "fully_occluded",
+    "visible"
+  ],
+  "left_hind_contact": [
+    true,
+    true,
+    false,
+    false,
+    true
+  ],
+  "nose_image_frame0_px": [
+    320.0,
+    277.3134328358209
+  ],
+  "nose_image_frame4_px": [
+    331.34328358208955,
+    277.3134328358209
+  ],
+  "observation_count_total": 130,
+  "payload_sha256": "e428bbe52403608737321772a5b6d3c8c23a404db5a7286be8cfd93a1c47ad3e",
+  "root_x_m": [
+    0.0,
+    0.016,
+    0.034,
+    0.054000000000000006,
+    0.076
+  ]
+}
