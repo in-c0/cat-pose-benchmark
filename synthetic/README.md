@@ -23,23 +23,25 @@ S0A therefore uses project-authored analytic proxy geometry. The result is **X1 
 - Uncertainty: zero-radius `synthetic_exact` confidence regions; this is simulator certainty, not real-world uncertainty.
 - Evidence tier: `X1` for every exported observation.
 
-## Generate the canonical fixture
+## Generate the full annotation bundle
 
 ```bash
-python -m synthetic.s0_proxy --output synthetic/fixtures/s0_proxy_v0.json
+python -m synthetic.s0_proxy --output /tmp/s0_proxy_v0.json
 ```
 
-Validate an existing fixture without rewriting it:
+Validate an existing generated bundle without rewriting it:
 
 ```bash
 python -m synthetic.s0_proxy \
-  --output synthetic/fixtures/s0_proxy_v0.json \
+  --output /tmp/s0_proxy_v0.json \
   --validate-only
 ```
 
-The generator computes `payload_sha256` over the canonical JSON payload excluding the digest field itself. The unit suite also pins the expected digest and compares a fresh generator run with the committed fixture.
+The full five-frame annotation payload is regenerated on demand rather than committed as a large derived file. `synthetic/fixtures/s0_proxy_v0.json` is the compact canonical regression manifest: it pins the full payload SHA-256 plus exact semantic checkpoints for projection, motion, contact and occlusion. CI also generates the complete bundle twice and requires byte-identical outputs.
 
-## What the fixture contains
+The generator computes `payload_sha256` over canonical JSON excluding the digest field itself. A changed generator therefore has to change the pinned regression manifest explicitly rather than silently redefining expected truth.
+
+## What the generated bundle contains
 
 The five-frame sequence includes:
 
@@ -51,13 +53,13 @@ The five-frame sequence includes:
 - camera intrinsics/extrinsics and dynamic scene-object transforms;
 - explicit source IDs, lineage, visibility, evidence tier, quality and uncertainty for every observation.
 
-All individual observations validate against `schemas/observation.schema.json`.
+All 130 individual observations validate against `schemas/observation.schema.json`.
 
 ## M1 boundary
 
 S0A deliberately proves the new V1→M1 boundary in the negative direction.
 
-The fixture is `X1` synthetic exact. A structurally valid V1 pose package built from it **must be rejected** by `fusion.v1_pose_package.validate_pose_package`, because M1's prospective-real visual comparator accepts only G2/G3/S1/S2 evidence.
+The generated observations are `X1` synthetic exact. A structurally valid V1 pose package built from them **must be rejected** by `fusion.v1_pose_package.validate_pose_package`, because M1's prospective-real visual comparator accepts only G2/G3/S1/S2 evidence.
 
 Passing S0A therefore does **not** make an episode M1-ready and does not create any pose-accuracy result.
 
