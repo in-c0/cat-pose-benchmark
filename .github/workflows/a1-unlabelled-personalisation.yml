@@ -60,14 +60,15 @@ jobs:
             /tmp/catmeows-manifest.csv /tmp/catmeows \
             --output /tmp/catmeows-features.csv
 
-      - name: Run frozen P2 unlabelled adaptation curve
+      - name: Run frozen P2 unlabelled adaptation curve plus robustness analysis
         run: |
           python -m audio.unlabelled_personalisation \
             /tmp/catmeows-features.csv /tmp/a1-personalisation/p0-feasibility.json \
             --repeats 20 --seed 20260821 --shrinkage-tau 4 \
+            --bootstrap-reps 2000 --bootstrap-seed 20260822 \
             --output /tmp/a1-personalisation/p2-unlabelled.json
 
-      - name: Print aggregate and fold-direction results
+      - name: Print attribution and cat-equal results
         run: |
           python - <<'PY'
           import json
@@ -79,6 +80,7 @@ jobs:
           print('feature_set:', report['feature_set'])
           print('repeats_per_budget:', report['repeats_per_budget'])
           print('shrinkage_tau:', report['shrinkage_tau'])
+          print('robustness_status:', report['post_run_robustness_analysis']['status'])
 
           for budget, result in report['by_budget'].items():
               print(f'\n### budget={budget}; folds={result["supported_folds"]}; test_clips={result.get("n_test_clips", 0)}')
@@ -90,24 +92,29 @@ jobs:
                       f"macro_f1={metrics['macro_f1']:.4f}, log_loss={metrics['log_loss']:.4f}, "
                       f"brier={metrics['multiclass_brier']:.4f}, ece={metrics['top_label_ece']:.4f}"
                   )
-              for model_name, delta in result['delta_vs_population'].items():
+
+              print('target adaptation minus matched zero-shot residualised model:')
+              for model_name, delta in result['target_adaptation_delta_vs_zero_shot'].items():
                   print(
-                      f"delta {model_name}: balanced_accuracy={delta['balanced_accuracy']:+.4f}, "
+                      f"  {model_name}: balanced_accuracy={delta['balanced_accuracy']:+.4f}, "
                       f"macro_f1={delta['macro_f1']:+.4f}, log_loss={delta['log_loss']:+.4f}, "
                       f"brier={delta['multiclass_brier']:+.4f}, ece={delta['top_label_ece']:+.4f}"
                   )
 
-              eligible = [fold for fold in report['folds'] if fold['by_budget'].get(budget, {}).get('supported')]
-              for model_name in ['centered_unshrunk', 'centered_shrinkage']:
-                  key = f'{model_name}_delta_vs_population'
-                  improved_logloss = sum(fold['by_budget'][budget][key]['log_loss'] < 0 for fold in eligible)
-                  improved_brier = sum(fold['by_budget'][budget][key]['multiclass_brier'] < 0 for fold in eligible)
-                  improved_balacc = sum(fold['by_budget'][budget][key]['balanced_accuracy'] > 0 for fold in eligible)
-                  print(
-                      f"fold_direction {model_name}: logloss_better={improved_logloss}/{len(eligible)}, "
-                      f"brier_better={improved_brier}/{len(eligible)}, "
-                      f"balanced_accuracy_better={improved_balacc}/{len(eligible)}"
-                  )
+              for comparison_name in [
+                  'centered_shrinkage_vs_population',
+                  'centered_shrinkage_vs_zero_shot',
+                  'centered_unshrunk_vs_zero_shot',
+              ]:
+                  comparison = result['cat_equal_robustness'][comparison_name]
+                  print(f"cat-equal {comparison_name}; n_cats={comparison['n_cats']}")
+                  for metric in ['balanced_accuracy', 'log_loss', 'multiclass_brier']:
+                      summary = comparison['metrics'][metric]
+                      print(
+                          f"  {metric}: mean_delta={summary['cat_equal_mean_delta']:+.4f}, "
+                          f"median_delta={summary['cat_equal_median_delta']:+.4f}, "
+                          f"bootstrap_mean_ci95={summary['bootstrap_mean_ci95']}"
+                      )
           PY
 
       - name: Upload aggregate reports only
