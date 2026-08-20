@@ -41,6 +41,7 @@ See:
 
 - [Feline intent research programme](docs/FELINE-INTENT-RESEARCH.md)
 - [Beyond pose: what could a cat-intent system actually rely on?](posts/2026-08-21-beyond-pose.md)
+- [Latent states before labels: when the confound detector catches us](posts/2026-08-21-latent-states-before-labels.md)
 
 Within that programme, this repository is **V1 — Pose & motion benchmark**. Its job is to
 make visual evidence measurable, temporally stable, provenance-aware and calibrated so
@@ -161,7 +162,8 @@ docs/
   OPEN-DECISIONS.md                 unresolved choices that block collection
 
 posts/
-  2026-08-21-beyond-pose.md         public research note introducing the broader framing
+  2026-08-21-beyond-pose.md                  broader multimodal framing
+  2026-08-21-latent-states-before-labels.md  L1 confound-detection methodology note
 
 schemas/
   observation.schema.json           machine-readable observation/provenance draft
