@@ -4,11 +4,17 @@ on:
   pull_request:
     paths:
       - "fusion/**"
+      - "context/**"
+      - "programme/**"
+      - "schemas/intent-event.schema.json"
       - ".github/workflows/m1-fusion-guard.yml"
   push:
     branches: [main]
     paths:
       - "fusion/**"
+      - "context/**"
+      - "programme/**"
+      - "schemas/intent-event.schema.json"
       - ".github/workflows/m1-fusion-guard.yml"
 
 permissions:
@@ -25,8 +31,10 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Run M1 result-guard tests
-        run: python -m unittest fusion.test_m1_result_guard
+      - name: Install M1 integration dependencies
+        run: python -m pip install --disable-pip-version-check jsonschema
+      - name: Run M1 guard and cohort tests
+        run: python -m unittest fusion.test_m1_result_guard fusion.test_m1_cohort_manifest
       - name: Generate complete synthetic M1 report
         run: python -m fusion.fixtures.m1_synthetic_report --output /tmp/m1-report.json
       - name: Validate complete synthetic M1 report
@@ -57,3 +65,22 @@ jobs:
           else
             echo "M1 guard correctly rejected omitted ablation"
           fi
+      - name: Build synthetic M1.2 shared cohort manifest
+        run: |
+          python -m fusion.fixtures.m1_cohort_events --output /tmp/m1-events.json
+          python -m fusion.m1_cohort_manifest \
+            /tmp/m1-events.json \
+            --output /tmp/m1-cohort.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          manifest = json.loads(Path('/tmp/m1-cohort.json').read_text())
+          assert manifest['performance_analysis_performed'] is False
+          assert manifest['support_counts']['events_received'] == 7
+          assert manifest['support_counts']['primary_complete_case_labelled'] == 2
+          expected = manifest['primary_episode_ids']
+          assert len(expected) == 2
+          for row_id, episode_ids in manifest['ablation_episode_ids'].items():
+              assert episode_ids == expected, (row_id, episode_ids, expected)
+          print('M1.2 shared-cohort manifest stayed performance-blind and cohort-identical')
+          PY
