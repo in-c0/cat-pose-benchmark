@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cat-pose-benchmark.example/context/ct1_context_snapshot.schema.json",
+  "title": "CT1 Prediction-Time Context Snapshot",
+  "description": "Timestamped context snapshot captured at the CT1 prediction cutoff. This is a measurement record, not an intent label.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "snapshot_version",
+    "captured_at",
+    "location",
+    "objects",
+    "social",
+    "environment",
+    "provenance"
+  ],
+  "properties": {
+    "snapshot_version": {
+      "const": "0.1.0"
+    },
+    "captured_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "location": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "objects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "object_id",
+          "object_type"
+        ],
+        "properties": {
+          "object_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "object_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "state": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "relation_to_subject": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "social": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "entity_id",
+          "entity_type"
+        ],
+        "properties": {
+          "entity_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "entity_type": {
+            "enum": [
+              "human",
+              "cat",
+              "other_animal",
+              "unknown"
+            ]
+          },
+          "relationship": {
+            "type": "string"
+          },
+          "distance_m": {
+            "type": "number",
+            "minimum": 0
+          },
+          "orientation": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_ids",
+        "capture_method"
+      ],
+      "properties": {
+        "source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "capture_method": {
+          "enum": [
+            "direct_observation",
+            "sensor",
+            "derived",
+            "synthetic"
+          ]
+        },
+        "annotation_source": {
+          "enum": [
+            "observed",
+            "human_annotated",
+            "model_inferred",
+            "synthetic",
+            "derived",
+            "mixed"
+          ]
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "uncertainty": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

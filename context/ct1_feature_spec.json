@@ -17,6 +17,19 @@
     "context.routine"
   ],
   "context_contract": "top-level context is a prediction-time snapshot; later naturalistic capture must timestamp/provenance this snapshot explicitly",
+  "prospective_context_contract": {
+    "strict_extractor": "context.ct1_strict_features",
+    "schema_ref": "context/ct1_context_snapshot.schema.json",
+    "required_observation": {
+      "modality": "object_environment",
+      "start_offset_ms": 0,
+      "end_offset_ms": 0
+    },
+    "captured_at": "must equal event.time.start_time exactly",
+    "consistency_check": "snapshot location/objects/social/environment must match top-level event.context",
+    "extractor_source": "validated timestamped snapshot",
+    "ct1_1_backwards_compatibility": "context.ct1_features remains unchanged for synthetic/legacy instrumentation"
+  },
   "feature_groups": {
     "time": [
       "local_hour_sin",
