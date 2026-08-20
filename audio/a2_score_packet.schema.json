@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cat-pose-benchmark.example/audio/a2_score_packet.schema.json",
+  "title": "A2 generic acoustic score packet",
+  "description": "Timestamped generic acoustic event scores derived only from the frozen 0-5 s prospective audio evidence window.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "packet_version",
+    "event_id",
+    "episode_id",
+    "source_audio",
+    "source_model",
+    "class_map",
+    "frames",
+    "semantic_ground_truth"
+  ],
+  "properties": {
+    "packet_version": {"const": "A2-score-packet-v0"},
+    "event_id": {"type": "string", "minLength": 1},
+    "episode_id": {"type": "string", "minLength": 1},
+    "source_audio": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_sha256",
+        "sealed_record_sha256",
+        "start_offset_ms",
+        "end_offset_ms"
+      ],
+      "properties": {
+        "artifact_sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
+        "sealed_record_sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
+        "start_offset_ms": {"type": "integer", "minimum": 0, "maximum": 4999},
+        "end_offset_ms": {"type": "integer", "minimum": 1, "maximum": 5000}
+      }
+    },
+    "source_model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "model_family", "weights_sha256", "class_map_sha256"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1},
+        "model_family": {"type": "string", "minLength": 1},
+        "weights_sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
+        "class_map_sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
+        "code_revision": {"type": "string", "minLength": 1}
+      }
+    },
+    "class_map": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["class_id", "display_name"],
+        "properties": {
+          "class_id": {"type": "string", "minLength": 1},
+          "display_name": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "frames": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["frame_index", "start_offset_ms", "end_offset_ms", "scores"],
+        "properties": {
+          "frame_index": {"type": "integer", "minimum": 0},
+          "start_offset_ms": {"type": "number", "minimum": 0, "maximum": 5000},
+          "end_offset_ms": {"type": "number", "minimum": 0, "maximum": 5000},
+          "scores": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"type": "number", "minimum": 0, "maximum": 1}
+          }
+        }
+      }
+    },
+    "semantic_ground_truth": {"const": false},
+    "notes": {"type": "string"}
+  }
+}
