@@ -32,7 +32,7 @@ jobs:
       - name: Install CT1 dependencies
         run: python -m pip install --disable-pip-version-check jsonschema scikit-learn
       - name: Run CT1 unit tests
-        run: python -m unittest context.test_ct1_features context.test_ct1_baseline context.test_ct1_capture context.test_ct1_pilot_audit context.test_ct1_capture_cli
+        run: python -m unittest context.test_ct1_features context.test_ct1_baseline context.test_ct1_capture context.test_ct1_pilot_audit context.test_ct1_capture_cli context.test_ct1_capture_batch
       - name: Generate deterministic synthetic events
         run: python -m context.fixtures.ct1_synthetic_events --output /tmp/ct1-events.json
       - name: Build synthetic CT1 rows
@@ -91,34 +91,54 @@ jobs:
           assert not any(token in rendered for token in forbidden)
           print('CT1.3 H0 audit and H1 sizing smoke test passed')
           PY
-      - name: Smoke-test local CT1.3 start/action/finalize CLI
+      - name: Smoke-test local CT1.3 capture and batch pipeline
         run: |
+          mkdir -p /tmp/ct1-h0-dir
           python -m context.ct1_capture_cli start \
-            --output /tmp/ct1-live.json \
+            --output /tmp/ct1-h0-dir/episode-001.json \
             --context context/fixtures/ct1_context_input.example.json \
             --subject-id synthetic-cat \
             --household-id synthetic-household \
             --session-id synthetic-session \
             --event-id synthetic-cli-smoke
           python -m context.ct1_capture_cli action \
-            --event /tmp/ct1-live.json \
+            --event /tmp/ct1-h0-dir/episode-001.json \
             --action-type open_door \
             --actor-id human-example \
             --target-id door-example \
             --offset-ms 12000
           python -m context.ct1_capture_cli finalize \
-            --event /tmp/ct1-live.json \
+            --event /tmp/ct1-h0-dir/episode-001.json \
             --outcome terminated
-          python -m context.ct1_capture /tmp/ct1-live.json
+          python -m context.ct1_capture /tmp/ct1-h0-dir/episode-001.json
+          python -m context.ct1_capture_batch status \
+            --directory /tmp/ct1-h0-dir \
+            --output /tmp/ct1-h0-status.json
+          python -m context.ct1_capture_batch bundle \
+            --directory /tmp/ct1-h0-dir \
+            --output /tmp/ct1-h0-bundle.json \
+            --manifest /tmp/ct1-h0-manifest.json
+          python -m context.ct1_h0_audit \
+            /tmp/ct1-h0-bundle.json \
+            --output /tmp/ct1-h0-bundle-audit.json
           python - <<'PY'
           import json
           from pathlib import Path
 
-          event = json.loads(Path('/tmp/ct1-live.json').read_text())
-          lock = json.loads(Path('/tmp/ct1-live.json.ct1-lock.json').read_text())
+          event = json.loads(Path('/tmp/ct1-h0-dir/episode-001.json').read_text())
+          lock = json.loads(Path('/tmp/ct1-h0-dir/episode-001.json.ct1-lock.json').read_text())
+          status = json.loads(Path('/tmp/ct1-h0-status.json').read_text())
+          bundle = json.loads(Path('/tmp/ct1-h0-bundle.json').read_text())
+          manifest = json.loads(Path('/tmp/ct1-h0-manifest.json').read_text())
+          audit = json.loads(Path('/tmp/ct1-h0-bundle-audit.json').read_text())
+
           assert event['outcomes'][0]['signalling_terminated'] is True
           assert event['human_actions'][0]['action_type'] == 'open_door'
           assert lock['finalized'] is True
-          assert lock['action_count'] == 1
-          print('CT1.3 capture CLI smoke test passed')
+          assert status['performance_analysis_performed'] is False
+          assert status['counts']['bundle_ready_events'] == 1
+          assert len(bundle) == 1
+          assert manifest['n_events'] == 1
+          assert audit['counts']['strict_valid_events'] == 1
+          print('CT1.3 capture → status → bundle → H0 audit smoke test passed')
           PY
