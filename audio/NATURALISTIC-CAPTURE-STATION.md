@@ -34,11 +34,43 @@ Serve the page through the included localhost server. Do not open the HTML direc
 
 ## Start the station
 
-Use the same-origin-hardened launcher from the repository root:
+### Preferred Windows H0 path
+
+From the repository root, run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\start-h0-capture.ps1
+```
+
+On first use the launcher asks for pseudonymous subject and household IDs, for example `cat-01` and `hh-01`. Those two defaults may be remembered in `local-data/h0-launcher-config.json`; `local-data/` is Git-ignored and is the only place the launcher stores its own config. A fresh session ID is proposed for each launch.
+
+The launcher:
+
+- fails closed when this is a Git checkout and `local-data/` is not ignored;
+- performs a lightweight import preflight of the canonical secure station;
+- prints the frozen CT1.3 H0 restrictions before capture;
+- starts only `audio.a1_capture_station_secure`;
+- opens the browser using the station's existing `--open-browser` flag;
+- writes household capture under `local-data/ct1-h0/` by default.
+
+Optional overrides remain explicit:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\start-h0-capture.ps1 `
+  -SubjectId cat-01 `
+  -HouseholdId hh-01 `
+  -SessionId session-001
+```
+
+Use `-NoPersistDefaults` if even the pseudonymous subject/household defaults should not be retained between launches.
+
+### Canonical Python fallback
+
+The PowerShell script is convenience only. The canonical same-origin-hardened entry point remains:
 
 ```bash
 python -m audio.a1_capture_station_secure \
-  --output-dir local-data/a1-naturalistic \
+  --output-dir local-data/ct1-h0 \
   --subject-id cat-01 \
   --household-id hh-01 \
   --session-id session-001 \
@@ -51,7 +83,20 @@ Default URL:
 http://127.0.0.1:8765/
 ```
 
-The implementation rejects non-loopback bind addresses. The lower-level `audio.a1_capture_station` module contains the tested capture state machine and core HTTP implementation; the documented operator entry point is the hardened wrapper above.
+The implementation rejects non-loopback bind addresses. The lower-level `audio.a1_capture_station` module contains the tested capture state machine and core HTTP implementation; the hardened `audio.a1_capture_station_secure` module remains the canonical operator/server boundary.
+
+## CT1.3 H0 restrictions
+
+The first 10 eligible strict-valid naturally occurring episodes are **instrumentation-only**.
+
+During H0:
+
+- do not manufacture episodes through delayed care, denied ordinary access, induced hunger, startle, restraint, teasing, forced social contact, or altered health/veterinary routines;
+- do not inspect predictor coefficients, model scores, feature/target associations, or audio incremental performance;
+- do not treat H0 as test data or report H0 model performance;
+- H0 may inform later H1 sizing only through termination prevalence, missingness/usable-label rate, episode rate, and temporal dependence.
+
+Ordinary care always overrides data completeness.
 
 ## Before an episode: quick context, no JSON required
 
@@ -132,12 +177,14 @@ For an event such as `a1-...`, the output directory can contain:
 - `<event>.a1.m1.json` — derived audio-enriched #18 event;
 - `<event>.a1.readiness.json` — performance-blind M1 support/readiness summary.
 
-These local household files are not intended for the public repository.
+These local household files are private local acquisition artefacts and are not intended for the public repository. The repository `.gitignore` explicitly ignores `local-data/`.
 
 ## Privacy and network boundary
 
+- `local-data/` is Git-ignored before real household acquisition begins;
+- the PowerShell launcher stores at most pseudonymous subject/household defaults in that ignored directory;
 - server binds to loopback only;
-- the documented launcher validates the HTTP `Host` header against loopback names and the actual bound port;
+- the documented hardened server validates the HTTP `Host` header against loopback names and the actual bound port;
 - every state-changing request requires a matching same-origin `Origin` header;
 - cross-site `Sec-Fetch-Site` values are rejected when supplied by the browser;
 - JSON endpoints require `application/json`, and audio upload requires a WAV media type, preventing simple cross-origin form/text POSTs from reaching mutation handlers;
