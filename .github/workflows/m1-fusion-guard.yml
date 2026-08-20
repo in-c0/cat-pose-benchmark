@@ -1,0 +1,59 @@
+name: M1 fusion result guard
+
+on:
+  pull_request:
+    paths:
+      - "fusion/**"
+      - ".github/workflows/m1-fusion-guard.yml"
+  push:
+    branches: [main]
+    paths:
+      - "fusion/**"
+      - ".github/workflows/m1-fusion-guard.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run M1 result-guard tests
+        run: python -m unittest fusion.test_m1_result_guard
+      - name: Generate complete synthetic M1 report
+        run: python -m fusion.fixtures.m1_synthetic_report --output /tmp/m1-report.json
+      - name: Validate complete synthetic M1 report
+        run: |
+          python -m fusion.m1_result_guard \
+            /tmp/m1-report.json \
+            --summary /tmp/m1-summary.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          summary = json.loads(Path('/tmp/m1-summary.json').read_text())
+          assert summary['contract_valid'] is True
+          assert summary['advancement_eligible'] is True
+          print('M1 complete synthetic report passed frozen result contract')
+          PY
+      - name: Prove omitted ablation fails closed
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('/tmp/m1-report.json').read_text())
+          report['rows'] = [row for row in report['rows'] if row['id'] != 'A']
+          Path('/tmp/m1-invalid.json').write_text(json.dumps(report))
+          PY
+          if python -m fusion.m1_result_guard /tmp/m1-invalid.json; then
+            echo "ERROR: invalid M1 report unexpectedly passed"
+            exit 1
+          else
+            echo "M1 guard correctly rejected omitted ablation"
+          fi
