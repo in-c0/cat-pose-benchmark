@@ -95,6 +95,7 @@ jobs:
           from context.ct1_capture_cli import build_started_event, build_lock, finalize_event
           from fusion.m1_sensor_sidecar import build_reservation, seal_sidecar, compose_enriched_event
           from fusion.m1_cohort_manifest import build_manifest
+          from fusion.v1_pose_package import POSE_PACKAGE_SCHEMA_REF
 
           root = Path(tempfile.mkdtemp(prefix='m1-sidecar-ci-'))
           wav = root / 'cat.wav'
@@ -104,7 +105,6 @@ jobs:
               handle.setsampwidth(2)
               handle.setframerate(8000)
               handle.writeframes(b'\x00\x00' * 40000)
-          pose.write_text(json.dumps({'frames': [{'t_ms': 0, 'keypoints': []}]}))
 
           started = datetime(2026, 8, 21, 8, 0, tzinfo=timezone.utc)
           event = build_started_event(
@@ -114,6 +114,52 @@ jobs:
               started_at=started, clock_uncertainty_ms=10,
           )
           lock = build_lock(event)
+          pose.write_text(json.dumps({
+              'package_version': 'V1-M1-pose-package-v0',
+              'event_id': event['event_id'],
+              'episode_id': event['episode_id'],
+              'sequence_id': 'synthetic-v1-sequence',
+              'subject_id': event['subject_id'],
+              'evidence_window_ms': {'start_offset_ms': 0, 'end_offset_ms': 5000},
+              'producer': {
+                  'kind': 'learned_model',
+                  'name': 'synthetic-ci-producer',
+                  'version': '0.0-test',
+                  'model_family': 'synthetic-ci-family',
+                  'weights_sha256': 'b' * 64,
+                  'code_revision': 'synthetic-ci',
+              },
+              'source_media': [{
+                  'record_id': 'synthetic-video-record',
+                  'sha256': 'a' * 64,
+                  'media_type': 'video/webm',
+                  'width_px': 640,
+                  'height_px': 480,
+                  'frame_rate_hz': 30.0,
+              }],
+              'samples': [{
+                  'event_offset_ms': 0,
+                  'frame_index': 0,
+                  'observations': [{
+                      'observation_id': 'synthetic-frame-000-nose',
+                      'sequence_id': 'synthetic-v1-sequence',
+                      'frame_index': 0,
+                      'subject_id': event['subject_id'],
+                      'observation_class': 'surface_landmark',
+                      'semantic_name': 'nose',
+                      'coordinate_space': 'image',
+                      'units': 'pixels',
+                      'mean': [100.0, 80.0],
+                      'covariance': [[4.0, 0.0], [0.0, 4.0]],
+                      'visibility': ['visible'],
+                      'evidence_tier': 'S2',
+                      'quality': 'bronze',
+                      'source_ids': ['synthetic-video-record'],
+                      'lineage': ['synthetic-ci-producer'],
+                  }],
+              }],
+          }))
+
           audio = seal_sidecar(build_reservation(
               event, lock, modality='audio_vocalisation',
               schema_ref='audio/A1-naturalistic-wav-v0', human_content='none',
@@ -121,9 +167,11 @@ jobs:
           ), wav)
           visual = seal_sidecar(build_reservation(
               event, lock, modality='visual_pose',
-              schema_ref='schemas/observation.schema.json', human_content='none',
+              schema_ref=POSE_PACKAGE_SCHEMA_REF, human_content='none',
               reserved_at=started + timedelta(milliseconds=200),
           ), pose)
+          assert visual['seal']['media_metadata']['package_version'] == 'V1-M1-pose-package-v0'
+          assert visual['seal']['media_metadata']['observation_count'] == 1
           finalized, final_lock = finalize_event(event, lock, terminated=True)
           base_before = json.dumps(finalized, sort_keys=True)
           enriched = compose_enriched_event(finalized, final_lock, [audio, visual])
@@ -134,5 +182,5 @@ jobs:
           assert row['support']['V1_visual_pose'] is True
           assert str(wav.resolve()) not in json.dumps(enriched)
           assert str(pose.resolve()) not in json.dumps(enriched)
-          print('M1.3 composition enriched only the derived event and kept raw paths local')
+          print('M1.3 composition requires a provenance-valid V1 pose package and keeps raw paths local')
           PY
