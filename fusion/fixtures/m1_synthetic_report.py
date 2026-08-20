@@ -51,10 +51,10 @@ def build_report(*, request_advance: bool = True) -> dict[str, Any]:
         row: dict[str, Any] = {
             "id": row_id,
             "mode": "dropout_stress" if row_id.startswith("BVA-") else "predictive",
-            "available_inputs": inputs[row_id],
-            "target": target,
+            "available_inputs": list(inputs[row_id]),
+            "target": dict(target),
             "outer_split_manifest_sha256": split_sha,
-            "evaluation_episode_ids": episode_ids,
+            "evaluation_episode_ids": list(episode_ids),
             "evaluation_episode_sha256": episode_sha,
             "metrics": {
                 "log_loss": log_loss,
@@ -106,7 +106,7 @@ def build_report(*, request_advance: bool = True) -> dict[str, Any]:
     return {
         "contract_version": "M1.1-v0",
         "synthetic_fixture": True,
-        "target": target,
+        "target": dict(target),
         "outer_split": {
             "manifest_sha256": split_sha,
             "claim_scope": "synthetic_cross_subject_guard_test",
