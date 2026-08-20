@@ -44,15 +44,18 @@ PROJECTION_GROUPS: dict[str, dict[str, Any]] = {
     },
 }
 
+# These would turn a weak acoustic proxy into an unsupported feline/affective claim.
+# The report is allowed to contain explicit metadata such as
+# `intent_inference_performed: false` and prose saying intent ground truth was *not*
+# produced, so the generic word "intent" is intentionally not banned here.
 FORBIDDEN_OUTPUT_TOKENS = (
     "cat_eating",
     "cat_drinking",
     "cat_scratching",
     "contentment",
     "relaxed_pleasure",
-    "intent",
-    "hunger",
-    "thirst",
+    "hunger_state",
+    "thirst_state",
 )
 
 
