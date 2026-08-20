@@ -9,11 +9,14 @@ from pathlib import Path
 
 from synthetic.unity_roundtrip import (
     PINNED_UNITY_EDITOR_VERSION,
+    UNITY_EXPORT_VERSION,
     build_mock_unity_export,
     build_report,
     compare_unity_export,
     write_mock_export,
 )
+
+UNITY_PROJECT = Path(__file__).resolve().parent / "unity" / "S0AProxy"
 
 
 class S0BUnityRoundTripTests(unittest.TestCase):
@@ -115,6 +118,37 @@ class S0BUnityRoundTripTests(unittest.TestCase):
                 [],
                 compare_unity_export(payload, require_unity_runtime=False),
             )
+
+    def test_unity_project_is_pinned_to_exact_lts_patch(self) -> None:
+        version_file = UNITY_PROJECT / "ProjectSettings" / "ProjectVersion.txt"
+        self.assertEqual(
+            f"m_EditorVersion: {PINNED_UNITY_EDITOR_VERSION}\n",
+            version_file.read_text(encoding="utf-8"),
+        )
+        manifest = json.loads(
+            (UNITY_PROJECT / "Packages" / "manifest.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual({}, manifest["dependencies"])
+
+    def test_exporter_static_contract_matches_python_gate(self) -> None:
+        source = (
+            UNITY_PROJECT
+            / "Assets"
+            / "Editor"
+            / "S0BProxyExportCommand.cs"
+        ).read_text(encoding="utf-8")
+        for required in (
+            f'ExportVersion = "{UNITY_EXPORT_VERSION}"',
+            'runtime_source = "unity_editor"',
+            'ReferenceBundleVersion = "S0A-proxy-handshake-v0"',
+            'SequenceId = "s0a-proxy-sequence-0001"',
+            'SubjectId = "synthetic-cat-proxy-0001"',
+            "Application.unityVersion",
+            "InverseTransformPoint",
+            "occluderCollider.bounds.IntersectRay",
+            "Physics.SyncTransforms",
+        ):
+            self.assertIn(required, source)
 
 
 if __name__ == "__main__":
