@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from context.ct1_capture import validate_capture_event
+from fusion.v1_pose_package import POSE_PACKAGE_SCHEMA_REF, POSE_PACKAGE_VERSION
 from programme.validate_intent_event import validate_instance
 
 TARGET_NAME = "signalling_terminated"
@@ -54,18 +55,65 @@ def _termination_label(event: dict[str, Any]) -> tuple[bool | None, list[str]]:
     return value, errors
 
 
-def _sensor_support(event: dict[str, Any], modality: str) -> tuple[list[str], list[str]]:
+def _valid_v1_package_provenance(observation: dict[str, Any]) -> bool:
+    """Require the public-shaped markers emitted by a validated V1 sidecar seal.
+
+    The full package is validated when sealed/composed. M1.2 operates on derived #18
+    events and therefore independently requires the canonical schema plus immutable
+    seal/package metadata instead of accepting modality name alone.
+    """
+    if observation.get("schema_ref") != POSE_PACKAGE_SCHEMA_REF:
+        return False
+    features = observation.get("features")
+    if not isinstance(features, dict):
+        return False
+    if features.get("artifact_kind") != "pose_features_json":
+        return False
+    if features.get("local_path_included") is not False:
+        return False
+    artifact_sha = features.get("artifact_sha256")
+    sealed_sha = features.get("sealed_record_sha256")
+    if not isinstance(artifact_sha, str) or len(artifact_sha) != 64:
+        return False
+    if not isinstance(sealed_sha, str) or len(sealed_sha) != 64:
+        return False
+    metadata = features.get("media_metadata")
+    if not isinstance(metadata, dict):
+        return False
+    if metadata.get("package_version") != POSE_PACKAGE_VERSION:
+        return False
+    window = metadata.get("evidence_window_ms")
+    if not isinstance(window, dict):
+        return False
+    if window.get("start_offset_ms") != observation.get("start_offset_ms"):
+        return False
+    if window.get("end_offset_ms") != observation.get("end_offset_ms"):
+        return False
+    if not isinstance(metadata.get("observation_count"), int) or metadata["observation_count"] < 1:
+        return False
+    if not isinstance(metadata.get("sample_count"), int) or metadata["sample_count"] < 1:
+        return False
+    return True
+
+
+def _sensor_support(
+    event: dict[str, Any], modality: str
+) -> tuple[list[str], list[str], list[str]]:
     eligible: list[str] = []
     late: list[str] = []
+    invalid_provenance: list[str] = []
     for observation in event.get("observations", []):
         if observation.get("modality") != modality:
             continue
         ref = str(observation.get("observation_ref", "<unknown>"))
-        if int(observation.get("end_offset_ms", 0)) <= SENSOR_EVIDENCE_CUTOFF_MS:
-            eligible.append(ref)
-        else:
+        if int(observation.get("end_offset_ms", 0)) > SENSOR_EVIDENCE_CUTOFF_MS:
             late.append(ref)
-    return sorted(eligible), sorted(late)
+            continue
+        if modality == "visual_pose" and not _valid_v1_package_provenance(observation):
+            invalid_provenance.append(ref)
+            continue
+        eligible.append(ref)
+    return sorted(eligible), sorted(late), sorted(invalid_provenance)
 
 
 def _event_row(event: dict[str, Any]) -> dict[str, Any]:
@@ -79,8 +127,8 @@ def _event_row(event: dict[str, Any]) -> dict[str, Any]:
     declared_missing = set(event.get("missing_modalities", []))
     modality_conflicts = sorted(observed_modalities & declared_missing)
 
-    visual_refs, late_visual_refs = _sensor_support(event, "visual_pose")
-    audio_refs, late_audio_refs = _sensor_support(event, "audio_vocalisation")
+    visual_refs, late_visual_refs, invalid_visual_refs = _sensor_support(event, "visual_pose")
+    audio_refs, late_audio_refs, invalid_audio_refs = _sensor_support(event, "audio_vocalisation")
 
     reasons: list[str] = []
     reasons.extend(f"event_contract:{error}" for error in event_errors)
@@ -92,6 +140,11 @@ def _event_row(event: dict[str, Any]) -> dict[str, Any]:
         )
     if label is None and not label_errors:
         reasons.append("target:missing_or_unknown_termination_label")
+    if invalid_visual_refs:
+        reasons.append(
+            "V1:visual_pose_observation_lacks_valid_pose_package_provenance:"
+            + ",".join(invalid_visual_refs)
+        )
     if not visual_refs:
         reasons.append("V1:no_visual_pose_observation_within_0_5000ms")
     if not audio_refs:
@@ -136,6 +189,10 @@ def _event_row(event: dict[str, Any]) -> dict[str, Any]:
         "post_evidence_cutoff_observation_refs": {
             "V1": late_visual_refs,
             "A1": late_audio_refs,
+        },
+        "invalid_provenance_observation_refs": {
+            "V1": invalid_visual_refs,
+            "A1": invalid_audio_refs,
         },
         "observed_modalities": sorted(observed_modalities),
         "declared_missing_modalities": sorted(declared_missing),
@@ -202,7 +259,7 @@ def build_manifest(events: list[dict[str, Any]]) -> dict[str, Any]:
             "horizon_ms": TARGET_HORIZON_MS,
         },
         "sensor_evidence_window_ms": [0, SENSOR_EVIDENCE_CUTOFF_MS],
-        "primary_cohort_rule": "strict B0/CT1 + boolean termination target + V1 + A1 on the same episode",
+        "primary_cohort_rule": "strict B0/CT1 + boolean termination target + provenance-valid V1 + A1 on the same episode",
         "global_integrity_errors": global_errors,
         "support_counts": support_counts,
         "modality_pattern_counts": dict(sorted(missing_patterns.items())),
