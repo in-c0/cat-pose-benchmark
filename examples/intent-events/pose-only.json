@@ -1,0 +1,68 @@
+{
+  "schema_version": "0.1.0",
+  "event_id": "evt-pose-001",
+  "subject_id": "cat-pseudonym-001",
+  "household_id": "hh-synthetic",
+  "session_id": "sess-v1-001",
+  "episode_id": "ep-v1-001",
+  "time": {
+    "start_time": "2026-08-21T00:00:00Z",
+    "end_time": "2026-08-21T00:00:02Z",
+    "start_offset_ms": 0,
+    "end_offset_ms": 2000,
+    "clock_source": "synthetic-sequence-clock"
+  },
+  "observations": [
+    {
+      "observation_ref": "obsref-v1-001",
+      "modality": "visual_pose",
+      "schema_ref": "schemas/observation.schema.json",
+      "record_ids": ["obs-0001", "obs-0002"],
+      "start_offset_ms": 0,
+      "end_offset_ms": 2000
+    }
+  ],
+  "context": {
+    "location": "synthetic-stage0",
+    "objects": [
+      {"object_id": "floor-1", "object_type": "support_surface"}
+    ],
+    "social": [],
+    "environment": {"synthetic": true}
+  },
+  "hypotheses": [
+    {
+      "hypothesis_id": "h-unknown",
+      "kind": "unknown",
+      "probability": 1.0,
+      "source": "prior",
+      "evidence_refs": ["obsref-v1-001"]
+    }
+  ],
+  "human_actions": [],
+  "interventions": [],
+  "outcomes": [],
+  "missing_modalities": [
+    "audio_vocalisation",
+    "audio_environment",
+    "object_environment",
+    "temporal_routine",
+    "social_proxemic",
+    "physiology",
+    "human_input",
+    "intervention",
+    "outcome"
+  ],
+  "provenance": {
+    "source_ids": ["synthetic-sequence-v1-001"],
+    "lineage": ["Unity exact annotation export", "V1 observation schema references"],
+    "annotation_source": "synthetic",
+    "software_versions": {"schema": "0.1.0"}
+  },
+  "privacy": {
+    "data_class": "synthetic",
+    "consent_status": "not_applicable",
+    "contains_human_audio": false,
+    "contains_human_image": false
+  }
+}

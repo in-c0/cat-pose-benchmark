@@ -1,0 +1,105 @@
+{
+  "schema_version": "0.1.0",
+  "event_id": "evt-audio-001",
+  "subject_id": "cat-pseudonym-007",
+  "household_id": "hh-003",
+  "session_id": "sess-a1-003",
+  "episode_id": "ep-a1-014",
+  "time": {
+    "start_time": "2026-08-21T01:10:00Z",
+    "end_time": "2026-08-21T01:10:04Z",
+    "start_offset_ms": 0,
+    "end_offset_ms": 4000,
+    "clock_source": "recorder-clock",
+    "uncertainty_ms": 10
+  },
+  "observations": [
+    {
+      "observation_ref": "audio-call-014",
+      "modality": "audio_vocalisation",
+      "schema_ref": "programme/audio-observation-v0.1",
+      "record_ids": ["clip-014"],
+      "source_uri": "private://audio/clip-014.wav",
+      "start_offset_ms": 650,
+      "end_offset_ms": 1750,
+      "features": {
+        "f0_median_hz": 512.4,
+        "duration_ms": 1100
+      }
+    }
+  ],
+  "context": {
+    "location": "kitchen",
+    "objects": [
+      {
+        "object_id": "bowl-food",
+        "object_type": "food_bowl",
+        "state": {"visible_state": "empty"}
+      }
+    ],
+    "social": [
+      {
+        "entity_id": "human-01",
+        "entity_type": "human",
+        "relationship": "household_member"
+      }
+    ]
+  },
+  "hypotheses": [
+    {
+      "hypothesis_id": "h-food",
+      "kind": "human_label",
+      "label": "food-related request",
+      "probability": 0.48,
+      "source": "model",
+      "calibration_model": "a1-baseline-v0",
+      "evidence_refs": ["audio-call-014"]
+    },
+    {
+      "hypothesis_id": "h-attention",
+      "kind": "human_label",
+      "label": "social attention",
+      "probability": 0.27,
+      "source": "model",
+      "calibration_model": "a1-baseline-v0",
+      "evidence_refs": ["audio-call-014"]
+    },
+    {
+      "hypothesis_id": "h-unknown",
+      "kind": "unknown",
+      "probability": 0.25,
+      "source": "model",
+      "calibration_model": "a1-baseline-v0",
+      "evidence_refs": ["audio-call-014"]
+    }
+  ],
+  "human_actions": [],
+  "interventions": [],
+  "outcomes": [],
+  "missing_modalities": [
+    "visual_pose",
+    "visual_microstate",
+    "audio_environment",
+    "physiology",
+    "intervention",
+    "outcome"
+  ],
+  "uncertainty": {
+    "episode_confidence": 0.52,
+    "notes": "Audio-only example; probabilities are illustrative, not empirical."
+  },
+  "provenance": {
+    "source_ids": ["clip-014"],
+    "lineage": ["household audio capture", "A1 feature extraction"],
+    "annotation_source": "mixed",
+    "annotator_ids": ["annotator-pseudonym-1"]
+  },
+  "privacy": {
+    "data_class": "private_household",
+    "consent_status": "recorded",
+    "consent_record_id": "consent-hh003-v1",
+    "retention_policy": "research-protocol-v0",
+    "contains_human_audio": true,
+    "contains_human_image": false
+  }
+}
