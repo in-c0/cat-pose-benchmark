@@ -1,0 +1,57 @@
+name: L1 semantics-blind latent discovery
+
+on:
+  pull_request:
+    paths:
+      - "latent/**"
+      - ".github/workflows/l1-latent-discovery.yml"
+  push:
+    branches: [main]
+    paths:
+      - "latent/**"
+      - ".github/workflows/l1-latent-discovery.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install L1 dependencies
+        run: python -m pip install --disable-pip-version-check numpy scikit-learn jsonschema
+      - name: Run L1 regression tests
+        run: python -m unittest latent.test_l1_discovery
+      - name: Write software-only recoverable fixture
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from latent.fixtures import build_recoverable_fixture
+          payload, _ = build_recoverable_fixture(90)
+          Path('/tmp/l1-input.json').write_text(json.dumps(payload, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+          PY
+      - name: Smoke-test L1 CLI
+        run: |
+          python -m latent.l1_discovery /tmp/l1-input.json --output /tmp/l1-report.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('/tmp/l1-report.json').read_text(encoding='utf-8'))
+          assert report['semantic_naming_performed'] is False, report
+          assert report['performance_analysis_performed'] is False, report
+          assert report['advancement_decision'].startswith('not_evaluated_'), report
+          assert all(
+              cluster.startswith('L1-Z')
+              for row in report['per_k'] if row.get('eligible')
+              for cluster in row['cluster_ids']
+          )
+          print('L1 software-only semantics-blind smoke passed')
+          PY
