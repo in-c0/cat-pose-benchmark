@@ -33,8 +33,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install M1 integration dependencies
         run: python -m pip install --disable-pip-version-check jsonschema
-      - name: Run M1 guard and cohort tests
-        run: python -m unittest fusion.test_m1_result_guard fusion.test_m1_cohort_manifest
+      - name: Run M1 guard, cohort and sidecar tests
+        run: python -m unittest fusion.test_m1_result_guard fusion.test_m1_cohort_manifest fusion.test_m1_sensor_sidecar
       - name: Generate complete synthetic M1 report
         run: python -m fusion.fixtures.m1_synthetic_report --output /tmp/m1-report.json
       - name: Validate complete synthetic M1 report
@@ -83,4 +83,56 @@ jobs:
           for row_id, episode_ids in manifest['ablation_episode_ids'].items():
               assert episode_ids == expected, (row_id, episode_ids, expected)
           print('M1.2 shared-cohort manifest stayed performance-blind and cohort-identical')
+          PY
+      - name: Smoke-test immutable M1.3 sensor composition
+        run: |
+          python - <<'PY'
+          import json
+          import tempfile
+          import wave
+          from datetime import datetime, timedelta, timezone
+          from pathlib import Path
+          from context.ct1_capture_cli import build_started_event, build_lock, finalize_event
+          from fusion.m1_sensor_sidecar import build_reservation, seal_sidecar, compose_enriched_event
+          from fusion.m1_cohort_manifest import build_manifest
+
+          root = Path(tempfile.mkdtemp(prefix='m1-sidecar-ci-'))
+          wav = root / 'cat.wav'
+          pose = root / 'pose.json'
+          with wave.open(str(wav), 'wb') as handle:
+              handle.setnchannels(1)
+              handle.setsampwidth(2)
+              handle.setframerate(8000)
+              handle.writeframes(b'\x00\x00' * 40000)
+          pose.write_text(json.dumps({'frames': [{'t_ms': 0, 'keypoints': []}]}))
+
+          started = datetime(2026, 8, 21, 8, 0, tzinfo=timezone.utc)
+          event = build_started_event(
+              context={'location':'hallway','objects':[],'social':[],'environment':{'synthetic':True}},
+              subject_id='synthetic-cat', household_id='synthetic-household',
+              session_id='synthetic-session', event_id='synthetic-sidecar-smoke',
+              started_at=started, clock_uncertainty_ms=10,
+          )
+          lock = build_lock(event)
+          audio = seal_sidecar(build_reservation(
+              event, lock, modality='audio_vocalisation',
+              schema_ref='audio/A1-naturalistic-wav-v0', human_content='none',
+              reserved_at=started + timedelta(milliseconds=100),
+          ), wav)
+          visual = seal_sidecar(build_reservation(
+              event, lock, modality='visual_pose',
+              schema_ref='schemas/observation.schema.json', human_content='none',
+              reserved_at=started + timedelta(milliseconds=200),
+          ), pose)
+          finalized, final_lock = finalize_event(event, lock, terminated=True)
+          base_before = json.dumps(finalized, sort_keys=True)
+          enriched = compose_enriched_event(finalized, final_lock, [audio, visual])
+          assert json.dumps(finalized, sort_keys=True) == base_before
+          row = build_manifest([enriched])['events'][0]
+          assert row['primary_cohort_eligible'] is True
+          assert row['support']['A1_vocal_audio'] is True
+          assert row['support']['V1_visual_pose'] is True
+          assert str(wav.resolve()) not in json.dumps(enriched)
+          assert str(pose.resolve()) not in json.dumps(enriched)
+          print('M1.3 composition enriched only the derived event and kept raw paths local')
           PY
