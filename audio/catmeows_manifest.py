@@ -6,9 +6,13 @@ import re
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+# The published CatMeows naming note describes R as sessions 1, 2, or 3, but the
+# checksum-verified v1.0.2 archive also contains session 4 (for example
+# I_BLE01_EU_FN_DEL01_401.wav). Treat R as the single session digit encoded by
+# the filename and report observed values from the actual archive.
 PATTERN = re.compile(
     r"^(?P<context>[BFI])_(?P<cat_id>[^_]+)_(?P<breed>MC|EU)_(?P<sex>FI|FN|MI|MN)_"
-    r"(?P<owner_id>[^_]+)_(?P<session>[123])(?P<vocalisation_index>\d{2})$"
+    r"(?P<owner_id>[^_]+)_(?P<session>\d)(?P<vocalisation_index>\d{2})$"
 )
 
 CONTEXTS = {

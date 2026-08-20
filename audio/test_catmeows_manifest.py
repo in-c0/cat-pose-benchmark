@@ -21,6 +21,15 @@ class CatMeowsManifestTests(unittest.TestCase):
         self.assertEqual(3, record.vocalisation_index)
         self.assertEqual("ABC01:2", record.sequence_group)
 
+    def test_parse_empirically_observed_session_four(self) -> None:
+        record = parse_filename(Path("I_BLE01_EU_FN_DEL01_401.wav"))
+        self.assertEqual("isolation_unfamiliar_environment", record.context)
+        self.assertEqual("BLE01", record.cat_id)
+        self.assertEqual("DEL01", record.owner_id)
+        self.assertEqual(4, record.session)
+        self.assertEqual(1, record.vocalisation_index)
+        self.assertEqual("BLE01:4", record.sequence_group)
+
     def test_invalid_filename_is_rejected(self) -> None:
         with self.assertRaises(ValueError):
             parse_filename(Path("mystery-cat.wav"))
