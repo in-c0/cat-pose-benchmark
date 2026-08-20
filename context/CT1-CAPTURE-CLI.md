@@ -68,21 +68,11 @@ python -m context.ct1_capture_cli action \
   --target-id door-balcony
 ```
 
-If `--offset-ms` is omitted, the CLI calculates elapsed time from the frozen event start. For deterministic import/testing, an explicit offset may be supplied:
-
-```bash
-python -m context.ct1_capture_cli action \
-  --event local-data/h0/episode-001.json \
-  --action-type present_toy \
-  --target-id toy-01 \
-  --offset-ms 12500
-```
+If `--offset-ms` is omitted, the CLI calculates elapsed time from the frozen event start. For deterministic import/testing, an explicit offset may be supplied.
 
 Only actions inside the frozen 0–60 s episode window are accepted. Do not create actions for experimental discrimination unless the episode separately follows the prospective I1 protocol in #20.
 
 ## Finalize after the frozen window
-
-If signalling had stopped by the end of the window:
 
 ```bash
 python -m context.ct1_capture_cli finalize \
@@ -90,34 +80,51 @@ python -m context.ct1_capture_cli finalize \
   --outcome terminated
 ```
 
-If it had not stopped:
+Allowed outcomes are `terminated`, `continued`, and `unknown`. `unknown` is preferable to retrospectively guessing.
+
+## Performance-blind collection status
+
+At any point during H0, inspect the local capture directory without fitting a model:
 
 ```bash
-python -m context.ct1_capture_cli finalize \
-  --event local-data/h0/episode-001.json \
-  --outcome continued
+python -m context.ct1_capture_batch status \
+  --directory local-data/h0 \
+  --output local-data/h0-status.json
 ```
 
-If the state could not be observed reliably:
+The status report checks:
+
+- sidecar lock presence;
+- frozen `t0` fingerprint integrity;
+- append-only action-log integrity;
+- completed-event hash integrity;
+- strict CT1.2 validation;
+- open/finalized/unknown counts;
+- whether the 10 strict-valid finalized H0 target has been reached.
+
+It performs no predictor-performance analysis.
+
+## Bundle H0 events
+
+Once captures are finalized, create the chronological audit bundle and manifest:
 
 ```bash
-python -m context.ct1_capture_cli finalize \
-  --event local-data/h0/episode-001.json \
-  --outcome unknown
+python -m context.ct1_capture_batch bundle \
+  --directory local-data/h0 \
+  --output local-data/h0-events.json \
+  --manifest local-data/h0-manifest.json
 ```
 
-`unknown` is preferable to retrospectively guessing.
+Bundling fails closed if it finds a duplicate event ID, missing lock, invalid event, or fingerprint/hash mismatch. Valid but still-open episodes are left out of the bundle rather than force-finalized.
 
-## H0 audit
-
-After the first 10 eligible strict-valid episodes, put the event objects into one JSON array and run:
+Then run the preregistered performance-blind audit and sizing path:
 
 ```bash
-python -m context.ct1_h0_audit h0-events.json --output h0-audit.json
-python -m context.ct1_h1_sizing h0-audit.json --output h1-sizing.json
+python -m context.ct1_h0_audit local-data/h0-events.json --output local-data/h0-audit.json
+python -m context.ct1_h1_sizing local-data/h0-audit.json --output local-data/h1-sizing.json
 ```
 
-The H0 path is intentionally performance-blind. Do not fit CT1 predictors or inspect feature/target associations before the H1 size/split is frozen as required by #37.
+Do not fit CT1 predictors or inspect feature/target associations before the H1 size/split is frozen as required by #37.
 
 ## Data handling boundary
 
@@ -127,4 +134,5 @@ The H0 path is intentionally performance-blind. Do not fit CT1 predictors or ins
 - Ordinary care takes precedence over completing the 60 s window.
 - `unknown`/excluded episodes remain part of the audit trail.
 - Recorded ordinary actions are observational metadata, not evidence that an intervention revealed an intent.
+- Status, bundling, H0 audit, and H1 sizing remain performance-blind until the preregistered H1 freeze.
 - This instrumentation does not establish literal feline language, emotion, pain, disease, or universal semantics.
