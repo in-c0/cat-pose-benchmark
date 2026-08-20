@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
@@ -29,6 +30,13 @@ FEATURE_MANIFEST = [
         "description": "Synthetic pre-outcome routine coordinate.",
     },
 ]
+
+
+def _manifest_copy() -> list[dict[str, Any]]:
+    # Tests intentionally mutate returned manifests to prove leakage rejection. Every
+    # fixture build must therefore return independent objects rather than aliasing a
+    # module-level list across test cases or experiments.
+    return copy.deepcopy(FEATURE_MANIFEST)
 
 
 def _episode(
@@ -100,7 +108,7 @@ def build_recoverable_fixture(n: int = 120) -> tuple[dict[str, Any], list[int]]:
         truth.append(latent)
     return {
         "dataset_version": "L1-input-v0",
-        "feature_manifest": FEATURE_MANIFEST,
+        "feature_manifest": _manifest_copy(),
         "episodes": episodes,
     }, truth
 
@@ -143,6 +151,6 @@ def build_identity_confounded_fixture(n_per_subject: int = 30) -> dict[str, Any]
             index += 1
     return {
         "dataset_version": "L1-input-v0",
-        "feature_manifest": FEATURE_MANIFEST,
+        "feature_manifest": _manifest_copy(),
         "episodes": episodes,
     }
