@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cat-pose-benchmark.example/fusion/v1_pose_package.schema.json",
+  "title": "V1 to M1 prospective pose package",
+  "description": "Versioned, provenance-bearing feline pose/motion observations eligible to enter the frozen M1 visual comparator.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "package_version",
+    "event_id",
+    "episode_id",
+    "sequence_id",
+    "subject_id",
+    "evidence_window_ms",
+    "producer",
+    "source_media",
+    "samples"
+  ],
+  "properties": {
+    "package_version": {"const": "V1-M1-pose-package-v0"},
+    "event_id": {"type": "string", "minLength": 1},
+    "episode_id": {"type": "string", "minLength": 1},
+    "sequence_id": {"type": "string", "minLength": 1},
+    "subject_id": {"type": "string", "minLength": 1},
+    "evidence_window_ms": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start_offset_ms", "end_offset_ms"],
+      "properties": {
+        "start_offset_ms": {"type": "integer", "minimum": 0, "maximum": 4999},
+        "end_offset_ms": {"type": "integer", "minimum": 1, "maximum": 5000}
+      }
+    },
+    "producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "name", "version"],
+      "properties": {
+        "kind": {
+          "enum": ["learned_model", "human_annotation", "calibrated_geometry", "constrained_estimate"]
+        },
+        "name": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1},
+        "model_family": {"type": "string", "minLength": 1},
+        "weights_sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
+        "code_revision": {"type": "string", "minLength": 1}
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {"kind": {"const": "learned_model"}},
+            "required": ["kind"]
+          },
+          "then": {"required": ["model_family", "weights_sha256"]}
+        }
+      ]
+    },
+    "source_media": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["record_id", "sha256", "media_type"],
+        "properties": {
+          "record_id": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
+          "media_type": {"type": "string", "minLength": 1},
+          "width_px": {"type": "integer", "minimum": 1},
+          "height_px": {"type": "integer", "minimum": 1},
+          "frame_rate_hz": {"type": "number", "exclusiveMinimum": 0}
+        }
+      }
+    },
+    "samples": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["event_offset_ms", "frame_index", "observations"],
+        "properties": {
+          "event_offset_ms": {"type": "number", "minimum": 0, "maximum": 5000},
+          "frame_index": {"type": "integer", "minimum": 0},
+          "observations": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"type": "object"}
+          }
+        }
+      }
+    },
+    "notes": {"type": "string"}
+  }
+}
