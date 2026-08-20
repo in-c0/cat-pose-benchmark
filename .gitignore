@@ -21,6 +21,9 @@ venv/
 *.pth
 *.onnx
 
+# Private local household capture/data — never commit.
+local-data/
+
 # Data — never commit bulk media; releases go to a data host
 data/raw/
 data/renders/
