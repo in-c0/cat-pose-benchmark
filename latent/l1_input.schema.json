@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cat-pose-benchmark.example/latent/l1_input.schema.json",
+  "title": "L1 semantics-blind latent discovery input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["dataset_version", "feature_manifest", "episodes"],
+  "properties": {
+    "dataset_version": {"const": "L1-input-v0"},
+    "feature_manifest": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "family", "semantic_role", "source_time_rule"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "family": {
+            "enum": ["context", "routine", "audio", "visual", "social", "physiology", "interaction", "other"]
+          },
+          "semantic_role": {"const": "predictor"},
+          "source_time_rule": {"const": "at_or_before_prediction_time"},
+          "description": {"type": "string"}
+        }
+      }
+    },
+    "episodes": {
+      "type": "array",
+      "minItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "episode_id",
+          "subject_id",
+          "household_id",
+          "session_id",
+          "start_time",
+          "fit_features",
+          "audit_only"
+        ],
+        "properties": {
+          "episode_id": {"type": "string", "minLength": 1},
+          "subject_id": {"type": "string", "minLength": 1},
+          "household_id": {"type": "string", "minLength": 1},
+          "session_id": {"type": "string", "minLength": 1},
+          "start_time": {"type": "string", "format": "date-time"},
+          "fit_features": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": ["number", "null"]
+            }
+          },
+          "audit_only": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "context_bucket": {"type": ["string", "null"]},
+              "observable_outcome": {
+                "type": ["string", "number", "integer", "boolean", "null"]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
