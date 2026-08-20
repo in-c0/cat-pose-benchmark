@@ -60,7 +60,7 @@ class UnlabelledPersonalisationTests(unittest.TestCase):
         second = _stable_order(relabelled, seed=7, repeat=2, cat_id="CAT", test_session=1)
         self.assertEqual([row["path"] for row in first], [row["path"] for row in second])
 
-    def test_centering_can_remove_large_identity_offset_without_test_session_leakage(self) -> None:
+    def test_target_adaptation_beats_zero_shot_when_identity_offset_is_large(self) -> None:
         features, audit_path = self._synthetic_tables()
         report = evaluate(
             features,
@@ -69,17 +69,41 @@ class UnlabelledPersonalisationTests(unittest.TestCase):
             repeats=1,
             seed=123,
             shrinkage_tau=4.0,
+            bootstrap_reps=100,
+            bootstrap_seed=456,
         )
         result = report["by_budget"]["4"]
         self.assertEqual(8, result["supported_folds"])
-        raw = result["models"]["population_raw"]["balanced_accuracy"]
-        centered = result["models"]["centered_unshrunk"]["balanced_accuracy"]
-        self.assertGreater(centered, raw)
-        self.assertGreaterEqual(centered, 0.99)
+        zero_shot = result["models"]["centered_zero_shot"]["balanced_accuracy"]
+        adapted = result["models"]["centered_unshrunk"]["balanced_accuracy"]
+        self.assertGreater(adapted, zero_shot)
+        self.assertGreaterEqual(adapted, 0.99)
+        self.assertGreater(
+            result["target_adaptation_delta_vs_zero_shot"]["centered_unshrunk"]["balanced_accuracy"],
+            0.0,
+        )
+
+    def test_cat_equal_summary_is_reported_separately_from_clip_pooled_metrics(self) -> None:
+        features, audit_path = self._synthetic_tables()
+        report = evaluate(
+            features,
+            audit_path,
+            budgets=[4],
+            repeats=1,
+            bootstrap_reps=50,
+            bootstrap_seed=999,
+        )
+        robustness = report["by_budget"]["4"]["cat_equal_robustness"]
+        comparison = robustness["centered_unshrunk_vs_zero_shot"]
+        self.assertEqual(4, comparison["n_cats"])
+        self.assertEqual(50, comparison["bootstrap_reps"])
+        self.assertEqual("cat", comparison["bootstrap_unit"])
+        ci = comparison["metrics"]["balanced_accuracy"]["bootstrap_mean_ci95"]
+        self.assertEqual(2, len(ci))
 
     def test_budget_support_uses_only_other_target_cat_sessions(self) -> None:
         features, audit_path = self._synthetic_tables()
-        report = evaluate(features, audit_path, budgets=[4], repeats=2)
+        report = evaluate(features, audit_path, budgets=[4], repeats=2, bootstrap_reps=0)
         for fold in report["folds"]:
             self.assertEqual(4, fold["n_test"])
             self.assertEqual(4, fold["n_adaptation_available"])
