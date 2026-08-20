@@ -15,6 +15,14 @@ def _row(manifest: dict, token: str) -> dict:
     return next(row for row in manifest["events"] if token in row["event_id"])
 
 
+def _visual_observation(event: dict) -> dict:
+    return next(
+        observation
+        for observation in event["observations"]
+        if observation["modality"] == "visual_pose"
+    )
+
+
 class M1CohortManifestTests(unittest.TestCase):
     def test_primary_cohort_is_exact_complete_case_intersection(self) -> None:
         manifest = build_manifest(build_events())
@@ -45,6 +53,44 @@ class M1CohortManifestTests(unittest.TestCase):
             {"A1_only": 1, "V1+A1": 3, "V1_only": 3},
             manifest["modality_pattern_counts"],
         )
+
+    def test_modality_name_alone_cannot_create_v1_support(self) -> None:
+        events = build_events()
+        event = next(item for item in events if "complete-true" in item["event_id"])
+        visual = _visual_observation(event)
+        visual["schema_ref"] = "schemas/observation.schema.json"
+        visual["features"] = {"synthetic_hand_authored_pose": True}
+
+        manifest = build_manifest(events)
+        row = _row(manifest, "complete-true")
+        self.assertFalse(row["support"]["V1_visual_pose"])
+        self.assertFalse(row["primary_cohort_eligible"])
+        self.assertEqual([visual["observation_ref"]], row["invalid_provenance_observation_refs"]["V1"])
+        self.assertTrue(any("lacks_valid_pose_package_provenance" in reason for reason in row["exclusion_reasons"]))
+
+    def test_forged_pose_package_identity_cannot_create_v1_support(self) -> None:
+        events = build_events()
+        event = next(item for item in events if "complete-true" in item["event_id"])
+        visual = _visual_observation(event)
+        visual["features"]["media_metadata"]["subject_id"] = "other-cat"
+
+        manifest = build_manifest(events)
+        row = _row(manifest, "complete-true")
+        self.assertFalse(row["support"]["V1_visual_pose"])
+        self.assertFalse(row["primary_cohort_eligible"])
+        self.assertEqual([visual["observation_ref"]], row["invalid_provenance_observation_refs"]["V1"])
+
+    def test_non_sha_provenance_marker_cannot_create_v1_support(self) -> None:
+        events = build_events()
+        event = next(item for item in events if "complete-true" in item["event_id"])
+        visual = _visual_observation(event)
+        visual["features"]["artifact_sha256"] = "g" * 64
+
+        manifest = build_manifest(events)
+        row = _row(manifest, "complete-true")
+        self.assertFalse(row["support"]["V1_visual_pose"])
+        self.assertFalse(row["primary_cohort_eligible"])
+        self.assertEqual([visual["observation_ref"]], row["invalid_provenance_observation_refs"]["V1"])
 
     def test_post_cutoff_audio_is_flagged_and_not_used(self) -> None:
         manifest = build_manifest(build_events())
