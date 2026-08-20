@@ -70,6 +70,50 @@ jobs:
           set -euo pipefail
           python -m audio.catmeows_manifest /tmp/catmeows --output /tmp/catmeows-manifest.csv
           test "$(($(wc -l < /tmp/catmeows-manifest.csv) - 1))" = "440"
+
+          python - <<'PY'
+          import csv
+          import json
+          import platform
+          from collections import Counter
+          from pathlib import Path
+
+          import librosa
+          import numpy
+          import scipy
+          import sklearn
+
+          manifest = Path('/tmp/catmeows-manifest.csv')
+          with manifest.open(newline='', encoding='utf-8') as handle:
+              rows = list(csv.DictReader(handle))
+
+          provenance_path = Path('/tmp/a1-reports/provenance.json')
+          provenance = json.loads(provenance_path.read_text(encoding='utf-8'))
+          provenance.update({
+              'observed_sessions': sorted({int(row['session']) for row in rows}),
+              'context_counts': dict(sorted(Counter(row['context'] for row in rows).items())),
+              'cat_count': len({row['cat_id'] for row in rows}),
+              'owner_count': len({row['owner_id'] for row in rows}),
+              'breed_counts': dict(sorted(Counter(row['breed'] for row in rows).items())),
+              'sex_counts': dict(sorted(Counter(row['sex'] for row in rows).items())),
+              'runtime': {
+                  'python': platform.python_version(),
+                  'numpy': numpy.__version__,
+                  'scipy': scipy.__version__,
+                  'librosa': librosa.__version__,
+                  'scikit_learn': sklearn.__version__,
+              },
+              'published_naming_note_discrepancy': (
+                  'The published record describes recording session R as 1, 2, or 3; '
+                  'the checksum-verified v1.0.2 archive contains at least session 4.'
+              ),
+          })
+          provenance_path.write_text(
+              json.dumps(provenance, indent=2, sort_keys=True) + '\n', encoding='utf-8'
+          )
+          print(json.dumps(provenance, indent=2, sort_keys=True))
+          PY
+
           python -m audio.acoustic_features \
             /tmp/catmeows-manifest.csv /tmp/catmeows \
             --output /tmp/catmeows-features.csv
@@ -98,6 +142,9 @@ jobs:
           from pathlib import Path
 
           root = Path('/tmp/a1-reports')
+          print('\n## provenance')
+          print((root / 'provenance.json').read_text())
+
           for filename in ['a1-baselines-cross-cat.json', 'a1-baselines-cross-owner.json']:
               report = json.loads((root / filename).read_text())
               print(f'\n## {filename}')
