@@ -1,0 +1,24 @@
+{
+  "location": "hallway",
+  "objects": [
+    {
+      "object_id": "door-example",
+      "object_type": "door",
+      "state": {
+        "open": false
+      },
+      "relation_to_subject": "subject-facing"
+    }
+  ],
+  "social": [
+    {
+      "entity_id": "human-example",
+      "entity_type": "human",
+      "relationship": "household_member",
+      "distance_m": 1.5
+    }
+  ],
+  "environment": {
+    "example_only": true
+  }
+}
