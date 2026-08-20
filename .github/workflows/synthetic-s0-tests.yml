@@ -1,0 +1,46 @@
+name: S0A synthetic annotation handshake
+
+on:
+  pull_request:
+    paths:
+      - "synthetic/**"
+      - "schemas/observation.schema.json"
+      - "fusion/v1_pose_package.py"
+      - "fusion/v1_pose_package.schema.json"
+      - ".github/workflows/synthetic-s0-tests.yml"
+  push:
+    branches: [main]
+    paths:
+      - "synthetic/**"
+      - "schemas/observation.schema.json"
+      - "fusion/v1_pose_package.py"
+      - "fusion/v1_pose_package.schema.json"
+      - ".github/workflows/synthetic-s0-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install schema dependency
+        run: python -m pip install --disable-pip-version-check jsonschema
+      - name: Run S0A unit tests
+        run: python -m unittest synthetic.test_s0_proxy
+      - name: Regenerate canonical S0A fixture
+        run: |
+          python -m synthetic.s0_proxy --output /tmp/s0_proxy_v0.json
+          cmp synthetic/fixtures/s0_proxy_v0.json /tmp/s0_proxy_v0.json
+      - name: Validate committed S0A fixture and M1 boundary
+        run: |
+          python -m synthetic.s0_proxy \
+            --output synthetic/fixtures/s0_proxy_v0.json \
+            --validate-only
