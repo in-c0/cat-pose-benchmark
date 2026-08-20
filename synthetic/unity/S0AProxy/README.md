@@ -10,7 +10,28 @@ It is intentionally minimal:
 - the Editor command creates all proxy transforms and the occluder procedurally;
 - no rendering, animal data, learned pose model or physical capture is involved.
 
-## Batch export
+## Windows one-command verification
+
+From the repository root, after installing the pinned Unity Editor through Unity Hub:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File synthetic/unity/run_s0b_windows.ps1
+```
+
+The launcher uses the normal Unity Hub install path by default:
+
+`C:\Program Files\Unity\Hub\Editor\6000.3.18f1\Editor\Unity.exe`
+
+If the editor is elsewhere, pass its exact executable:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File synthetic/unity/run_s0b_windows.ps1 `
+  -UnityExe "D:\Unity\6000.3.18f1\Editor\Unity.exe"
+```
+
+The script runs the Editor exporter, runs the authoritative Python comparator and fails unless the summary is contract-valid **and** `unity_runtime_verified: true`.
+
+## Manual batch export
 
 Run from a machine with the pinned Unity Editor installed. Replace `Unity` with the platform-specific editor executable if needed.
 
@@ -47,6 +68,8 @@ The actual gate requires:
 - contact agreement;
 - visibility/occlusion agreement;
 - scene-object transform agreement.
+
+The default round-trip tolerance is `5e-5`, chosen only to accommodate Unity float32 versus Python float64 representation. At image coordinates around 300 px, one float32 ULP is already on the order of `3e-5` px. This is a serialization/runtime-convention tolerance, not an allowed pose-estimation error.
 
 A zero-mismatch report sets `unity_runtime_verified: true`.
 
