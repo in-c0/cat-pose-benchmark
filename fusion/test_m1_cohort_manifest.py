@@ -39,10 +39,10 @@ class M1CohortManifestTests(unittest.TestCase):
         self.assertEqual(6, manifest["support_counts"]["target_labelled"])
         self.assertEqual(7, manifest["support_counts"]["B0"])
         self.assertEqual(6, manifest["support_counts"]["V1"])
-        self.assertEqual(5, manifest["support_counts"]["A1"])
-        self.assertEqual(4, manifest["support_counts"]["V1_A1"])
+        self.assertEqual(4, manifest["support_counts"]["A1"])
+        self.assertEqual(3, manifest["support_counts"]["V1_A1"])
         self.assertEqual(
-            {"A1_only": 1, "V1+A1": 4, "V1_only": 2},
+            {"A1_only": 1, "V1+A1": 3, "V1_only": 3},
             manifest["modality_pattern_counts"],
         )
 
