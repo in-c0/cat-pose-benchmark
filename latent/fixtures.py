@@ -79,10 +79,15 @@ def build_recoverable_fixture(n: int = 120) -> tuple[dict[str, Any], list[int]]:
     truth: list[int] = []
     for index in range(n):
         latent = (index * 7) % 3
-        subject_index = index % 6
+        # Every consecutive group of three contains all three latent regimes for the
+        # same subject. This makes identity orthogonal to the planted structure rather
+        # than accidentally encoding it through modular arithmetic.
+        subject_index = (index // 3) % 6
         subject_id = f"cat-{subject_index:02d}"
         household_id = f"hh-{subject_index % 3:02d}"
-        session_id = f"session-{index // 10:03d}"
+        # Twelve episodes = four complete 3-state cycles, so session identity is also
+        # balanced with respect to the planted latent regime.
+        session_id = f"session-{index // 12:03d}"
         values = centers[latent] + rng.normal(0.0, 0.28, size=3)
         # Deterministic sparse missingness exercises median imputation without erasing structure.
         routine_value: float | None = float(values[2])
