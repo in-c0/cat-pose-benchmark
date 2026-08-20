@@ -1,0 +1,106 @@
+{
+  "spec_version": "CT1.1-v0",
+  "input_contract": "schemas/intent-event.schema.json v0.1.0",
+  "prediction_cutoff": "event.time.start_time",
+  "target": {
+    "name": "signalling_terminated",
+    "source": "event.outcomes[outcome_type=signalling_termination].signalling_terminated",
+    "role": "label_only",
+    "unknown_policy": "row retained for extraction but excluded from supervised evaluation"
+  },
+  "excluded_current_episode_predictors": [
+    "observations",
+    "human_actions",
+    "interventions",
+    "outcomes",
+    "hypotheses",
+    "context.routine"
+  ],
+  "context_contract": "top-level context is a prediction-time snapshot; later naturalistic capture must timestamp/provenance this snapshot explicitly",
+  "feature_groups": {
+    "time": [
+      "local_hour_sin",
+      "local_hour_cos"
+    ],
+    "object_location": [
+      "location",
+      "n_objects",
+      "n_humans_present",
+      "n_other_cats_present",
+      "nearest_human_distance_m",
+      "nearest_human_distance_m_missing",
+      "door_present",
+      "door_open",
+      "door_closed",
+      "toy_present",
+      "food_area_present"
+    ],
+    "routine_history": [
+      "time_since_previous_episode_s",
+      "time_since_previous_episode_s_missing",
+      "episodes_last_1h",
+      "episodes_last_24h",
+      "previous_location",
+      "previous_signalling_terminated",
+      "previous_signalling_terminated_missing",
+      "time_since_food_action_s",
+      "time_since_food_action_s_missing",
+      "time_since_play_action_s",
+      "time_since_play_action_s_missing",
+      "time_since_access_action_s",
+      "time_since_access_action_s_missing",
+      "time_since_social_action_s",
+      "time_since_social_action_s_missing"
+    ]
+  },
+  "history_policy": {
+    "eligible_event": "event.time.start_time < current prediction cutoff",
+    "eligible_action": "absolute action timestamp <= current prediction cutoff",
+    "eligible_prior_outcome": "absolute outcome timestamp <= current prediction cutoff",
+    "missing_numeric_sentinel": -1.0,
+    "missing_indicators": "paired *_missing feature where applicable"
+  },
+  "action_keyword_groups": {
+    "food": [
+      "feed",
+      "food",
+      "meal"
+    ],
+    "play": [
+      "play",
+      "toy"
+    ],
+    "access": [
+      "door",
+      "access",
+      "gate",
+      "window"
+    ],
+    "social": [
+      "contact",
+      "pet",
+      "stroke",
+      "call",
+      "acknowledge",
+      "social"
+    ]
+  },
+  "evaluation": {
+    "ct1_1_scope": "single-household chronological blocked sensitivity",
+    "model_ladder": [
+      "prevalence",
+      "routine_history",
+      "object_location",
+      "context_routine"
+    ],
+    "metrics": [
+      "balanced_accuracy",
+      "macro_f1",
+      "log_loss",
+      "brier",
+      "ece"
+    ],
+    "no_random_event_split": true,
+    "future_extension": "cross-cat/cross-household group-aware evaluation"
+  }
+}
