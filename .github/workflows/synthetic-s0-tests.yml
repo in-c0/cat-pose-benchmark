@@ -34,7 +34,11 @@ jobs:
       - name: Install schema dependency
         run: python -m pip install --disable-pip-version-check jsonschema
       - name: Run S0A and S0B unit tests
-        run: python -m unittest synthetic.test_s0_proxy synthetic.test_unity_roundtrip
+        run: >-
+          python -m unittest
+          synthetic.test_s0_proxy
+          synthetic.test_unity_roundtrip
+          synthetic.test_unity_runtime_compat
       - name: Prove full generated S0A bundle is byte-deterministic
         run: |
           python -m synthetic.s0_proxy --output /tmp/s0_proxy_a.json
@@ -72,3 +76,16 @@ jobs:
           else
             echo "Actual Unity runtime gate correctly rejected the Python mock"
           fi
+      - name: Parse Windows S0B runner
+        shell: pwsh
+        run: |
+          $errors = $null
+          [void][System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path 'synthetic/unity/run_s0b_windows.ps1'),
+            [ref]$null,
+            [ref]$errors
+          )
+          if ($errors.Count -ne 0) {
+            $errors | ForEach-Object { Write-Error $_.Message }
+            exit 1
+          }
