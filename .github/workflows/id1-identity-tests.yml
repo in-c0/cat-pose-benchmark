@@ -1,0 +1,40 @@
+name: ID1 persistent identity
+
+on:
+  push:
+    paths:
+      - "identity/**"
+      - "docs/ID1-PERSISTENT-IDENTITY.md"
+      - "docs/FELINE-INTENT-RESEARCH.md"
+      - ".github/workflows/id1-identity-tests.yml"
+  pull_request:
+    paths:
+      - "identity/**"
+      - "docs/ID1-PERSISTENT-IDENTITY.md"
+      - "docs/FELINE-INTENT-RESEARCH.md"
+      - ".github/workflows/id1-identity-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run ID1 contract tests
+        run: python -m unittest discover -s identity -p 'test_*.py'
+
+      - name: Validate frozen experiment spec is parseable
+        run: python -m json.tool identity/id1_experiment_spec.json >/dev/null
