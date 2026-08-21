@@ -38,8 +38,10 @@ jobs:
           python -m pip install --disable-pip-version-check --upgrade pip
           python -m pip install --disable-pip-version-check \
             torch torchvision --index-url https://download.pytorch.org/whl/cpu
+          # pandas is imported by the pinned REMIND debug-association path but is
+          # omitted from upstream environment.yml at this revision.
           python -m pip install --disable-pip-version-check \
-            transformers scikit-learn scipy numpy opencv-python tqdm psutil ultralytics
+            transformers scikit-learn scipy numpy opencv-python tqdm psutil ultralytics pandas
 
       - name: Fetch exact REMIND revision
         run: |
