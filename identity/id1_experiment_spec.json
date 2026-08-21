@@ -1,0 +1,75 @@
+{
+  "spec_version": "ID1.0",
+  "thread": "persistent_identity_reid",
+  "status": "frozen_before_feline_results",
+  "primary_question": "Can a visual system preserve the identity of the same physical cat across occlusion, disappearance and re-entry, viewpoint/pose change, illumination change, and multi-cat ambiguity?",
+  "upstream": {
+    "system": "REMIND",
+    "repository": "cvar-vision-dl/remind-reid-tracker",
+    "commit": "f88ea1d5d81da0a8ed28b206df6d4dab48327342",
+    "paper": "arXiv:2607.09267",
+    "license": "MIT"
+  },
+  "systems": [
+    {
+      "id": "short_term_temporal_baseline",
+      "role": "existing V1-compatible short-term temporal/segmentation baseline where the same labelled sequence can be evaluated"
+    },
+    {
+      "id": "remind_unmodified",
+      "role": "primary external long-term ReID baseline",
+      "must_match_upstream_commit": true
+    }
+  ],
+  "required_stress_strata": [
+    "ordinary_continuity",
+    "short_occlusion",
+    "long_gap_reentry",
+    "viewpoint_pose_deformation",
+    "illumination_change",
+    "lookalike_multicat",
+    "crossing_close_interaction"
+  ],
+  "primary_metrics": [
+    "idf1",
+    "idsw",
+    "frag",
+    "tracking_recall",
+    "reopen_rate_existing",
+    "objects_recovered_reference",
+    "coverage_firm",
+    "firm_accuracy",
+    "uncertain_rate"
+  ],
+  "resource_metrics": [
+    "total_runtime_seconds",
+    "avg_loop_ms"
+  ],
+  "quantitative_run_requirements": {
+    "monocular_rgb": true,
+    "persistent_subject_ground_truth": true,
+    "frame_or_interval_ground_truth": true,
+    "provenance_record": true,
+    "dataset_or_sequence_hashes": true,
+    "subject_ids_pseudonymous": true,
+    "stress_strata_declared_before_scoring": true
+  },
+  "claims_boundary": {
+    "identity_success_means": "correct persistent association of observations to physical cat identity",
+    "identity_success_does_not_mean": [
+      "intent inference",
+      "affect inference",
+      "language translation",
+      "health or welfare diagnosis"
+    ],
+    "synthetic_fixtures_may_establish": "software and metric-contract correctness only",
+    "upstream_indoor_object_results_may_establish": "prior-art motivation only, not feline performance"
+  },
+  "adaptations_blocked_until_unmodified_baseline": [
+    "face_or_head_descriptor",
+    "fur_pattern_descriptor",
+    "pose_normalised_body_part_descriptor",
+    "gait_or_temporal_signature",
+    "audio_or_context_identity_fusion"
+  ]
+}
