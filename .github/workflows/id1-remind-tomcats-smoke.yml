@@ -23,6 +23,7 @@ jobs:
     env:
       REMIND_COMMIT: f88ea1d5d81da0a8ed28b206df6d4dab48327342
       TOMCATS_URL: https://upload.wikimedia.org/wikipedia/commons/5/50/Tomcats_conflict.webm
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
 
     steps:
       - name: Check out benchmark repository
@@ -90,6 +91,7 @@ jobs:
         if: always()
         run: |
           mkdir -p smoke
+          if [ -n "$HF_TOKEN" ]; then hf_token_present=true; else hf_token_present=false; fi
           {
             echo "schema_version=ID1.1-smoke-v0"
             echo "quantitative=false"
@@ -101,6 +103,7 @@ jobs:
             echo "yolo_weights_sha256=$(sha256sum remind-src/yolo/yolo11n-seg.pt | awk '{print $1}')"
             echo "python=$(python --version 2>&1)"
             echo "runner_os=$RUNNER_OS"
+            echo "hf_token_present=$hf_token_present"
             echo "remind_step_outcome=${{ steps.remind.outcome }}"
           } > smoke/provenance.txt
           python -m pip freeze > smoke/pip-freeze.txt
