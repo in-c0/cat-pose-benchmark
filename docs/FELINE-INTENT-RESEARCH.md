@@ -1,7 +1,7 @@
 # Feline intent research programme
 
-**Status:** public research direction v0.1  
-**Date:** 2026-08-21
+**Status:** public research direction v0.2  
+**Date:** 2026-08-22
 
 ## Premise
 
@@ -34,6 +34,8 @@ When an intervention is available, its outcome becomes additional evidence:
 
 The system should be allowed to remain uncertain. It should also be allowed to discover recurring latent states before assigning them human semantic labels.
 
+A separate prerequisite is **subject continuity**: evidence joined into `H` must actually belong to the same physical cat. Persistent identity/re-identification is therefore measured independently rather than assumed.
+
 ## Evidence channels
 
 The programme treats each of the following as a possible research thread or sensor family.
@@ -46,7 +48,8 @@ The programme treats each of the following as a possible research thread or sens
 - tail position, curvature, velocity, and tip motion;
 - paw contact and weight transfer;
 - gait, crouch, freeze, piloerection, kneading, rolling, rubbing;
-- object-relative and scene-relative trajectories.
+- object-relative and scene-relative trajectories;
+- persistent visual identity across occlusion, re-entry and multi-cat interactions.
 
 ### Vocal acoustics
 
@@ -122,6 +125,7 @@ The programme is deliberately plural. No single thread is assumed to be sufficie
 | --- | --- | --- |
 | V1 — Pose & motion benchmark | Can visual surface/contact motion be recovered reliably over time? | calibrated visual features |
 | V2 — Face/gaze/ear/tail microstate | Which fine visual signals add information beyond whole-body pose? | micro-behaviour embeddings |
+| ID1 — Persistent identity & ReID | Can observations be assigned to the same physical cat across occlusion, re-entry, deformation and multi-cat ambiguity? | persistent subject tracks + identity uncertainty |
 | A1 — Vocalisation acoustics | Which acoustic structures predict context, response or outcome? | call embeddings + calibrated classifiers |
 | A2 — Environmental audio | Do non-vocal sounds improve state inference? | activity/event features |
 | C1 — Object/context reasoning | How much intent information comes from where the cat is and what it is acting on? | object-relative state model |
@@ -133,7 +137,7 @@ The programme is deliberately plural. No single thread is assumed to be sufficie
 | L1 — Latent-state discovery | Are there stable recurring communicative states that do not map cleanly to existing human labels? | unsupervised latent-state catalogue |
 | E1 — Edge sensing | What useful subset can run continuously on practical home hardware? | latency/power/accuracy frontier |
 
-The current `cat-pose-benchmark` work is **V1**, not the programme's definition.
+The current `cat-pose-benchmark` work began as **V1**, but the repository now also hosts programme contracts and adjacent measurement threads. ID1 is an upstream identity/provenance layer, not an intent classifier.
 
 ## Validation doctrine
 
@@ -145,10 +149,11 @@ The programme should prefer tests that can fail:
 2. **Outcome termination:** if the proposed need is satisfied, does the signalling sequence stop or change in the predicted way?
 3. **Intervention discrimination:** do competing hypotheses respond differently to controlled actions?
 4. **Cross-context robustness:** does the signal retain meaning across rooms, times and environmental changes?
-5. **Personalisation gain:** does within-cat history improve prediction without simply memorising time or location?
-6. **Multimodal ablation:** does each modality contribute information beyond strong baselines?
-7. **Calibration:** when the system says 70%, is it right approximately 70% of the time under the declared evaluation protocol?
-8. **Unknown-state handling:** can the system abstain or create a new latent cluster instead of forcing every event into a familiar label?
+5. **Identity continuity:** are observations joined into an individual's history actually from the same physical cat, and does the system expose uncertainty instead of silently swapping identities?
+6. **Personalisation gain:** does within-cat history improve prediction without simply memorising time or location?
+7. **Multimodal ablation:** does each modality contribute information beyond strong baselines?
+8. **Calibration:** when the system says 70%, is it right approximately 70% of the time under the declared evaluation protocol?
+9. **Unknown-state handling:** can the system abstain or create a new latent cluster instead of forcing every event into a familiar label?
 
 ## Intervention as a first-class modality
 
@@ -185,13 +190,15 @@ A future system can be thought of as:
 
 `audio + vision + objects/context + human interaction + environment + routine/history + physiology + outcomes/interventions`
 
+`-> identity association + uncertainty`
+
 `-> personalised temporal world model`
 
 `-> latent feline state distribution`
 
 `-> probabilistic human interpretation`
 
-The human-facing output is the last layer, not the ground truth.
+The human-facing output is the last layer, not the ground truth. Identity association is likewise infrastructure: knowing **which cat** produced an observation is not evidence that we know **what that cat intends**.
 
 ## Relationship to the pose benchmark
 
@@ -200,17 +207,23 @@ The pose benchmark remains valuable because reliable motion measurement can feed
 What changes is the hierarchy:
 
 - **before:** visual motion was implicitly close to the translator's central representation;
-- **now:** visual motion is one evidence source among several;
-- **goal:** compare and combine modalities under common predictive, causal and calibration tests.
+- **now:** visual motion is one evidence source among several, and persistent subject identity is independently validated;
+- **goal:** compare and combine modalities under common predictive, causal, identity, and calibration tests.
+
+V1 and ID1 answer different questions:
+
+- V1: **what is the body doing?**
+- ID1: **whose observation is this across time?**
 
 ## Immediate next steps
 
 1. Continue V1 without expanding its claims.
-2. Define a programme-wide event record linking sensor observations, context, human actions and outcomes.
-3. Start A1 with a small audio protocol focused on reproducible acoustic features and context labels.
-4. Start I1 with low-risk household interventions and explicit competing hypotheses.
-5. Define M1 ablations before building a large fusion model.
-6. Add personalisation experiments only after population baselines are frozen.
-7. Keep health/welfare inference separated until its own ethics and evidence programme exists.
+2. Run ID1.0's frozen REMIND baseline once a provenance-valid labelled feline sequence is available; until then keep `feline_remind_performance = not_run`.
+3. Continue the programme-wide event record linking sensor observations, context, human actions and outcomes.
+4. Continue A1/A2 with reproducible acoustic features and strict semantic boundaries.
+5. Continue I1 with low-risk household interventions and explicit competing hypotheses.
+6. Preserve M1 ablations and shared-cohort rules before large fusion models.
+7. Add personalisation only when subject identity provenance is sufficient for the intended experiment.
+8. Keep health/welfare inference separated until its own ethics and evidence programme exists.
 
 The aim is not to make a cat say English. The aim is to build increasingly testable models of what a cat may be trying to do, communicate or change in its environment — and to know when the evidence is insufficient.
