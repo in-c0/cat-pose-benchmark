@@ -1,4 +1,4 @@
-name: S0A synthetic annotation handshake
+name: S0 synthetic annotation handshake
 
 on:
   pull_request:
@@ -33,15 +33,59 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install schema dependency
         run: python -m pip install --disable-pip-version-check jsonschema
-      - name: Run S0A unit tests
-        run: python -m unittest synthetic.test_s0_proxy
-      - name: Prove full generated bundle is byte-deterministic
+      - name: Run S0A and S0B unit tests
+        run: >-
+          python -m unittest
+          synthetic.test_s0_proxy
+          synthetic.test_unity_roundtrip
+          synthetic.test_unity_runtime_compat
+      - name: Prove full generated S0A bundle is byte-deterministic
         run: |
           python -m synthetic.s0_proxy --output /tmp/s0_proxy_a.json
           python -m synthetic.s0_proxy --output /tmp/s0_proxy_b.json
           cmp /tmp/s0_proxy_a.json /tmp/s0_proxy_b.json
-      - name: Validate full generated bundle and M1 boundary
+      - name: Validate full generated S0A bundle and M1 boundary
         run: |
           python -m synthetic.s0_proxy \
             --output /tmp/s0_proxy_a.json \
             --validate-only
+      - name: Smoke-test S0B mock round-trip without claiming Unity execution
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from synthetic.unity_roundtrip import write_mock_export
+          write_mock_export(Path('/tmp/s0b-mock-unity.json'))
+          PY
+          python -m synthetic.unity_roundtrip \
+            /tmp/s0b-mock-unity.json \
+            --allow-mock \
+            --summary /tmp/s0b-mock-summary.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('/tmp/s0b-mock-summary.json').read_text())
+          assert report['contract_valid'] is True
+          assert report['unity_runtime_verified'] is False
+          assert report['performance_analysis_performed'] is False
+          PY
+      - name: Prove mock export fails the actual Unity runtime gate
+        run: |
+          if python -m synthetic.unity_roundtrip /tmp/s0b-mock-unity.json; then
+            echo "ERROR: Python mock unexpectedly satisfied actual Unity runtime gate"
+            exit 1
+          else
+            echo "Actual Unity runtime gate correctly rejected the Python mock"
+          fi
+      - name: Parse Windows S0B runner
+        shell: pwsh
+        run: |
+          $errors = $null
+          [void][System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path 'synthetic/unity/run_s0b_windows.ps1'),
+            [ref]$null,
+            [ref]$errors
+          )
+          if ($errors.Count -ne 0) {
+            $errors | ForEach-Object { Write-Error $_.Message }
+            exit 1
+          }
