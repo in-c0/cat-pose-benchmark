@@ -4,10 +4,12 @@ on:
   push:
     paths:
       - "stage0/**"
+      - "unity-viewer/**"
       - ".github/workflows/stage0-tests.yml"
   pull_request:
     paths:
       - "stage0/**"
+      - "unity-viewer/**"
       - ".github/workflows/stage0-tests.yml"
 
 permissions:
@@ -46,5 +48,20 @@ jobs:
           python stage0/compare_reports.py \
             stage0/geometry-conditioning-report.json \
             /tmp/geometry-conditioning-report.json \
+            --abs-tol 1e-8 \
+            --rel-tol 1e-10
+
+      - name: Regenerate Unity data contract
+        run: |
+          python -m stage0.export_unity_config \
+            --layouts stage0/layouts.json \
+            --report stage0/geometry-conditioning-report.json \
+            --output /tmp/stage0-layouts.json
+
+      - name: Verify Unity data contract is reproducible
+        run: |
+          python stage0/compare_reports.py \
+            unity-viewer/Assets/StreamingAssets/CatPose/stage0-layouts.json \
+            /tmp/stage0-layouts.json \
             --abs-tol 1e-8 \
             --rel-tol 1e-10

@@ -7,6 +7,7 @@ from pathlib import Path
 import numpy as np
 
 from stage0.compare_reports import compare_values
+from stage0.export_unity_config import export_config
 from stage0.geometry_sim import (
     direct_projection_matrix,
     evaluate,
@@ -20,8 +21,15 @@ from stage0.geometry_sim import (
 class GeometrySimulationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        config_path = Path(__file__).with_name("layouts.json")
-        cls.config = json.loads(config_path.read_text(encoding="utf-8"))
+        stage0_dir = Path(__file__).parent
+        cls.config = json.loads(
+            (stage0_dir / "layouts.json").read_text(encoding="utf-8")
+        )
+        cls.report = json.loads(
+            (stage0_dir / "geometry-conditioning-report.json").read_text(
+                encoding="utf-8"
+            )
+        )
 
     def test_reflection_across_yz_plane(self) -> None:
         reflected = reflect_point(
@@ -105,6 +113,18 @@ class GeometrySimulationTests(unittest.TestCase):
                 if name != "direct+all_reflections"
             ]
             self.assertLess(combined, min(single_reflection_pairs))
+
+    def test_unity_export_uses_arrays_and_python_virtual_camera_reference(self) -> None:
+        exported = export_config(self.config, self.report)
+
+        self.assertEqual(exported["repositoryToUnityAxisMap"], ["+x", "+z", "+y"])
+        self.assertEqual(len(exported["layouts"]), 2)
+        for layout in exported["layouts"]:
+            self.assertIsInstance(layout["mirrors"], list)
+            self.assertGreaterEqual(layout["combinedCoverageFraction"], 0.90)
+            for mirror in layout["mirrors"]:
+                self.assertEqual(mirror["reflectionParity"], "mirrored")
+                self.assertEqual(len(mirror["expectedVirtualCameraCentreM"]), 3)
 
     def test_report_comparison_accepts_last_digit_numeric_drift(self) -> None:
         expected = {"metric": [1.0, {"p95": 0.8133944159}]}

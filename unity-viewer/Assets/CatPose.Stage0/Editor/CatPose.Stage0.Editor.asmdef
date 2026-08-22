@@ -1,0 +1,18 @@
+{
+  "name": "CatPose.Stage0.Editor",
+  "rootNamespace": "CatPose.Stage0.Editor",
+  "references": [
+    "CatPose.Stage0.Runtime"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
