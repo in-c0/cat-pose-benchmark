@@ -87,6 +87,12 @@ jobs:
           echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
           echo "quantitative run=$run_id"
 
+      - name: Publish target run id
+        run: |
+          gh pr comment "${{ github.event.pull_request.number }}" \
+            --repo "$GITHUB_REPOSITORY" \
+            --body "ID1.2 live quantitative run: \`${{ steps.target.outputs.run_id }}\` for frozen target SHA \`$TARGET_SHA\`."
+
       - name: Follow quantitative run
         id: follow
         run: |
