@@ -1,0 +1,113 @@
+name: DINOv3 backbone access
+
+# The ID1.0 REMIND baseline reads frozen DINOv3 patch features, and the DINOv3
+# weights are a gated Hugging Face repository. Access therefore depends on two
+# things that live outside this repository: a per-account acceptance of the model
+# conditions, and an HF_TOKEN Actions secret. This workflow makes the state of
+# that setup visible instead of letting it surface later as an opaque 401 in the
+# middle of a tracking run.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "identity/dinov3_access.py"
+      - "identity/dinov3_backbone_pin.json"
+      - "identity/test_dinov3_access.py"
+      - ".github/workflows/dinov3-backbone-access.yml"
+  pull_request:
+    paths:
+      - "identity/dinov3_access.py"
+      - "identity/dinov3_backbone_pin.json"
+      - "identity/test_dinov3_access.py"
+      - ".github/workflows/dinov3-backbone-access.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    name: Offline access-contract tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run DINOv3 access-contract tests
+        run: python -m unittest identity.test_dinov3_access -v
+
+      - name: Validate frozen backbone pin is parseable
+        run: python -m json.tool identity/dinov3_backbone_pin.json >/dev/null
+
+  preflight:
+    name: Live gated-access preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      # Secrets are not exposed to workflow runs triggered from forked pull
+      # requests, so an absent token is only tolerated on automatic triggers.
+      # A manual workflow_dispatch is a deliberate "is my setup correct?" check
+      # and fails if the secret is missing. Every other failure -- rejected
+      # token, ungranted gate, wrong repo id -- fails on all triggers.
+      - name: Preflight gated DINOv3 access
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            python -m identity.dinov3_access --output dinov3-access-report.json
+          else
+            python -m identity.dinov3_access --output dinov3-access-report.json \
+              --allow-missing-token
+          fi
+
+      - name: Summarise access state
+        if: always()
+        run: |
+          if [ ! -f dinov3-access-report.json ]; then
+            echo "Preflight produced no report." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("dinov3-access-report.json").read_text(encoding="utf-8"))
+          mark = "PASS" if report["ok"] else "FAIL"
+          print(f"### DINOv3 backbone access: {mark}")
+          print()
+          print(f"- status: `{report['status']}`")
+          print(f"- repo id: `{report['repo_id']}`")
+          print(f"- revision probed: `{report['revision']}`")
+          if report.get("resolved_sha"):
+              print(f"- resolved commit: `{report['resolved_sha']}`")
+          if report.get("remedy"):
+              print()
+              print("**Next step**")
+              print()
+              print(report["remedy"])
+          PY
+
+      - name: Upload access report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dinov3-access-report
+          path: dinov3-access-report.json
+          if-no-files-found: ignore

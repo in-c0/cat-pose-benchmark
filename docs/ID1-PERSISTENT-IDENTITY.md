@@ -134,6 +134,45 @@ The adapter fails closed when:
 
 Every emitted packet explicitly states that intent inference, translation claims, and health/welfare inference were not performed.
 
+## Gated backbone dependency
+
+REMIND computes frozen DINOv3 patch features, so the DINOv3 weights are part of the ID1.0 provenance surface: swapping the backbone changes every identity descriptor and silently invalidates comparison against an earlier run. The backbone is therefore pinned in `identity/dinov3_backbone_pin.json` rather than left to whatever the upstream default resolves to at run time.
+
+DINOv3 is a **gated** Hugging Face repository. Two things must exist outside this repository before a quantitative run is possible:
+
+1. the model conditions accepted on Hugging Face, by the account that owns the token — this is a click-through licence acceptance bound to that account and cannot be performed by CI or by an agent on the account holder's behalf;
+2. a Hugging Face **read** token stored as the `HF_TOKEN` repository secret under Settings -> Secrets and variables -> Actions. A fine-grained token additionally needs the scope *Read access to contents of all public gated repos you can access*; a plain read token without it still returns 403 on a gated repo.
+
+`identity/dinov3_access.py` preflights that setup and fails closed. It runs three probes so that a failure names its own cause rather than collapsing into one opaque 401:
+
+| Status | Meaning |
+| --- | --- |
+| `ok` | the token's account is entitled to download the pinned weights |
+| `token_missing` | no token in the environment |
+| `token_invalid` | Hugging Face rejected the token itself |
+| `gate_not_accepted` | token is valid, but its account was never granted the gated repo |
+| `model_not_found` | the pinned `repo_id` does not resolve for this account |
+| `network_unreachable` | `huggingface.co` is blocked, which is a network-policy fact, not a credential fact |
+
+The distinction between `token_invalid` and `gate_not_accepted` is the one that matters operationally: they present identically as a failed download but have entirely different fixes.
+
+### Frozen backbone revision
+
+The backbone is frozen to a commit, not a branch:
+
+| Field | Value |
+| --- | --- |
+| `repo_id` | `facebook/dinov3-vits16-pretrain-lvd1689m` |
+| `revision` | `114c1379950215c8b35dfcd4e90a5c251dde0d32` |
+
+Both were confirmed by a live preflight rather than assumed: the entitlement probe returned success for the token's account, which simultaneously establishes that the repo id resolves, that the model conditions have been accepted, and that the `HF_TOKEN` secret is present and valid. `identity/test_dinov3_access.py` enforces that a pin claiming `revision_verified` carries a 40-character commit SHA, so the backbone cannot silently revert to a floating branch name.
+
+Because the pin names a commit, the preflight probes that commit rather than `main`. If the upstream branch head later moves away from the pinned revision, the report carries `upstream_head_moved: true`. That is deliberately **not** a failure — the pinned revision is exactly what keeps a run reproducible — but the divergence is provenance-relevant and should be visible when deciding whether to re-baseline.
+
+Re-pinning is therefore an explicit act: change `revision`, re-run the preflight, and treat any earlier ID1 result as belonging to the previous backbone.
+
+The frozen `identity/id1_experiment_spec.json` is intentionally left untouched by this: the backbone pin is a separate artifact so that recording it does not amount to editing a spec that was frozen before results.
+
 ## First execution packet
 
 A quantitative REMIND run should be launched only when a provenance-valid labelled feline sequence exists in an execution environment. The upstream evaluator already supports custom DAVIS-style frame/mask/metadata inputs, so ID1 should adapt the dataset to that interface rather than fork REMIND prematurely.
