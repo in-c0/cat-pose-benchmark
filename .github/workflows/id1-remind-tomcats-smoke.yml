@@ -1,0 +1,127 @@
+name: ID1 REMIND Tomcats smoke
+
+on:
+  push:
+    branches:
+      - "identity/id1-remind-tomcats-smoke"
+    paths:
+      - ".github/workflows/id1-remind-tomcats-smoke.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/id1-remind-tomcats-smoke.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  remind-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      REMIND_COMMIT: f88ea1d5d81da0a8ed28b206df6d4dab48327342
+      TOMCATS_URL: https://upload.wikimedia.org/wikipedia/commons/5/50/Tomcats_conflict.webm
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+
+    steps:
+      - name: Check out benchmark repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
+
+      - name: Install REMIND runtime dependencies
+        run: |
+          python -m pip install --disable-pip-version-check --upgrade pip
+          python -m pip install --disable-pip-version-check \
+            torch torchvision --index-url https://download.pytorch.org/whl/cpu
+          # pandas is imported by the pinned REMIND debug-association path but is
+          # omitted from upstream environment.yml at this revision.
+          python -m pip install --disable-pip-version-check \
+            transformers scikit-learn scipy numpy opencv-python tqdm psutil ultralytics pandas
+
+      - name: Fetch exact REMIND revision
+        run: |
+          git clone https://github.com/cvar-vision-dl/remind-reid-tracker.git remind-src
+          git -C remind-src checkout --detach "$REMIND_COMMIT"
+          test "$(git -C remind-src rev-parse HEAD)" = "$REMIND_COMMIT"
+
+      - name: Materialize feline smoke input and YOLO weights
+        run: |
+          mkdir -p smoke remind-src/yolo
+          curl --fail --location --retry 3 "$TOMCATS_URL" --output smoke/tomcats-conflict.webm
+          python - <<'PY'
+          from pathlib import Path
+          from ultralytics import YOLO
+
+          YOLO("yolo11n-seg.pt")
+          source = Path("yolo11n-seg.pt")
+          if not source.is_file():
+              raise SystemExit("Ultralytics did not materialize yolo11n-seg.pt")
+          target = Path("remind-src/yolo/yolo11n-seg.pt")
+          target.write_bytes(source.read_bytes())
+          print(target)
+          PY
+
+      - name: Run unlabelled feline REMIND smoke
+        id: remind
+        continue-on-error: true
+        run: |
+          mkdir -p smoke/output
+          set -o pipefail
+          python remind-src/main.py tomcats yolo11n-seg.pt \
+            --source "$GITHUB_WORKSPACE/smoke/tomcats-conflict.webm" \
+            --yolo-dir "$GITHUB_WORKSPACE/remind-src/yolo" \
+            --output-dir "$GITHUB_WORKSPACE/smoke/output" \
+            --input-video-fps 1 \
+            --max-frames 15 \
+            --output-fps 10 \
+            --classes 15 \
+            --yolo-imgsz 640 \
+            --device cpu \
+            --dino-model-label S \
+            --save-output-video \
+            2>&1 | tee smoke/remind.log
+
+      - name: Record exact smoke provenance
+        if: always()
+        run: |
+          mkdir -p smoke
+          if [ -n "$HF_TOKEN" ]; then hf_token_present=true; else hf_token_present=false; fi
+          {
+            echo "schema_version=ID1.1-smoke-v0"
+            echo "quantitative=false"
+            echo "intent_inference_performed=false"
+            echo "feline_reid_performance_claim=false"
+            echo "remind_commit=$REMIND_COMMIT"
+            echo "tomcats_url=$TOMCATS_URL"
+            echo "tomcats_sha256=$(sha256sum smoke/tomcats-conflict.webm | awk '{print $1}')"
+            echo "yolo_weights_sha256=$(sha256sum remind-src/yolo/yolo11n-seg.pt | awk '{print $1}')"
+            echo "python=$(python --version 2>&1)"
+            echo "runner_os=$RUNNER_OS"
+            echo "hf_token_present=$hf_token_present"
+            echo "remind_step_outcome=${{ steps.remind.outcome }}"
+          } > smoke/provenance.txt
+          python -m pip freeze > smoke/pip-freeze.txt
+          git -C remind-src status --short > smoke/remind-git-status.txt
+          git -C remind-src rev-parse HEAD > smoke/remind-head.txt
+          find smoke/output -maxdepth 2 -type f -printf '%P\t%s bytes\n' 2>/dev/null | sort > smoke/output-files.txt || true
+          cat smoke/provenance.txt
+          cat smoke/output-files.txt || true
+
+      - name: Upload smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: id1-remind-tomcats-smoke
+          path: smoke/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Fail if REMIND did not execute successfully
+        if: steps.remind.outcome == 'failure'
+        run: exit 1
