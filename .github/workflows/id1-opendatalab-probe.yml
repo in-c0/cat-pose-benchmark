@@ -39,7 +39,8 @@ jobs:
           python - <<'PY' 2>&1 | tee opendatalab-probe.log
           import json
           import os
-          from openxlab.dataset import info, query
+          from pathlib import Path
+          from openxlab.dataset import info, query, download
 
           repo = "OpenDataLab/YouTubeVIS2019"
           print("repo=", repo)
@@ -55,6 +56,23 @@ jobs:
                       print(repr(result))
               except Exception as exc:
                   print(type(exc).__name__ + ": " + str(exc))
+
+          print("--- anonymous README download ---")
+          target = Path("odl-download")
+          target.mkdir(exist_ok=True)
+          try:
+              result = download(
+                  dataset_repo=repo,
+                  source_path="/README.md",
+                  target_path=str(target),
+              )
+              print("download_result=", repr(result))
+              for path in sorted(target.rglob("*")):
+                  if path.is_file():
+                      print("downloaded_file=", path, "bytes=", path.stat().st_size)
+                      print(path.read_text(encoding="utf-8", errors="replace")[:1000])
+          except Exception as exc:
+              print("download_error=", type(exc).__name__ + ": " + str(exc))
           PY
 
       - name: Upload probe evidence
@@ -62,6 +80,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: id1-opendatalab-probe
-          path: opendatalab-probe.log
-          if-no-files-found: error
+          path: |
+            opendatalab-probe.log
+            odl-download/
+          if-no-files-found: warn
           retention-days: 7
