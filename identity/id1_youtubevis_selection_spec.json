@@ -1,5 +1,5 @@
 {
-  "spec_version": "ID1.2-selection-v0",
+  "spec_version": "ID1-YTVIS-select-v0",
   "dataset": "YouTube-VIS-2019",
   "category_name": "cat",
   "minimum_persistent_instances": 2,
