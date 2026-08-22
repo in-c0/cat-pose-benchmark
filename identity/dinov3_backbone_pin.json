@@ -1,0 +1,27 @@
+{
+  "pin_version": "DINOV3-S-PIN-v0",
+  "role": "frozen visual backbone for the ID1.0 unmodified REMIND baseline",
+  "why_pinned": "REMIND computes frozen DINOv3 patch features. A change of backbone weights changes identity descriptors, so the backbone is part of the ID1.0 provenance surface and must not float.",
+  "repo_id": "facebook/dinov3-vits16-pretrain-lvd1689m",
+  "repo_id_verified": false,
+  "revision": null,
+  "revision_verified": false,
+  "gated": true,
+  "entitlement_probe_file": "config.json",
+  "access": {
+    "requires_accepted_conditions": true,
+    "requires_token_secret": "HF_TOKEN",
+    "token_kind": "read",
+    "fine_grained_scope_required": "Read access to contents of all public gated repos you can access"
+  },
+  "license": {
+    "name": "DINOv3 License",
+    "holder": "Meta Platforms, Inc.",
+    "acceptance": "click-through on the Hugging Face model page, bound to the accepting account",
+    "redistribution_in_this_repository": false
+  },
+  "unfrozen_until_preflight_passes": [
+    "repo_id_verified",
+    "revision"
+  ]
+}
