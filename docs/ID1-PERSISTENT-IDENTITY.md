@@ -156,11 +156,20 @@ DINOv3 is a **gated** Hugging Face repository. Two things must exist outside thi
 
 The distinction between `token_invalid` and `gate_not_accepted` is the one that matters operationally: they present identically as a failed download but have entirely different fixes.
 
-### Pin verification status
+### Frozen backbone revision
 
-`repo_id` in the backbone pin is recorded as `repo_id_verified: false` and `revision` as `null`. Neither has been confirmed against Hugging Face, because the environment in which the pin was authored could not reach the host. The pin deliberately does not assert them as verified, and `identity/test_dinov3_access.py` enforces that an unverified `repo_id` cannot carry a claimed revision.
+The backbone is frozen to a commit, not a branch:
 
-The first successful preflight prints the resolved commit SHA. Freezing the backbone means copying that SHA into `revision`, setting both verification flags to `true`, and committing the result — after which the pin, not `main`, is what CI probes. Until that happens the backbone is pinned by name only, which is weaker than the provenance discipline the rest of ID1.0 applies.
+| Field | Value |
+| --- | --- |
+| `repo_id` | `facebook/dinov3-vits16-pretrain-lvd1689m` |
+| `revision` | `114c1379950215c8b35dfcd4e90a5c251dde0d32` |
+
+Both were confirmed by a live preflight rather than assumed: the entitlement probe returned success for the token's account, which simultaneously establishes that the repo id resolves, that the model conditions have been accepted, and that the `HF_TOKEN` secret is present and valid. `identity/test_dinov3_access.py` enforces that a pin claiming `revision_verified` carries a 40-character commit SHA, so the backbone cannot silently revert to a floating branch name.
+
+Because the pin names a commit, the preflight probes that commit rather than `main`. If the upstream branch head later moves away from the pinned revision, the report carries `upstream_head_moved: true`. That is deliberately **not** a failure — the pinned revision is exactly what keeps a run reproducible — but the divergence is provenance-relevant and should be visible when deciding whether to re-baseline.
+
+Re-pinning is therefore an explicit act: change `revision`, re-run the preflight, and treat any earlier ID1 result as belonging to the previous backbone.
 
 The frozen `identity/id1_experiment_spec.json` is intentionally left untouched by this: the backbone pin is a separate artifact so that recording it does not amount to editing a spec that was frozen before results.
 

@@ -52,11 +52,39 @@ class LoadPinTests(unittest.TestCase):
 
     def test_pin_does_not_claim_unverified_facts(self) -> None:
         pin = load_pin()
-        # The repo id and revision cannot be confirmed without reaching Hugging Face,
-        # so the pin must not assert them as verified until a preflight says so.
-        if not pin["repo_id_verified"]:
+        # An unverified repo id cannot carry a claimed revision; a verified one must
+        # carry a real commit SHA rather than a floating branch name.
+        if pin["repo_id_verified"]:
+            self.assertTrue(pin["revision_verified"])
+            self.assertRegex(pin["revision"], r"^[0-9a-f]{40}$")
+        else:
             self.assertIsNone(pin["revision"])
             self.assertFalse(pin["revision_verified"])
+
+    def test_repository_pin_is_frozen_to_a_commit(self) -> None:
+        # The backbone is part of the ID1.0 provenance surface: a floating revision
+        # would let identity descriptors change under an unchanged spec.
+        pin = load_pin()
+        self.assertTrue(pin["repo_id_verified"])
+        self.assertRegex(pin["revision"], r"^[0-9a-f]{40}$")
+        self.assertIn("workflow_run", pin["verified_by"])
+
+    def test_rejects_verified_pin_with_a_branch_name(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "pin.json"
+            path.write_text(
+                json.dumps(
+                    {
+                        "pin_version": "DINOV3-S-PIN-v0",
+                        "repo_id": "x/y",
+                        "revision": "main",
+                        "revision_verified": True,
+                    }
+                ),
+                "utf-8",
+            )
+            with self.assertRaises(DINOv3AccessError):
+                load_pin(path)
 
     def test_rejects_foreign_pin_version(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -109,6 +137,18 @@ class CheckAccessTests(unittest.TestCase):
         # and already proves the account may fetch the weights.
         report = self._check(entitlement=302)
         self.assertEqual(report["status"], STATUS_OK)
+
+    def test_upstream_head_drift_is_surfaced_without_failing(self) -> None:
+        # A frozen revision that no longer matches the branch head is still
+        # reproducible, but the divergence is provenance-relevant.
+        report = self._check(sha="0" * 40)
+        self.assertEqual(report["status"], STATUS_OK)
+        self.assertTrue(report["upstream_head_moved"])
+
+    def test_no_drift_flag_when_head_matches_the_pin(self) -> None:
+        report = self._check(sha=self.pin["revision"])
+        self.assertEqual(report["status"], STATUS_OK)
+        self.assertNotIn("upstream_head_moved", report)
 
     def test_missing_token_is_named_as_such(self) -> None:
         report = check_access(pin=self.pin, token=None, transport=fake_transport())

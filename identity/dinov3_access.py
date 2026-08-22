@@ -72,6 +72,12 @@ def load_pin(path: Path = PIN_PATH) -> dict[str, Any]:
         raise DINOv3AccessError("expected a DINOV3-S-PIN-v0 backbone pin")
     if not str(raw.get("repo_id", "")).strip():
         raise DINOv3AccessError("backbone pin is missing repo_id")
+    if raw.get("revision_verified"):
+        revision = str(raw.get("revision") or "")
+        if len(revision) != 40 or any(ch not in "0123456789abcdef" for ch in revision.lower()):
+            raise DINOv3AccessError(
+                "revision_verified pin must carry a 40-character commit SHA, not a branch name"
+            )
     return raw
 
 
@@ -166,6 +172,11 @@ def check_access(
                 context["resolved_sha"] = json.loads(info.body).get("sha")
             except (ValueError, AttributeError):
                 pass
+            head = context.get("resolved_sha")
+            pinned = str(pin.get("revision") or "")
+            if pin.get("revision_verified") and head and head != pinned:
+                # Not a failure: the pinned revision is what makes the run reproducible.
+                context["upstream_head_moved"] = True
         elif info.status != 403:
             return _result(STATUS_UNEXPECTED, http_status=info.status, probe="model_info", **context)
 
