@@ -75,7 +75,7 @@ jobs:
           set -euo pipefail
           run_id=""
           for attempt in $(seq 1 40); do
-            run_id="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs" \
+            run_id="$(gh api --method GET "repos/$GITHUB_REPOSITORY/actions/runs" \
               -f head_sha="$TARGET_SHA" -f event=push -f per_page=100 \
               --jq ".workflow_runs[] | select(.name == \"$TARGET_WORKFLOW_NAME\") | .id" \
               | head -n1 || true)"
@@ -93,7 +93,7 @@ jobs:
           set -euo pipefail
           run_id="${{ steps.target.outputs.run_id }}"
           for attempt in $(seq 1 360); do
-            payload="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id")"
+            payload="$(gh api --method GET "repos/$GITHUB_REPOSITORY/actions/runs/$run_id")"
             status="$(jq -r '.status' <<<"$payload")"
             conclusion="$(jq -r '.conclusion // ""' <<<"$payload")"
             echo "attempt=$attempt status=$status conclusion=$conclusion"
