@@ -1,0 +1,314 @@
+name: ID1 YouTube-VIS quantitative REMIND
+
+on:
+  push:
+    branches:
+      - "identity/id1-youtubevis-acquire"
+    paths:
+      - "identity/youtubevis_archive.py"
+      - "identity/test_youtubevis_archive.py"
+      - ".github/workflows/id1-youtubevis-quantitative.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quantitative:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      OPENXLAB_AK: ${{ secrets.OPENXLAB_AK }}
+      OPENXLAB_SK: ${{ secrets.OPENXLAB_SK }}
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      REMIND_COMMIT: f88ea1d5d81da0a8ed28b206df6d4dab48327342
+      DATASET_REPO: OpenDataLab/YouTubeVIS2019
+      DATASET_SOURCE_PATH: /raw/train.zip
+
+    steps:
+      - name: Check out benchmark repository
+        uses: actions/checkout@v6
+
+      - name: Preflight required private credentials
+        run: |
+          set -eu
+          missing=0
+          for name in OPENXLAB_AK OPENXLAB_SK HF_TOKEN; do
+            eval "value=\${$name:-}"
+            if [ -z "$value" ]; then
+              echo "missing GitHub Actions secret: $name"
+              missing=1
+            else
+              echo "$name present"
+            fi
+          done
+          test "$missing" -eq 0
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
+
+      - name: Install acquisition dependencies
+        run: |
+          python -m pip install --disable-pip-version-check --upgrade pip
+          python -m pip install --disable-pip-version-check openxlab numpy pillow pycocotools
+
+      - name: Download official YouTube-VIS 2019 train archive mirror
+        run: |
+          mkdir -p "$RUNNER_TEMP/ytvis-download"
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          import openxlab
+          from openxlab.dataset import download
+
+          openxlab.login(ak=os.environ["OPENXLAB_AK"], sk=os.environ["OPENXLAB_SK"])
+          target = Path(os.environ["RUNNER_TEMP"]) / "ytvis-download"
+          result = download(
+              dataset_repo=os.environ["DATASET_REPO"],
+              source_path=os.environ["DATASET_SOURCE_PATH"],
+              target_path=str(target),
+          )
+          print("download_result=", repr(result))
+          PY
+          df -h "$RUNNER_TEMP" "$GITHUB_WORKSPACE"
+          find "$RUNNER_TEMP/ytvis-download" -maxdepth 6 -type f -printf '%p\t%s bytes\n' | sort
+
+      - name: Resolve exactly one train.zip and record source hash
+        id: archive
+        run: |
+          mapfile -t archives < <(find "$RUNNER_TEMP/ytvis-download" -type f -name 'train.zip' -print)
+          if [ "${#archives[@]}" -ne 1 ]; then
+            printf 'expected exactly one train.zip, found %s\n' "${#archives[@]}"
+            printf '%s\n' "${archives[@]}"
+            exit 1
+          fi
+          archive="${archives[0]}"
+          echo "path=$archive" >> "$GITHUB_OUTPUT"
+          echo "sha256=$(sha256sum "$archive" | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+          ls -lh "$archive"
+          unzip -l "$archive" | sed -n '1,30p'
+
+      - name: Freeze candidate selection and selectively materialize only it
+        run: |
+          python -m identity.youtubevis_archive \
+            --archive "${{ steps.archive.outputs.path }}" \
+            --output-root "$GITHUB_WORKSPACE/ytvis-selected" \
+            --category-name cat \
+            --min-instances 2 \
+            --source-uri "opendatalab://OpenDataLab/YouTubeVIS2019/raw/train.zip" \
+            | tee "$GITHUB_WORKSPACE/ytvis-materialize.log"
+          python -m json.tool "$GITHUB_WORKSPACE/ytvis-selected/selection.json"
+          python -m json.tool "$GITHUB_WORKSPACE/ytvis-selected/davis/manifest.json" >/dev/null
+
+      - name: Record deterministic sequence and ground-truth package hashes before scoring
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          root = Path("ytvis-selected/davis")
+          manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+          seq = {
+              "schema_version": "ID1-sequence-manifest-v0",
+              "video_id": manifest["video_id"],
+              "frames": [
+                  {
+                      "index": row["index"],
+                      "canonical_name": row["canonical_name"],
+                      "canonical_sha256": row["canonical_sha256"],
+                  }
+                  for row in manifest["frames"]
+              ],
+          }
+          gt = {
+              "schema_version": "ID1-ground-truth-manifest-v0",
+              "video_id": manifest["video_id"],
+              "stable_id_by_source_annotation_id": manifest["stable_id_by_source_annotation_id"],
+              "masks": [
+                  {
+                      "index": row["index"],
+                      "mask_name": row["mask_name"],
+                      "mask_sha256": row["mask_sha256"],
+                      "visible_stable_ids": row["visible_stable_ids"],
+                  }
+                  for row in manifest["masks"]
+              ],
+          }
+          for name, payload in (("sequence_manifest.json", seq), ("ground_truth_manifest.json", gt)):
+              path = Path("ytvis-selected") / name
+              text = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+              path.write_text(text, encoding="utf-8")
+              print(name, hashlib.sha256(text.encode("utf-8")).hexdigest())
+          PY
+
+      - name: Free train archive before model installation
+        run: |
+          rm -f "${{ steps.archive.outputs.path }}"
+          rm -rf "$RUNNER_TEMP/ytvis-download"
+          df -h "$RUNNER_TEMP" "$GITHUB_WORKSPACE"
+
+      - name: Install pinned REMIND runtime dependencies
+        run: |
+          python -m pip install --disable-pip-version-check \
+            torch torchvision --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --disable-pip-version-check \
+            transformers scikit-learn scipy opencv-python tqdm psutil ultralytics pandas
+
+      - name: Fetch exact REMIND revision
+        run: |
+          git clone https://github.com/cvar-vision-dl/remind-reid-tracker.git remind-src
+          git -C remind-src checkout --detach "$REMIND_COMMIT"
+          test "$(git -C remind-src rev-parse HEAD)" = "$REMIND_COMMIT"
+          git -C remind-src status --short
+
+      - name: Build one-scene custom DAVIS batch definition
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path.cwd()
+          manifest = json.loads((root / "ytvis-selected/davis/manifest.json").read_text(encoding="utf-8"))
+          scene_id = f"youtubevis-{int(manifest['video_id'])}"
+          scene = [{
+              "scene_id": scene_id,
+              "frames_dir": str((root / "ytvis-selected/davis/frames").resolve()),
+              "davis_meta_path": str((root / "ytvis-selected/davis/meta.json").resolve()),
+              "davis_annotations_dir": str((root / "ytvis-selected/davis/annotations").resolve()),
+          }]
+          (root / "ytvis-selected/scenes.json").write_text(
+              json.dumps(scene, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print(json.dumps(scene, indent=2))
+          PY
+
+      - name: Run frozen REMIND batch evaluator using source masks as DAVIS detections
+        id: remind
+        run: |
+          set -o pipefail
+          python remind-src/testing/run_tracking_batch.py \
+            --scenes-def-file "$GITHUB_WORKSPACE/ytvis-selected/scenes.json" \
+            --output-dir "$GITHUB_WORKSPACE/remind-eval" \
+            --batch-size 1 \
+            --max-scenes 1 \
+            --detector-backend davis \
+            2>&1 | tee "$GITHUB_WORKSPACE/remind-eval.log"
+          test -f "$GITHUB_WORKSPACE/remind-eval/testing_batch/summary_global.csv"
+          test -f "$GITHUB_WORKSPACE/remind-eval/testing_batch/per_case.csv"
+          cat "$GITHUB_WORKSPACE/remind-eval/testing_batch/summary_global.csv"
+
+      - name: Build frozen ID1 quantitative run manifest
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          work = Path("ytvis-selected")
+          selection = json.loads((work / "selection.json").read_text(encoding="utf-8"))
+          davis = json.loads((work / "davis/manifest.json").read_text(encoding="utf-8"))
+          stats = selection["selected"]
+
+          def file_sha(path):
+              return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+          strata = []
+          if int(stats.get("co_visible_frames", 0)) > 0:
+              strata.append("ordinary_continuity")
+          gap = int(stats.get("max_internal_gap_frames", 0))
+          if 1 <= gap <= 2:
+              strata.append("short_occlusion")
+          if gap >= 3:
+              strata.append("long_gap_reentry")
+          if int(stats.get("bbox_overlap_frames", 0)) > 0:
+              strata.append("crossing_close_interaction")
+          if not strata:
+              strata.append("ordinary_continuity")
+
+          stable_ids = sorted(int(v) for v in davis["stable_id_by_source_annotation_id"].values())
+          video_id = int(davis["video_id"])
+          run_manifest = {
+              "run_id": f"id1-ytvis-{video_id}-remind-v0",
+              "system_id": "remind_unmodified",
+              "upstream_commit": "f88ea1d5d81da0a8ed28b206df6d4dab48327342",
+              "sequence_id": f"youtubevis-{video_id}",
+              "sequence_sha256": file_sha(work / "sequence_manifest.json"),
+              "ground_truth_sha256": file_sha(work / "ground_truth_manifest.json"),
+              "subject_ids": [f"ytvis-{video_id}-cat-{sid:03d}" for sid in stable_ids],
+              "stress_strata": strata,
+              "quantitative": True,
+              "persistent_subject_ground_truth": True,
+              "evaluation_detection_source": "source_instance_masks",
+              "selection_rule_version": stats["selection_rule_version"],
+          }
+          (work / "id1-run-manifest.json").write_text(
+              json.dumps(run_manifest, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print(json.dumps(run_manifest, indent=2, sort_keys=True))
+          PY
+
+      - name: Validate result through frozen ID1 adapter
+        run: |
+          python -m identity.remind_adapter \
+            --summary-global "$GITHUB_WORKSPACE/remind-eval/testing_batch/summary_global.csv" \
+            --manifest "$GITHUB_WORKSPACE/ytvis-selected/id1-run-manifest.json" \
+            --output "$GITHUB_WORKSPACE/ytvis-selected/id1-result.json" \
+            | tee "$GITHUB_WORKSPACE/id1-result.log"
+
+      - name: Record execution provenance
+        if: always()
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/evidence"
+          if [ -n "$OPENXLAB_AK" ]; then odl_ak=true; else odl_ak=false; fi
+          if [ -n "$OPENXLAB_SK" ]; then odl_sk=true; else odl_sk=false; fi
+          if [ -n "$HF_TOKEN" ]; then hf=true; else hf=false; fi
+          {
+            echo "schema_version=ID1.2-quantitative-run-v0"
+            echo "dataset_repo=$DATASET_REPO"
+            echo "dataset_source_path=$DATASET_SOURCE_PATH"
+            echo "download_archive_sha256=${{ steps.archive.outputs.sha256 }}"
+            echo "remind_commit=$REMIND_COMMIT"
+            echo "openxlab_ak_present=$odl_ak"
+            echo "openxlab_sk_present=$odl_sk"
+            echo "hf_token_present=$hf"
+            echo "python=$(python --version 2>&1)"
+            echo "runner_os=$RUNNER_OS"
+          } > "$GITHUB_WORKSPACE/evidence/provenance.txt"
+          python -m pip freeze > "$GITHUB_WORKSPACE/evidence/pip-freeze.txt"
+          git -C remind-src rev-parse HEAD > "$GITHUB_WORKSPACE/evidence/remind-head.txt" 2>/dev/null || true
+          git -C remind-src status --short > "$GITHUB_WORKSPACE/evidence/remind-git-status.txt" 2>/dev/null || true
+          df -h > "$GITHUB_WORKSPACE/evidence/disk-final.txt"
+
+      - name: Upload selection and quantitative evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: id1-youtubevis-quantitative
+          path: |
+            ytvis-selected/selection.json
+            ytvis-selected/sequence_manifest.json
+            ytvis-selected/ground_truth_manifest.json
+            ytvis-selected/davis/meta.json
+            ytvis-selected/davis/manifest.json
+            ytvis-selected/id1-run-manifest.json
+            ytvis-selected/id1-result.json
+            ytvis-materialize.log
+            remind-eval.log
+            id1-result.log
+            remind-eval/testing_batch/summary_global.csv
+            remind-eval/testing_batch/summary_current_batch.csv
+            remind-eval/testing_batch/per_scene.csv
+            remind-eval/testing_batch/per_object.csv
+            remind-eval/testing_batch/per_case.csv
+            remind-eval/testing_batch/per_frame.csv
+            remind-eval/testing_batch/per_pred_track.csv
+            remind-eval/testing_batch/per_event.csv
+            remind-eval/testing_batch/report.txt
+            evidence/
+          if-no-files-found: warn
+          retention-days: 30
