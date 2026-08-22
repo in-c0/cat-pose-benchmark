@@ -16,6 +16,7 @@ from identity.dinov3_access import (
     DINOv3AccessError,
     HttpResponse,
     check_access,
+    followup_note,
     load_pin,
     resolve_token,
 )
@@ -208,3 +209,28 @@ class CheckAccessTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class FollowupNoteTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.pin = load_pin()
+
+    def test_frozen_pin_at_head_says_nothing(self) -> None:
+        # The freeze instruction must not keep printing once the pin is already frozen.
+        report = {"ok": True, "resolved_sha": self.pin["revision"]}
+        self.assertIsNone(followup_note(report, self.pin))
+
+    def test_unfrozen_pin_is_told_how_to_freeze(self) -> None:
+        unfrozen = dict(self.pin, revision_verified=False)
+        note = followup_note({"ok": True, "resolved_sha": "a" * 40}, unfrozen)
+        self.assertIn("a" * 40, note)
+        self.assertIn("revision_verified", note)
+
+    def test_drift_is_reported_as_a_rebaselining_decision(self) -> None:
+        report = {"ok": True, "resolved_sha": "b" * 40, "upstream_head_moved": True}
+        note = followup_note(report, self.pin)
+        self.assertIn("b" * 40, note)
+        self.assertIn("re-baselining", note)
+
+    def test_no_note_without_a_resolved_sha(self) -> None:
+        self.assertIsNone(followup_note({"ok": True}, self.pin))

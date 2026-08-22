@@ -200,6 +200,25 @@ def check_access(
     )
 
 
+def followup_note(report: dict[str, Any], pin: dict[str, Any]) -> "str | None":
+    """Return the operator note for a successful preflight, or None if nothing to say."""
+    sha = report.get("resolved_sha")
+    if not sha:
+        return None
+    if not pin.get("revision_verified"):
+        return (
+            f'Backbone reachable. To freeze it, set "revision": "{sha}" and '
+            '"revision_verified": true in identity/dinov3_backbone_pin.json.'
+        )
+    if report.get("upstream_head_moved"):
+        return (
+            f"Backbone reachable at the pinned revision. Note that the upstream branch head "
+            f"has since moved to {sha}; the pin is deliberately unchanged, so ID1 results "
+            "remain comparable. Re-pinning is an explicit re-baselining decision."
+        )
+    return None
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description=(
@@ -216,7 +235,8 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    report = check_access(pin=load_pin(args.pin), token=resolve_token())
+    pin = load_pin(args.pin)
+    report = check_access(pin=pin, token=resolve_token())
     rendered = json.dumps(report, indent=2, sort_keys=True)
     print(rendered)
     if args.output:
@@ -224,12 +244,9 @@ def main() -> int:
         args.output.write_text(rendered + "\n", encoding="utf-8")
 
     if report["ok"]:
-        sha = report.get("resolved_sha")
-        if sha:
-            print(
-                f"\nBackbone reachable. To freeze it, set \"revision\": \"{sha}\" and "
-                '"revision_verified": true in identity/dinov3_backbone_pin.json.'
-            )
+        note = followup_note(report, pin)
+        if note:
+            print("\n" + note)
         return 0
     if report["status"] == STATUS_TOKEN_MISSING and args.allow_missing_token:
         print("\nNo token available; treating the backbone as not-yet-configured.")
