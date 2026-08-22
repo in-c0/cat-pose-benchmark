@@ -5,6 +5,7 @@ on:
     paths:
       - "identity/youtubevis_adapter.py"
       - "identity/test_youtubevis_adapter.py"
+      - "identity/test_youtubevis_selection_spec.py"
       - "identity/id1_youtubevis_selection_spec.json"
       - "docs/ID1-YOUTUBE-VIS-ADAPTER.md"
       - ".github/workflows/id1-youtubevis-tests.yml"
@@ -12,6 +13,7 @@ on:
     paths:
       - "identity/youtubevis_adapter.py"
       - "identity/test_youtubevis_adapter.py"
+      - "identity/test_youtubevis_selection_spec.py"
       - "identity/id1_youtubevis_selection_spec.json"
       - "docs/ID1-YOUTUBE-VIS-ADAPTER.md"
       - ".github/workflows/id1-youtubevis-tests.yml"
@@ -39,7 +41,7 @@ jobs:
         run: python -m pip install --disable-pip-version-check numpy pillow
 
       - name: Run adapter tests
-        run: python -m unittest -v identity.test_youtubevis_adapter
+        run: python -m unittest -v identity.test_youtubevis_adapter identity.test_youtubevis_selection_spec
 
       - name: Validate frozen selection spec
         run: python -m json.tool identity/id1_youtubevis_selection_spec.json >/dev/null
