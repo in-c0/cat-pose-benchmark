@@ -1,0 +1,22 @@
+{
+  "spec_version": "ID1.2-selection-v0",
+  "dataset": "YouTube-VIS-2019",
+  "category_name": "cat",
+  "minimum_persistent_instances": 2,
+  "selection_stage": "before_any_remind_scoring",
+  "rank_order": [
+    {"field": "cat_instance_count", "direction": "descending"},
+    {"field": "co_visible_frames", "direction": "descending"},
+    {"field": "max_internal_gap_frames", "direction": "descending"},
+    {"field": "bbox_overlap_frames", "direction": "descending"},
+    {"field": "visible_track_frames", "direction": "descending"},
+    {"field": "video_id", "direction": "ascending"}
+  ],
+  "stress_hints_are_selection_diagnostics_not_labels": true,
+  "selected_sequence_may_not_change_after_remind_scores_are_seen": true,
+  "claims_boundary": {
+    "selection_uses_model_scores": false,
+    "conversion_changes_source_instance_identity": false,
+    "youtube_vis_result_generalizes_to_household_longitudinal_identity": false
+  }
+}
