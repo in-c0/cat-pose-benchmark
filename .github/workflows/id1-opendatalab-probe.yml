@@ -1,0 +1,62 @@
+name: ID1 OpenDataLab access probe
+
+on:
+  push:
+    branches:
+      - "identity/id1-opendatalab-probe"
+    paths:
+      - ".github/workflows/id1-opendatalab-probe.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install OpenXLab SDK
+        run: python -m pip install --disable-pip-version-check openxlab
+
+      - name: Probe public dataset metadata without credentials
+        id: probe
+        continue-on-error: true
+        run: |
+          python - <<'PY' 2>&1 | tee opendatalab-probe.log
+          import json
+          import os
+          from openxlab.dataset import info, query
+
+          repo = "OpenDataLab/YouTubeVIS2019"
+          print("repo=", repo)
+          print("OPENXLAB_AK_present=", bool(os.getenv("OPENXLAB_AK")))
+          print("OPENXLAB_SK_present=", bool(os.getenv("OPENXLAB_SK")))
+          for name, fn in (("info", info), ("query", query)):
+              print(f"--- {name} ---")
+              try:
+                  result = fn(dataset_repo=repo)
+                  try:
+                      print(json.dumps(result, ensure_ascii=False, default=str, indent=2))
+                  except Exception:
+                      print(repr(result))
+              except Exception as exc:
+                  print(type(exc).__name__ + ": " + str(exc))
+          PY
+
+      - name: Upload probe evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: id1-opendatalab-probe
+          path: opendatalab-probe.log
+          if-no-files-found: error
+          retention-days: 7
