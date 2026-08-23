@@ -5,6 +5,7 @@ import tempfile
 import unittest
 import zipfile
 from pathlib import Path
+from unittest import mock
 
 import numpy as np
 from PIL import Image
@@ -112,6 +113,35 @@ class YouTubeVISArchiveTests(unittest.TestCase):
             self.assertTrue(
                 (self.root / "out" / "davis" / "annotations" / f"frame_{i:06d}.png").is_file()
             )
+
+    def test_youtube_vos_layout_dispatches_to_verified_adapter(self):
+        archive = self.root / "train.zip"
+        with zipfile.ZipFile(archive, "w") as zf:
+            zf.writestr("train/meta.json", json.dumps({"videos": {}}))
+
+        expected = {
+            "selection": {"dataset": "YouTube-VOS-2019"},
+            "davis_manifest": {"video_id": "fixture"},
+        }
+        with mock.patch.object(
+            ya,
+            "materialize_youtubevos_selected_sequence",
+            return_value=expected,
+        ) as delegated:
+            result = ya.materialize_selected_sequence(
+                archive_path=archive,
+                output_root=self.root / "out-vos",
+                source_uri="fixture://youtube-vos-train.zip",
+            )
+
+        self.assertEqual(result, expected)
+        delegated.assert_called_once_with(
+            archive_path=archive.resolve(),
+            output_root=(self.root / "out-vos").resolve(),
+            category_name="cat",
+            min_instances=2,
+            source_uri="fixture://youtube-vos-train.zip",
+        )
 
     def test_duplicate_archive_member_suffix_fails_closed(self):
         archive = self._build_archive(duplicate_frame=True)
