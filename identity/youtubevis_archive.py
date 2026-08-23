@@ -14,6 +14,11 @@ from identity.youtubevis_adapter import (
     resolve_category_id,
     sha256_file,
 )
+from identity.youtubevos_archive import (
+    YouTubeVOSArchiveError,
+    locate_meta_member,
+    materialize_selected_sequence as materialize_youtubevos_selected_sequence,
+)
 
 
 class YouTubeVISArchiveError(YouTubeVISAdapterError):
@@ -115,7 +120,25 @@ def materialize_selected_sequence(
     output_root.mkdir(parents=True, exist_ok=True)
 
     with zipfile.ZipFile(archive_path, "r", allowZip64=True) as zf:
-        annotations_member = locate_annotations_member(zf)
+        try:
+            annotations_member = locate_annotations_member(zf)
+        except YouTubeVISArchiveError as vis_error:
+            # The OpenDataLab repository currently named YouTubeVIS2019 serves a
+            # YouTube-VOS-style archive (meta.json + indexed PNG masks). Preserve
+            # the frozen selector and scoring protocol, but dispatch to the
+            # already-tested adapter for the format actually present on disk.
+            try:
+                locate_meta_member(zf)
+            except YouTubeVOSArchiveError:
+                raise vis_error
+            return materialize_youtubevos_selected_sequence(
+                archive_path=archive_path,
+                output_root=output_root,
+                category_name=category_name,
+                min_instances=min_instances,
+                source_uri=source_uri,
+            )
+
         data = read_annotations_from_archive(zf, annotations_member)
         category_id = resolve_category_id(data, category_name)
         candidates = inspect_candidates(
