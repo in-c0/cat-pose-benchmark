@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 180
     env:
-      TARGET_SHA: dd53df099d48838619aaf28733beec13230139f9
+      TARGET_SHA: 34fa1cf3c15a7f58eca7d411d096f6e8869c5ea5
       TARGET_WORKFLOW_NAME: ID1 YouTube-VIS quantitative REMIND
       GH_TOKEN: ${{ github.token }}
     steps:
