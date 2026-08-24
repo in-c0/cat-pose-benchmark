@@ -1,0 +1,195 @@
+name: ID1 YouTube-VIS run monitor
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "identity/youtubevis_archive.py"
+      - "identity/test_youtubevis_archive.py"
+      - "identity/youtubevos_archive.py"
+      - "identity/test_youtubevos_archive.py"
+      - "identity/remind_adapter.py"
+      - "identity/test_remind_adapter.py"
+      - ".github/workflows/id1-youtubevis-quantitative.yml"
+      - ".github/workflows/id1-youtubevis-run-monitor.yml"
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      TARGET_SHA: ${{ github.event.pull_request.head.sha }}
+      TARGET_WORKFLOW_NAME: ID1 YouTube-VIS quantitative REMIND
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Resolve latest still-valid quantitative run
+        id: target
+        run: |
+          set -euo pipefail
+
+          # Prefer an exact-head push run when the latest commit touched a
+          # quantitative input and therefore triggered the expensive workflow.
+          exact="$(gh api --method GET "repos/$GITHUB_REPOSITORY/actions/runs" \
+            -f head_sha="$TARGET_SHA" \
+            -f event=push \
+            -f per_page=100 \
+            --jq ".workflow_runs[] | select(.name == \"$TARGET_WORKFLOW_NAME\") | .id" \
+            | head -n1 || true)"
+          if [ -n "$exact" ]; then
+            echo "run_id=$exact" >> "$GITHUB_OUTPUT"
+            echo "Resolved exact-head quantitative run: $exact"
+            exit 0
+          fi
+
+          # A PR-only monitor fix (or other non-quantitative edit) does not
+          # trigger id1-youtubevis-quantitative.yml. Reuse the newest push run
+          # on this branch only when GitHub proves that every file changed
+          # since that run is outside the quantitative workflow's trigger set.
+          trigger_re='^(identity/(youtubevis_archive|test_youtubevis_archive|youtubevos_archive|test_youtubevos_archive|remind_adapter|test_remind_adapter)\.py|\.github/workflows/id1-youtubevis-quantitative\.yml)$'
+          candidates="$(gh api --method GET "repos/$GITHUB_REPOSITORY/actions/runs" \
+            -f branch="${{ github.event.pull_request.head.ref }}" \
+            -f event=push \
+            -f per_page=100 \
+            --jq ".workflow_runs[] | select(.name == \"$TARGET_WORKFLOW_NAME\") | [.id,.head_sha] | @tsv")"
+
+          while IFS=$'\t' read -r run_id run_sha; do
+            [ -n "$run_id" ] || continue
+            compare="$(gh api "repos/$GITHUB_REPOSITORY/compare/$run_sha...$TARGET_SHA" 2>/dev/null || true)"
+            [ -n "$compare" ] || continue
+            status="$(jq -r '.status // ""' <<<"$compare")"
+            if [ "$status" != "ahead" ] && [ "$status" != "identical" ]; then
+              continue
+            fi
+            if jq -r '.files[]?.filename' <<<"$compare" | grep -Eq "$trigger_re"; then
+              echo "Run $run_id is stale: quantitative inputs changed after $run_sha"
+              continue
+            fi
+            echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+            echo "Resolved still-valid quantitative run: $run_id ($run_sha)"
+            exit 0
+          done <<<"$candidates"
+
+          echo "Could not resolve a quantitative run valid for $TARGET_SHA" >&2
+          exit 1
+
+      - name: Follow quantitative run to completion
+        id: follow
+        run: |
+          set -euo pipefail
+          run_id="${{ steps.target.outputs.run_id }}"
+          for attempt in $(seq 1 360); do
+            payload="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id")"
+            status="$(jq -r '.status' <<<"$payload")"
+            conclusion="$(jq -r '.conclusion // ""' <<<"$payload")"
+            echo "attempt=$attempt status=$status conclusion=$conclusion"
+            if [ "$status" = "completed" ]; then
+              echo "conclusion=$conclusion" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            sleep 30
+          done
+          echo "monitor timeout before target run completed" >&2
+          exit 1
+
+      - name: Download quantitative evidence on success
+        if: steps.follow.outputs.conclusion == 'success'
+        run: |
+          mkdir -p monitor-artifact
+          gh run download "${{ steps.target.outputs.run_id }}" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name id1-youtubevis-quantitative \
+            --dir monitor-artifact
+          find monitor-artifact -maxdepth 5 -type f -printf '%P\t%s bytes\n' | sort
+
+      - name: Build success summary
+        if: steps.follow.outputs.conclusion == 'success'
+        run: |
+          python - <<'PY'
+          import csv
+          import json
+          from pathlib import Path
+
+          root = Path("monitor-artifact")
+          def one(name):
+              found = list(root.rglob(name))
+              if len(found) != 1:
+                  raise SystemExit(f"expected one {name}, found {len(found)}")
+              return found[0]
+
+          result = json.loads(one("id1-result.json").read_text(encoding="utf-8"))
+          selection = json.loads(one("selection.json").read_text(encoding="utf-8"))
+          summary_path = one("summary_global.csv")
+          with summary_path.open("r", encoding="utf-8-sig", newline="") as handle:
+              rows = list(csv.DictReader(handle))
+          summary = rows[0]
+          selected = selection["selected"]
+          metrics = result["metrics"]
+
+          lines = [
+              "## ID1.2 quantitative REMIND run completed",
+              "",
+              f"Actions run: `{result['run_id']}` / workflow run `${{ steps.target.outputs.run_id }}`",
+              f"Selected YouTube-VIS video: `{selected['video_id']}`",
+              f"Cat instances: **{selected['cat_instance_count']}**",
+              f"Co-visible frames: **{selected['co_visible_frames']}**",
+              f"Maximum internal gap: **{selected['max_internal_gap_frames']} frames**",
+              f"BBox-overlap frames: **{selected['bbox_overlap_frames']}**",
+              "",
+              "### Frozen ID1 metrics",
+              "",
+              f"- IDF1: **{metrics.get('idf1')}**",
+              f"- ID switches: **{metrics.get('idsw')}**",
+              f"- Fragmentations: **{metrics.get('frag')}**",
+              f"- Tracking recall: **{metrics.get('tracking_recall')}**",
+              f"- Reopen rate (existing): **{metrics.get('reopen_rate_existing')}**",
+              f"- Recovered-reference objects: **{metrics.get('objects_recovered_reference')}**",
+              f"- Firm coverage: **{metrics.get('coverage_firm')}**",
+              f"- Firm accuracy: **{metrics.get('firm_accuracy')}**",
+              f"- Uncertain rate: **{metrics.get('uncertain_rate')}**",
+              f"- Total runtime: **{metrics.get('total_runtime_seconds')} s**",
+              f"- Average loop: **{metrics.get('avg_loop_ms')} ms**",
+              "",
+              "This is a source-mask identity-association/ReID benchmark, not end-to-end detector accuracy and not an intent/translation/health claim.",
+          ]
+          Path("monitor-summary.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+          print(Path("monitor-summary.md").read_text(encoding="utf-8"))
+          PY
+
+      - name: Build failure summary
+        if: steps.follow.outputs.conclusion != 'success'
+        run: |
+          run_id="${{ steps.target.outputs.run_id }}"
+          {
+            echo "## ID1.2 quantitative REMIND run failed"
+            echo
+            echo "Workflow run: \`$run_id\`"
+            echo "Conclusion: \`${{ steps.follow.outputs.conclusion }}\`"
+            echo
+            echo '```text'
+            gh run view "$run_id" --repo "$GITHUB_REPOSITORY" --log-failed 2>&1 | tail -n 160 || true
+            echo '```'
+          } > monitor-summary.md
+          cat monitor-summary.md
+
+      - name: Comment result on PR
+        if: always()
+        run: |
+          if [ -f monitor-summary.md ]; then
+            gh pr comment "${{ github.event.pull_request.number }}" \
+              --repo "$GITHUB_REPOSITORY" \
+              --body-file monitor-summary.md
+          fi
+
+      - name: Fail monitor if quantitative run failed
+        if: steps.follow.outputs.conclusion != 'success'
+        run: exit 1

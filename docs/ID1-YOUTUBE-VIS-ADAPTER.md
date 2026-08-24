@@ -1,108 +1,107 @@
-# ID1.2 — YouTube-VIS feline → REMIND DAVIS adapter
+# ID1.2 — feline source-mask → REMIND DAVIS bridge
 
-**Status:** software bridge frozen before REMIND scores  
+**Status:** source-format correction frozen before any REMIND score  
 **Parent:** #72  
 **Baseline:** REMIND `f88ea1d5d81da0a8ed28b206df6d4dab48327342`
 
 ## Purpose
 
-The ID1.1 Tomcats smoke established that pinned REMIND executes coherently on feline video, but the generic YOLO proposal layer missed many visible cats. ID1.2 separates **identity association** from **detector recall** by using independent video-instance masks and persistent IDs as the REMIND DAVIS detector/ground-truth input.
+The ID1.1 Tomcats smoke established that pinned REMIND executes coherently on feline video, but generic YOLO proposal recall was weak. ID1.2 therefore evaluates **identity association / re-identification** with independent persistent instance masks supplied through REMIND's DAVIS backend.
 
-YouTube-VIS is used as the first bridge because its annotation model already represents per-video instances across frames. This adapter does not assign new semantic identity: stable DAVIS IDs are a deterministic renumbering of source annotation IDs.
+## Source correction before scoring
+
+The experiment was initially preregistered against YouTube-VIS 2019 because the OpenDataLab repository is named `OpenDataLab/YouTubeVIS2019`.
+
+The first authenticated acquisition completed with archive SHA-256:
+
+`87ac10b9ea9635b95c77db7657be0a0c8e3612b68db05af27b7331fa6d6e6202`
+
+Before any REMIND scoring, the downloaded archive was observed to contain:
+
+```text
+train/meta.json
+train/JPEGImages/<video>/<frame>.jpg
+train/Annotations/<video>/<frame>.png
+```
+
+That is the YouTube-VOS 2019 indexed-mask annotation model: `meta.json` stores persistent object IDs, categories and frame lists; those object IDs are the pixel values in the indexed PNG annotations. The failed first materialisation stopped before REMIND dependencies, evaluation or metric generation.
+
+Accordingly the executed benchmark source is now recorded as **YouTube-VOS 2019**. This is a source-identification correction, not a result-driven dataset substitution. The original ranking order and minimum-two-cat requirement are unchanged; the historical selection-rule identifier remains `ID1-YTVIS-select-v0` to make that continuity explicit.
 
 ## Frozen candidate selection
 
-`identity/id1_youtubevis_selection_spec.json` is frozen before any REMIND result is inspected.
+`identity/id1_youtubevis_selection_spec.json` records both the original preregistration and the pre-score source correction.
 
-Eligible videos must contain at least two persistent `cat` annotations. The category is resolved by **name**, not a hard-coded numeric category ID.
-
-Candidates are ranked deterministically by:
+Eligible videos must contain at least two persistent objects whose source category is exactly `cat` (case-insensitive). Candidates are ranked deterministically by:
 
 1. more cat instances;
-2. more co-visible frames;
-3. larger internal disappearance/re-entry gap;
-4. more frames with overlapping annotation bounding boxes;
-5. more total visible track-frames;
-6. lower source `video_id` as the final tie-break.
+2. more co-visible annotated frames;
+3. larger internal disappearance/re-entry gap measured on the ordered annotated-frame timeline;
+4. more frames whose source-mask-derived cat bounding boxes overlap;
+5. more total visible cat track-frames;
+6. lexicographically lower source video ID as the final tie-break.
 
-These are data-only selection criteria. They do not use REMIND output or performance.
+The indexed-mask adapter also verifies that every metadata-declared cat appearance exists in the corresponding source PNG. Inconsistent candidates are rejected before ranking and recorded in selection provenance.
 
-## Commands
+## Actual archive adapter
 
-Inspect candidates without scoring:
+`identity.youtubevos_archive` operates directly on the authenticated `train.zip` without fully extracting it. It:
 
-```bash
-python -m identity.youtubevis_adapter inspect \
-  --annotations /path/to/train.json \
-  --category-name cat \
-  --min-instances 2 \
-  --output /tmp/id1-youtubevis-candidates.json
-```
-
-Convert the frozen top-ranked candidate (or an explicitly preselected eligible video):
-
-```bash
-python -m identity.youtubevis_adapter convert \
-  --annotations /path/to/train.json \
-  --frames-root /path/to/train/JPEGImages \
-  --output-dir /tmp/id1-youtubevis-davis \
-  --source-uri '<dataset provenance URI>'
-```
+- locates and hashes the single `meta.json`;
+- resolves `cat` by category name;
+- inspects only videos with at least two cat objects;
+- computes the unchanged frozen ranking from source metadata/masks;
+- selects rank 1 before REMIND scoring;
+- extracts only the selected source frames;
+- filters/remaps only the selected cats into stable DAVIS `uint8` IDs `1..N`;
+- writes provenance-bound `meta.json`, `manifest.json`, frame hashes and mask hashes.
 
 Output layout:
 
 ```text
-id1-youtubevis-davis/
-  frames/
-    frame_000000.jpg
-    ...
-  annotations/
-    frame_000000.png
-    ...
-  meta.json
-  manifest.json
+ytvos-selected/
+  selection.json
+  source_meta.json
+  davis/
+    frames/
+      frame_000000.jpg
+      ...
+    annotations/
+      frame_000000.png
+      ...
+    meta.json
+    manifest.json
 ```
 
-The PNG annotation uses background `0` and stable `uint8` foreground IDs `1..N`. `meta.json` includes `frame_names` plus labels such as `cat_1`, `cat_2`, matching the pinned REMIND DAVIS loader contract.
+The source object identity is not inferred or repaired. Stable DAVIS IDs are a deterministic renumbering of the source indexed-PNG object IDs.
 
 ## Integrity gates
 
-The converter fails closed on:
+The actual-source converter fails closed on:
 
-- missing or duplicate source IDs;
-- category mismatch;
-- malformed video/frame metadata;
-- segmentation or bounding-box arrays with the wrong temporal length;
-- missing or path-traversing frame paths;
-- source frame dimensions that disagree with annotations;
-- malformed compressed/uncompressed COCO RLE;
-- more than 255 foreground instances for an 8-bit DAVIS mask;
-- overlapping source instance masks that would require modifying ground truth;
+- unsafe or duplicate ZIP member paths;
+- malformed `meta.json` / object maps;
+- non-integer or out-of-range indexed object IDs;
+- duplicate/unsafe frame IDs;
+- missing source image or mask members;
+- metadata-declared object appearances absent from source masks;
+- source-mask object appearances absent from metadata;
+- mask/image dimension mismatch;
+- changing frame dimensions within a sequence;
 - non-empty output directories.
 
-COCO compressed RLE is decoded using the same signed delta/run logic as the reference COCO mask API. Polygon annotations require `pycocotools` so rasterisation stays COCO-compatible rather than using an approximate custom polygon fill.
+The earlier `identity.youtubevis_adapter` and its COCO-RLE tests remain in the repository as the originally preregistered VIS-format bridge; they are no longer the acquisition path for this verified archive.
 
-## Provenance
+## Quantitative execution
 
-`manifest.json` binds:
+The credentialed workflow downloads the exact archive, verifies the frozen archive SHA, runs `identity.youtubevos_archive`, and hashes the selected sequence/ground-truth manifests **before scoring**. It then deletes the multi-gigabyte archive, installs the pinned REMIND runtime, runs REMIND's custom DAVIS batch evaluator with source masks as detections, and passes upstream `summary_global.csv` through `identity.remind_adapter` unchanged.
 
-- exact source annotation SHA-256;
-- source video/category identity;
-- deterministic stable-ID mapping;
-- source and copied frame hashes;
-- generated mask hashes;
-- generated meta hash;
-- candidate statistics frozen before scoring;
-- explicit `remind_scoring_performed=false` at conversion time.
-
-## Quantitative run
-
-Once official YouTube-VIS media + annotation files are present, the selected converted sequence can be evaluated through the pinned upstream DAVIS evaluator. The resulting `summary_global.csv` must then pass the already-merged `identity.remind_adapter` under the unchanged ID1.0 metric contract.
+This isolates identity association from detector recall. With exact source masks supplied as detections, geometric detection quality is not an independent result.
 
 Do not change the selected source video after seeing REMIND scores.
 
 ## Claims boundary
 
-A successful YouTube-VIS run can establish performance on the selected annotated feline video instance sequence. It does not establish longitudinal household identity, same-breed/look-alike robustness in the target home domain, or any intent/affect/translation/health claim.
+A successful run can establish REMIND identity-association performance on the selected annotated YouTube-VOS feline sequence under source masks. It does not establish end-to-end cat detection, longitudinal household identity, same-breed/look-alike robustness in the target home domain, intent, affect, translation, health or welfare inference.
 
-A later feline-specific expansion should use Cat Royale or another independently annotated multi-cat longitudinal dataset when its source files are accessible under suitable terms.
+A later feline-specific expansion should use Cat Royale or another independently annotated multi-cat longitudinal dataset when its files are accessible under suitable terms.

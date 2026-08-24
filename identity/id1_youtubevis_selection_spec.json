@@ -1,6 +1,11 @@
 {
   "spec_version": "ID1-YTVIS-select-v0",
-  "dataset": "YouTube-VIS-2019",
+  "dataset_originally_preregistered": "YouTube-VIS-2019",
+  "dataset_executed": "YouTube-VOS-2019",
+  "source_repository_label": "OpenDataLab/YouTubeVIS2019",
+  "source_format_verified_before_scoring": "meta.json + indexed-PNG YouTube-VOS annotation layout",
+  "source_correction_reason": "The authenticated train.zip contains train/meta.json plus train/Annotations/<video>/<frame>.png with persistent object IDs as pixel values, rather than the train.json COCO-style YouTube-VIS layout assumed before acquisition. This was observed before any REMIND score was produced.",
+  "ranking_changed_after_source_correction": false,
   "category_name": "cat",
   "minimum_persistent_instances": 2,
   "selection_stage": "before_any_remind_scoring",
@@ -17,6 +22,6 @@
   "claims_boundary": {
     "selection_uses_model_scores": false,
     "conversion_changes_source_instance_identity": false,
-    "youtube_vis_result_generalizes_to_household_longitudinal_identity": false
+    "youtube_vos_result_generalizes_to_household_longitudinal_identity": false
   }
 }

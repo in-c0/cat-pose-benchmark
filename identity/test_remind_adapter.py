@@ -36,7 +36,7 @@ class RemindAdapterTests(unittest.TestCase):
         path.write_text(json.dumps(manifest), encoding="utf-8")
         return path
 
-    def _write_summary(self, *, omit=()):
+    def _write_summary(self, *, omit=(), overrides=None):
         values = {
             "idf1": "0.81",
             "idsw": "2",
@@ -52,6 +52,8 @@ class RemindAdapterTests(unittest.TestCase):
         }
         for key in omit:
             values.pop(key, None)
+        if overrides:
+            values.update(overrides)
         path = self.root / "summary_global.csv"
         with path.open("w", encoding="utf-8", newline="") as handle:
             writer = csv.DictWriter(handle, fieldnames=list(values))
@@ -70,6 +72,34 @@ class RemindAdapterTests(unittest.TestCase):
         self.assertTrue(packet["claims"]["identity_evaluation_performed"])
         self.assertFalse(packet["claims"]["intent_inference_performed"])
         self.assertFalse(packet["claims"]["translation_claim_performed"])
+
+    def test_current_remind_recovery_metric_alias_is_canonicalized(self):
+        packet = build_result_packet(
+            summary_global=self._write_summary(
+                omit=("objects_recovered_reference",),
+                overrides={"recovery_success_reference_total": "4"},
+            ),
+            manifest_path=self._write_manifest(),
+        )
+        self.assertEqual(packet["metrics"]["objects_recovered_reference"], 4)
+
+    def test_matching_recovery_metric_aliases_are_accepted(self):
+        packet = build_result_packet(
+            summary_global=self._write_summary(
+                overrides={"recovery_success_reference_total": "4"},
+            ),
+            manifest_path=self._write_manifest(),
+        )
+        self.assertEqual(packet["metrics"]["objects_recovered_reference"], 4)
+
+    def test_conflicting_recovery_metric_aliases_fail_closed(self):
+        with self.assertRaisesRegex(ID1ValidationError, "conflicting values"):
+            build_result_packet(
+                summary_global=self._write_summary(
+                    overrides={"recovery_success_reference_total": "5"},
+                ),
+                manifest_path=self._write_manifest(),
+            )
 
     def test_wrong_upstream_commit_fails_closed(self):
         with self.assertRaisesRegex(ID1ValidationError, "upstream commit mismatch"):
