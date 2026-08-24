@@ -83,6 +83,15 @@ class RemindAdapterTests(unittest.TestCase):
         )
         self.assertEqual(packet["metrics"]["objects_recovered_reference"], 4)
 
+    def test_matching_recovery_metric_aliases_are_accepted(self):
+        packet = build_result_packet(
+            summary_global=self._write_summary(
+                overrides={"recovery_success_reference_total": "4"},
+            ),
+            manifest_path=self._write_manifest(),
+        )
+        self.assertEqual(packet["metrics"]["objects_recovered_reference"], 4)
+
     def test_conflicting_recovery_metric_aliases_fail_closed(self):
         with self.assertRaisesRegex(ID1ValidationError, "conflicting values"):
             build_result_packet(
