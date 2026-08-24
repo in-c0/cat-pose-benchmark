@@ -7,6 +7,10 @@ on:
     paths:
       - "identity/youtubevis_archive.py"
       - "identity/test_youtubevis_archive.py"
+      - "identity/youtubevos_archive.py"
+      - "identity/test_youtubevos_archive.py"
+      - "identity/remind_adapter.py"
+      - "identity/test_remind_adapter.py"
       - ".github/workflows/id1-youtubevis-quantitative.yml"
   workflow_dispatch:
 
@@ -92,6 +96,7 @@ jobs:
 
       - name: Freeze candidate selection and selectively materialize only it
         run: |
+          set -o pipefail
           python -m identity.youtubevis_archive \
             --archive "${{ steps.archive.outputs.path }}" \
             --output-root "$GITHUB_WORKSPACE/ytvis-selected" \
@@ -254,11 +259,13 @@ jobs:
 
       - name: Validate result through frozen ID1 adapter
         run: |
+          set -o pipefail
           python -m identity.remind_adapter \
             --summary-global "$GITHUB_WORKSPACE/remind-eval/testing_batch/summary_global.csv" \
             --manifest "$GITHUB_WORKSPACE/ytvis-selected/id1-run-manifest.json" \
             --output "$GITHUB_WORKSPACE/ytvis-selected/id1-result.json" \
             | tee "$GITHUB_WORKSPACE/id1-result.log"
+          test -s "$GITHUB_WORKSPACE/ytvis-selected/id1-result.json"
 
       - name: Record execution provenance
         if: always()
