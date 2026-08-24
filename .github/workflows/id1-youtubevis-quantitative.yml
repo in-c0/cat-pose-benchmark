@@ -172,7 +172,7 @@ jobs:
 
           root = Path.cwd()
           manifest = json.loads((root / "ytvis-selected/davis/manifest.json").read_text(encoding="utf-8"))
-          scene_id = f"youtubevis-{int(manifest['video_id'])}"
+          scene_id = f"youtubevis-{manifest['video_id']}"
           scene = [{
               "scene_id": scene_id,
               "frames_dir": str((root / "ytvis-selected/davis/frames").resolve()),
@@ -230,7 +230,7 @@ jobs:
               strata.append("ordinary_continuity")
 
           stable_ids = sorted(int(v) for v in davis["stable_id_by_source_annotation_id"].values())
-          video_id = int(davis["video_id"])
+          video_id = str(davis["video_id"])
           run_manifest = {
               "run_id": f"id1-ytvis-{video_id}-remind-v0",
               "system_id": "remind_unmodified",
