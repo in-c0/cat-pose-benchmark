@@ -32,30 +32,55 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
 
-      - name: Resolve target push run
+      - name: Resolve latest still-valid quantitative run
         id: target
         run: |
           set -euo pipefail
-          run_id=""
-          for attempt in $(seq 1 40); do
-            run_id="$(gh api --method GET "repos/$GITHUB_REPOSITORY/actions/runs" \
-              -f head_sha="$TARGET_SHA" \
-              -f event=push \
-              -f per_page=100 \
-              --jq ".workflow_runs[] | select(.name == \"$TARGET_WORKFLOW_NAME\") | .id" \
-              | head -n1 || true)"
-            if [ -n "$run_id" ]; then
-              break
-            fi
-            echo "target run not visible yet (attempt $attempt)"
-            sleep 15
-          done
-          if [ -z "$run_id" ]; then
-            echo "Could not resolve quantitative run for $TARGET_SHA" >&2
-            exit 1
+
+          # Prefer an exact-head push run when the latest commit touched a
+          # quantitative input and therefore triggered the expensive workflow.
+          exact="$(gh api --method GET "repos/$GITHUB_REPOSITORY/actions/runs" \
+            -f head_sha="$TARGET_SHA" \
+            -f event=push \
+            -f per_page=100 \
+            --jq ".workflow_runs[] | select(.name == \"$TARGET_WORKFLOW_NAME\") | .id" \
+            | head -n1 || true)"
+          if [ -n "$exact" ]; then
+            echo "run_id=$exact" >> "$GITHUB_OUTPUT"
+            echo "Resolved exact-head quantitative run: $exact"
+            exit 0
           fi
-          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
-          echo "Resolved quantitative run: $run_id"
+
+          # A PR-only monitor fix (or other non-quantitative edit) does not
+          # trigger id1-youtubevis-quantitative.yml. Reuse the newest push run
+          # on this branch only when GitHub proves that every file changed
+          # since that run is outside the quantitative workflow's trigger set.
+          trigger_re='^(identity/(youtubevis_archive|test_youtubevis_archive|youtubevos_archive|test_youtubevos_archive|remind_adapter|test_remind_adapter)\.py|\.github/workflows/id1-youtubevis-quantitative\.yml)$'
+          candidates="$(gh api --method GET "repos/$GITHUB_REPOSITORY/actions/runs" \
+            -f branch="${{ github.event.pull_request.head.ref }}" \
+            -f event=push \
+            -f per_page=100 \
+            --jq ".workflow_runs[] | select(.name == \"$TARGET_WORKFLOW_NAME\") | [.id,.head_sha] | @tsv")"
+
+          while IFS=$'\t' read -r run_id run_sha; do
+            [ -n "$run_id" ] || continue
+            compare="$(gh api "repos/$GITHUB_REPOSITORY/compare/$run_sha...$TARGET_SHA" 2>/dev/null || true)"
+            [ -n "$compare" ] || continue
+            status="$(jq -r '.status // ""' <<<"$compare")"
+            if [ "$status" != "ahead" ] && [ "$status" != "identical" ]; then
+              continue
+            fi
+            if jq -r '.files[]?.filename' <<<"$compare" | grep -Eq "$trigger_re"; then
+              echo "Run $run_id is stale: quantitative inputs changed after $run_sha"
+              continue
+            fi
+            echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+            echo "Resolved still-valid quantitative run: $run_id ($run_sha)"
+            exit 0
+          done <<<"$candidates"
+
+          echo "Could not resolve a quantitative run valid for $TARGET_SHA" >&2
+          exit 1
 
       - name: Follow quantitative run to completion
         id: follow
