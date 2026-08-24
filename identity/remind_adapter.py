@@ -9,6 +9,14 @@ from typing import Any
 
 SPEC_PATH = Path(__file__).with_name("id1_experiment_spec.json")
 
+# The frozen ID1 contract uses canonical metric names. The pinned REMIND
+# revision currently emits recovery_success_reference_total for the same
+# aggregate count. Keep the result packet stable while accepting that exact
+# upstream schema spelling; fail closed if both spellings disagree.
+METRIC_ALIASES: dict[str, tuple[str, ...]] = {
+    "objects_recovered_reference": ("recovery_success_reference_total",),
+}
+
 
 class ID1ValidationError(ValueError):
     pass
@@ -93,9 +101,22 @@ def read_summary_global(path: Path) -> dict[str, str]:
 
 
 def _parse_number(row: dict[str, str], key: str) -> float | int | None:
-    raw = str(row.get(key, "") or "").strip()
-    if raw == "":
+    source_keys = (key,) + METRIC_ALIASES.get(key, ())
+    populated: list[tuple[str, str]] = []
+    for source_key in source_keys:
+        raw = str(row.get(source_key, "") or "").strip()
+        if raw:
+            populated.append((source_key, raw))
+
+    if not populated:
         return None
+
+    distinct_values = {raw for _, raw in populated}
+    if len(distinct_values) > 1:
+        detail = ", ".join(f"{source}={raw!r}" for source, raw in populated)
+        raise ID1ValidationError(f"conflicting values for metric {key}: {detail}")
+
+    raw = populated[0][1]
     try:
         value = float(raw)
     except ValueError as exc:
