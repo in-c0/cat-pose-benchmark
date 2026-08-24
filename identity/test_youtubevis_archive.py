@@ -185,4 +185,4 @@ class YouTubeVISArchiveTests(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 
-# Credentialed quantitative workflow trigger: 2026-08-23.
+# Credentialed quantitative workflow trigger: adapter schema correction 2026-08-24.
