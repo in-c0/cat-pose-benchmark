@@ -5,6 +5,13 @@ on:
     branches:
       - main
     paths:
+      - "identity/youtubevis_archive.py"
+      - "identity/test_youtubevis_archive.py"
+      - "identity/youtubevos_archive.py"
+      - "identity/test_youtubevos_archive.py"
+      - "identity/remind_adapter.py"
+      - "identity/test_remind_adapter.py"
+      - ".github/workflows/id1-youtubevis-quantitative.yml"
       - ".github/workflows/id1-youtubevis-run-monitor.yml"
 
 permissions:
@@ -18,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 180
     env:
-      TARGET_SHA: 34fa1cf3c15a7f58eca7d411d096f6e8869c5ea5
+      TARGET_SHA: ${{ github.event.pull_request.head.sha }}
       TARGET_WORKFLOW_NAME: ID1 YouTube-VIS quantitative REMIND
       GH_TOKEN: ${{ github.token }}
     steps:
