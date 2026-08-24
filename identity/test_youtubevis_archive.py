@@ -143,6 +143,20 @@ class YouTubeVISArchiveTests(unittest.TestCase):
             source_uri="fixture://youtube-vos-train.zip",
         )
 
+    def test_unknown_layout_preserves_original_vis_failure(self):
+        archive = self.root / "unknown.zip"
+        with zipfile.ZipFile(archive, "w") as zf:
+            zf.writestr("README.txt", "not a supported dataset layout")
+
+        with self.assertRaisesRegex(
+            ya.YouTubeVISArchiveError,
+            "expected exactly one train.json in archive, found 0",
+        ):
+            ya.materialize_selected_sequence(
+                archive_path=archive,
+                output_root=self.root / "out-unknown",
+            )
+
     def test_duplicate_archive_member_suffix_fails_closed(self):
         archive = self._build_archive(duplicate_frame=True)
         with self.assertRaisesRegex(ya.YouTubeVISArchiveError, "exactly one archive member"):
