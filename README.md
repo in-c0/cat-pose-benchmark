@@ -8,9 +8,10 @@ ear, tail, contact, and scene-relative motion in real environments.**
 
 ---
 
-## Status: research direction v0.2 + Stage 0 design
+## Status: research direction v0.2 + Stage 0 design + model bake-off
 
-Created 2026-08-03. Visual benchmark direction revised 2026-08-04. Programme hierarchy revised 2026-08-21.
+Created 2026-08-03. Visual benchmark direction revised 2026-08-04. Scope narrowed back to the
+pose benchmark on 2026-09-11.
 
 The project is no longer based on the assumption that a real benchmark must be either
 fully hand-labelled or represented by one supposedly perfect source of truth. Its core
@@ -28,26 +29,16 @@ No outbound licence is set yet. Until the decisions in
 all rights reserved. A licence must be added before any data, weights, or reusable code
 are released.
 
-## Programme context
+## Scope note
 
-This repository is **one research thread**, not the complete cat-intent programme.
+For a few weeks in August 2026 this repository grew into a multimodal "feline intent
+programme" (vocalisation acoustics, environmental audio, household context capture,
+intervention pilots, fusion ablations, latent-state discovery). None of it needed a pose
+benchmark to exist and none of it produced a positive result, so on 2026-09-11 it was
+carved out. That work is preserved unchanged on the `programme/multimodal-intent` branch
+and at tag `programme-v0-2026-08-25`; `main` is the pose benchmark only.
 
-The broader programme treats feline intent/state as a latent variable that may be
-inferred from multiple evidence channels: visual motion, vocal and non-vocal audio,
-objects and environment, human input and cat response, temporal routines, social and
-proxemic context, individual history, physiology, and intervention outcomes.
-
-See:
-
-- [Feline intent research programme](docs/FELINE-INTENT-RESEARCH.md)
-- [Beyond pose: what could a cat-intent system actually rely on?](posts/2026-08-21-beyond-pose.md)
-- [Latent states before labels: when the confound detector catches us](posts/2026-08-21-latent-states-before-labels.md)
-
-Within that programme, this repository is **V1 — Pose & motion benchmark**. Its job is to
-make visual evidence measurable, temporally stable, provenance-aware and calibrated so
-it can later be compared with or fused with other modalities.
-
-## This thread's research objective
+## Research objective
 
 Build an open, licence-clean benchmark that can answer:
 
@@ -120,15 +111,11 @@ same assumptions used to generate them.
 - Confidence and uncertainty calibration
 - Edge deployment accuracy, latency, memory, power, and thermal behaviour
 
-## Product and programme boundary
+## What this is not
 
 This benchmark does not decode intent and does not claim literal semantic translation.
-It produces calibrated visual measurements that may become evidence for downstream
-multimodal state inference.
-
-A future human-facing system should report probabilistic interpretations and uncertainty,
-and its intent claims should be validated by predictive outcomes, intervention tests,
-strong unimodal baselines, multimodal ablations, and individual-specific evaluation.
+It produces calibrated visual measurements. What anyone infers from those measurements is
+a separate question with its own validation burden.
 
 Pain, health, welfare, or diagnostic inference is a separate research and validation
 programme. This repository produces measurement infrastructure, not veterinary claims.
@@ -151,26 +138,27 @@ include:
 
 ```text
 docs/
-  FELINE-INTENT-RESEARCH.md          umbrella multimodal programme and research threads
-  RESEARCH-CHARTER.md               V1 visual benchmark question, hypotheses, and gates
+  RESEARCH-CHARTER.md               benchmark question, hypotheses, and gates
   GROUND-TRUTH-PROVENANCE.md        observation tiers, uncertainty, and anti-circularity
   BENCHMARK-PROTOCOL-DRAFT.md       capture tiers, evaluation tracks, and v0 experiment
   STAGE-0-PORTAL-GEOMETRY.md        rigid-target mirror-layout experiment and gates
   KEYPOINT-TOPOLOGY-DRAFT.md        proposed landmarks and compatibility constraints
+  ID1-PERSISTENT-IDENTITY.md        persistent same-cat identity across time (REMIND baseline)
+  ID1-YOUTUBE-VIS-ADAPTER.md        frozen YouTube-VIS feline subset for identity evaluation
   PRIOR-ART-AND-LICENCE-SURVEY.md   existing resources and licence status
   LICENSING-POLICY.md               contamination and release constraints
   OPEN-DECISIONS.md                 unresolved choices that block collection
 
-posts/
-  2026-08-21-beyond-pose.md                  broader multimodal framing
-  2026-08-21-latent-states-before-labels.md  L1 confound-detection methodology note
-
 schemas/
   observation.schema.json           machine-readable observation/provenance draft
 
-stage0/
-  layouts.json                      nominal mirror planes and camera assumptions
-  geometry_sim.py                   virtual-camera conditioning and covariance simulation
-  geometry-conditioning-report.json generated nominal comparison; not measured evidence
-  test_geometry_sim.py              reflection and triangulation invariants
+stage0/                             mirror-portal geometry conditioning simulation (#1)
+synthetic/                          S0A procedural-proxy annotation contract + S0B Unity round-trip (#7, #54)
+bakeoff/                            fair test of existing animal pose models on real cat clips (#8)
+detail/                             feline detail head: SAM2 ear geometry and tail centreline (#11)
+temporal/                           whole-animal tracking and identity assignment across frames (#12)
+identity/                           ID1 persistent identity: REMIND baseline, DINOv3 pin, YouTube-VIS adapter
+
+Each experiment directory has its own README and a reports/ or results/ folder with
+what was actually run.
 ```

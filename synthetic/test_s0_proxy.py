@@ -5,13 +5,11 @@ import json
 import unittest
 from pathlib import Path
 
-from fusion.v1_pose_package import validate_pose_package
 from synthetic.s0_proxy import (
     DT_SECONDS,
     BUNDLE_VERSION,
     FRAME_COUNT,
     build_bundle,
-    build_synthetic_m1_candidate,
     camera_to_image,
     image_to_camera,
     root_acceleration_world,
@@ -198,18 +196,6 @@ class S0AProxyHandshakeTests(unittest.TestCase):
             any(
                 "synthetic observation must use X1" in item
                 for item in errors
-            ),
-            errors,
-        )
-
-    def test_x1_synthetic_bundle_cannot_satisfy_prospective_real_m1_contract(self) -> None:
-        candidate = build_synthetic_m1_candidate(self.bundle)
-        errors = validate_pose_package(candidate)
-        self.assertTrue(
-            any(
-                "evidence_tier" in error
-                and "cannot count as prospective real V1 evidence" in error
-                for error in errors
             ),
             errors,
         )

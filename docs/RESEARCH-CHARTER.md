@@ -1,20 +1,10 @@
-# V1 research charter — visual pose and motion benchmark
+# Research charter — visual pose and motion benchmark
 
 **Status:** direction v0.2, approved for specification work  
 **Original date:** 2026-08-04  
-**Programme-scope revision:** 2026-08-21
+**Scope revision:** 2026-09-11 — repository narrowed back to the pose benchmark alone
 
-## Programme relationship
-
-This charter governs **V1 — Pose & motion benchmark**, one thread inside the broader
-[Feline intent research programme](FELINE-INTENT-RESEARCH.md).
-
-It does not define the complete cat-intent problem. Audio, environmental context,
-human-input/response, temporal routines, personalisation, intervention/outcome,
-latent-state discovery and multimodal fusion are separate sibling threads with their
-own hypotheses and validation requirements.
-
-## Thread objective
+## Objective
 
 Create an open, reproducible visual-intelligence benchmark for domestic cats that
 measures pose, face, ears, tail, contact, and scene-relative motion over time, while
@@ -23,7 +13,7 @@ representing uncertainty honestly.
 The benchmark is intended to support three connected outcomes:
 
 1. a credible open research contribution;
-2. a calibrated visual evidence channel for downstream multimodal feline-state research;
+2. a calibrated visual evidence channel that downstream work can build on;
 3. an edge-deployed camera product and real-time Unity visualisation demonstrating the
    full data-to-device workflow.
 

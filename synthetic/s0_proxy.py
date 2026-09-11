@@ -9,7 +9,6 @@ from typing import Any
 
 from jsonschema import Draft202012Validator
 
-from fusion.v1_pose_package import validate_pose_package
 
 BUNDLE_VERSION = "S0A-proxy-handshake-v0"
 SEQUENCE_ID = "s0a-proxy-sequence-0001"
@@ -478,53 +477,6 @@ def validate_bundle(
     return errors
 
 
-def build_synthetic_m1_candidate(bundle: dict[str, Any]) -> dict[str, Any]:
-    # Deliberately constructs a structurally valid package with X1 observations so
-    # the prospective-real V1 validator can prove it rejects synthetic evidence.
-    first = bundle["frames"][0]
-    selected = [
-        copy.deepcopy(obs)
-        for obs in first["observations"]
-        if obs["observation_class"] == "surface_landmark"
-        and obs["coordinate_space"] == "image"
-    ][:2]
-    return {
-        "package_version": "V1-M1-pose-package-v0",
-        "event_id": "synthetic-event",
-        "episode_id": "synthetic-episode",
-        "sequence_id": bundle["sequence_id"],
-        "subject_id": bundle["subject_id"],
-        "evidence_window_ms": {"start_offset_ms": 0, "end_offset_ms": 100},
-        "producer": {
-            "kind": "calibrated_geometry",
-            "name": "s0a-procedural-proxy",
-            "version": BUNDLE_VERSION,
-            "code_revision": BUNDLE_VERSION,
-        },
-        "source_media": [
-            {
-                "record_id": "synthetic-render-placeholder",
-                "sha256": "0" * 64,
-                "media_type": "image/png",
-                "width_px": CAMERA["width_px"],
-                "height_px": CAMERA["height_px"],
-            }
-        ],
-        "samples": [
-            {
-                "event_offset_ms": 0,
-                "frame_index": 0,
-                "observations": selected,
-            }
-        ],
-        "notes": "Synthetic X1 package used only to assert prospective-real rejection.",
-    }
-
-
-def validate_m1_boundary(bundle: dict[str, Any]) -> list[str]:
-    return validate_pose_package(build_synthetic_m1_candidate(bundle))
-
-
 def write_bundle(path: Path, bundle: dict[str, Any] | None = None) -> None:
     payload = bundle or build_bundle()
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -550,13 +502,6 @@ def main() -> None:
         write_bundle(args.output, payload)
 
     errors = validate_bundle(payload)
-    boundary_errors = validate_m1_boundary(payload)
-    if not any(
-        "evidence_tier" in error
-        and "cannot count as prospective real V1 evidence" in error
-        for error in boundary_errors
-    ):
-        errors.append("M1 boundary failure: X1 synthetic evidence was not explicitly rejected")
 
     print(
         json.dumps(
@@ -564,7 +509,6 @@ def main() -> None:
                 "bundle_valid": not errors,
                 "errors": errors,
                 "payload_sha256": payload.get("payload_sha256"),
-                "m1_boundary_rejected": bool(boundary_errors),
             },
             indent=2,
             sort_keys=True,

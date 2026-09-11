@@ -8,7 +8,7 @@
 
 Can a visual system preserve the identity of the same physical cat across time when ordinary frame-to-frame tracking is no longer enough?
 
-This is infrastructure for the wider feline-intent programme. It is not itself an intent, affect, language, health, or welfare model.
+This is tracking infrastructure. It is not itself an intent, affect, language, health, or welfare model.
 
 A downstream temporal model can only learn an individual cat's routines, vocal signatures, interaction history, adaptation curve, or response to interventions if observations attributed to that cat are actually from the same physical animal. ID1 therefore makes persistent subject association an independently measurable research problem.
 
@@ -205,15 +205,6 @@ If unmodified REMIND fails systematically, candidate feline adaptations become s
 Each adaptation should answer a narrow question: **does this cue reduce identity error on held-out cats or held-out sequences beyond the frozen REMIND baseline?**
 
 ## Relationship to other threads
-
-ID1 is upstream infrastructure for several programme threads:
-
-- **T1 temporal routines:** prevents history from being assigned to the wrong cat;
-- **P1 personalisation:** defines whose adaptation history is being learned;
-- **S1 social/proxemic context:** keeps multiple cats distinct during interactions;
-- **A1/A2 audio:** enables later study of whether vocal identity agrees with visual identity;
-- **M1 fusion:** can use identity confidence as provenance/uncertainty, not as intent evidence;
-- **L1 latent-state discovery:** reduces the risk that clusters are artefacts of accidental cross-subject mixing.
 
 ID1 does not replace V1 pose/motion. V1 asks what the body is doing; ID1 asks whose body/observation this is across time.
 
