@@ -5,16 +5,12 @@ on:
     paths:
       - "synthetic/**"
       - "schemas/observation.schema.json"
-      - "fusion/v1_pose_package.py"
-      - "fusion/v1_pose_package.schema.json"
       - ".github/workflows/synthetic-s0-tests.yml"
   push:
     branches: [main]
     paths:
       - "synthetic/**"
       - "schemas/observation.schema.json"
-      - "fusion/v1_pose_package.py"
-      - "fusion/v1_pose_package.schema.json"
       - ".github/workflows/synthetic-s0-tests.yml"
 
 permissions:
@@ -44,7 +40,7 @@ jobs:
           python -m synthetic.s0_proxy --output /tmp/s0_proxy_a.json
           python -m synthetic.s0_proxy --output /tmp/s0_proxy_b.json
           cmp /tmp/s0_proxy_a.json /tmp/s0_proxy_b.json
-      - name: Validate full generated S0A bundle and M1 boundary
+      - name: Validate full generated S0A bundle
         run: |
           python -m synthetic.s0_proxy \
             --output /tmp/s0_proxy_a.json \

@@ -55,14 +55,6 @@ The five-frame sequence includes:
 
 All 130 individual observations validate against `schemas/observation.schema.json`.
 
-## M1 boundary
-
-S0A deliberately proves the new V1→M1 boundary in the negative direction.
-
-The generated observations are `X1` synthetic exact. A structurally valid V1 pose package built from them **must be rejected** by `fusion.v1_pose_package.validate_pose_package`, because M1's prospective-real visual comparator accepts only G2/G3/S1/S2 evidence.
-
-Passing S0A therefore does **not** make an episode M1-ready and does not create any pose-accuracy result.
-
 ## Unity handoff
 
 The next S0 layer should make a minimal Unity scene emit this same contract. The Unity exporter must reproduce:

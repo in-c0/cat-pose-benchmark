@@ -5,13 +5,11 @@ on:
     paths:
       - "identity/**"
       - "docs/ID1-PERSISTENT-IDENTITY.md"
-      - "docs/FELINE-INTENT-RESEARCH.md"
       - ".github/workflows/id1-identity-tests.yml"
   pull_request:
     paths:
       - "identity/**"
       - "docs/ID1-PERSISTENT-IDENTITY.md"
-      - "docs/FELINE-INTENT-RESEARCH.md"
       - ".github/workflows/id1-identity-tests.yml"
 
 permissions:
