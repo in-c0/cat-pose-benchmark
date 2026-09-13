@@ -35,7 +35,7 @@ jobs:
             jsonschema \
             numpy \
             pillow \
-            scikit-image
+            scikit-image \2            opencv-python-headless
 
       - name: Run feline detail tests
         run: python -m unittest discover -s detail -p 'test_*.py'
