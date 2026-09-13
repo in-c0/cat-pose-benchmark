@@ -29,6 +29,35 @@ No outbound licence is set yet. Until the decisions in
 all rights reserved. A licence must be added before any data, weights, or reusable code
 are released.
 
+## Help review frames (no setup needed)
+
+The quickest way to help right now is to look at model output on real cat video and say
+whether it is on the cat. It takes about 30–45 minutes, needs no code, and gives this
+project its first numbers from a person rather than from one model checking another.
+
+1. **Look at the sheets.** Four images, one per clip and method. Each tile is one frame with
+   the model's output drawn on it; the banner shows the frame index.
+   - [Cat Plays — body](review/results/2026-09-13-commons-v0/sheets/commons-cat-plays--body.jpg)
+   - [Cat Plays — tail](review/results/2026-09-13-commons-v0/sheets/commons-cat-plays--tail.jpg)
+   - [Jumping — body](review/results/2026-09-13-commons-v0/sheets/commons-cat-jumping-backwards--body.jpg)
+   - [Jumping — tail](review/results/2026-09-13-commons-v0/sheets/commons-cat-jumping-backwards--tail.jpg)
+2. **Get the template.** Download
+   [`TEMPLATE.csv`](review/results/2026-09-13-commons-v0/reviews/TEMPLATE.csv) and rename it
+   to `<your-github-handle>.csv`. One row per frame and body part, 285 rows.
+3. **Fill the `verdict` column** with `ok`, `wrong` or `not_visible`, following the rubric in
+   [review/README.md](review/README.md). Skip rows you are unsure about rather than guessing;
+   blank rows are ignored. `condition` and `note` are optional.
+4. **Send it back.** Either open a pull request adding your file to
+   `review/results/2026-09-13-commons-v0/reviews/`, or attach the CSV to
+   [the review call issue](https://github.com/in-c0/cat-pose-benchmark/issues/79) if you
+   would rather not deal with git. Both are fine.
+
+Every reviewer's verdicts are kept as a separate file. With two or more reviewers the scorer
+reports agreement and lists every disagreement, so you do not need to match anyone else.
+
+If you want to run the models on your own cat video instead, see
+[CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Scope note
 
 For a few weeks in August 2026 this repository grew into a multimodal "feline intent
