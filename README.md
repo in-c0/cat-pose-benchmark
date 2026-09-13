@@ -158,6 +158,7 @@ bakeoff/                            fair test of existing animal pose models on 
 detail/                             feline detail head: SAM2 ear geometry and tail centreline (#11)
 temporal/                           whole-animal tracking and identity assignment across frames (#12)
 identity/                           ID1 persistent identity: REMIND baseline, DINOv3 pin, YouTube-VIS adapter
+review/                             human frame review: overlays, contact sheets, verdict rubric and scorer
 
 Each experiment directory has its own README and a reports/ or results/ folder with
 what was actually run.

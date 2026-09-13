@@ -35,3 +35,6 @@ bakeoff/media/
 node_modules/
 
 # Provenance is COMMITTED on purpose — do not ignore provenance/
+
+# Frame-review working set (frames, overlays) — regenerate with review/*.py
+review/work/

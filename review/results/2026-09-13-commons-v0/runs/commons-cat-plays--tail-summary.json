@@ -1,0 +1,48 @@
+{
+  "clip_id": "commons-cat-plays",
+  "evidence_tier": "S2",
+  "method": "tail",
+  "model": {
+    "checkpoint": "facebook/sam2.1-hiera-tiny",
+    "device": "cuda",
+    "prompt": "review\\work\\commons-cat-plays\\tail-prompt.json"
+  },
+  "schema_version": "0.1.0",
+  "summary": {
+    "curve_coverage": 0.6060606060606061,
+    "degenerate_curve_frames": [
+      2,
+      19
+    ],
+    "engineering_feasibility": "revise",
+    "frames_failed": [
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "frames_total": 33,
+    "frames_with_curve": 20,
+    "input_seed_mask_area_fraction": 0.005121527777777778,
+    "interpretation_boundary": "Seed preservation, curve coverage, mask expansion and temporal displacement are failure-discovery metrics, not landmark accuracy. Inter-frame displacement contains true cat motion and projection change. Numerical accuracy requires independent visible-tail labels.",
+    "max_chronological_root_step_fraction": 0.20396773651019415,
+    "max_chronological_tip_step_fraction": 0.17372361999000951,
+    "mean_chronological_root_step_fraction": 0.03548377024636364,
+    "mean_chronological_tip_step_fraction": 0.06507832841819126,
+    "minimum_non_degenerate_curve_length_px": 14.686047800548657,
+    "suspicious_expansion_frames": [],
+    "suspicious_expansion_threshold": 0.02048611111111111,
+    "video_seed_mask_area_fraction": 0.005121527777777778,
+    "video_seed_preserved": true,
+    "video_seed_vs_input_mask_iou": 0.9451885431691737
+  }
+}

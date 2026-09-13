@@ -1,0 +1,18 @@
+{
+  "clip_id": "commons-cat-plays",
+  "evidence_tier": "S2",
+  "method": "body",
+  "model": {
+    "detector": "https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_m.onnx",
+    "device": "cpu",
+    "pose": "https://download.openmmlab.com/mmpose/v1/projects/rtmposev1/onnx_sdk/rtmpose-m_simcc-ap10k_pt-aic-coco_210e-256x256-7a041aa1_20230206.zip",
+    "runtime": "rtmlib/onnxruntime",
+    "score_threshold": 0.3
+  },
+  "schema_version": "0.1.0",
+  "summary": {
+    "frames": 33,
+    "frames_with_detection": 26,
+    "wall_seconds": 8.15
+  }
+}
