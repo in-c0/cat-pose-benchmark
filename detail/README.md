@@ -95,3 +95,10 @@ feline-detail JSON contract
 → licence-clean real-video sparse labels
 → learned detail head only if the baseline gap persists
 ```
+
+## Anchored tail (2026-09-13)
+
+`anchored_tail.py` is the per-frame alternative to `sam2_tail_video.py`: SAM2 segments the
+whole cat, the body is subtracted using RTMPose keypoints, and the thin piece left at the
+tail root is checked against anatomical rules before it is reported. Added after human
+review found the propagated mask tracking a leg. Report: `reports/anchored-tail-v0.md`.

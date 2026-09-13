@@ -10,13 +10,14 @@ CLIPS_PATH = REPO_ROOT / "review" / "clips.json"
 WORK_ROOT = REPO_ROOT / "review" / "work"
 
 # Reviewer vocabulary. Anything outside these sets is rejected by the scorer.
-PARTS = ["head", "spine", "front_paws", "hind_paws", "tail_curve"]
+PARTS = ["head", "spine", "front_paws", "hind_paws", "tail_curve", "tail_curve_anchored"]
 METHOD_FOR_PART = {
     "head": "body",
     "spine": "body",
     "front_paws": "body",
     "hind_paws": "body",
     "tail_curve": "tail",
+    "tail_curve_anchored": "tail_anchored",
 }
 VERDICTS = ["ok", "wrong", "not_visible"]
 CONDITIONS = ["none", "blur", "occlusion", "out_of_frame", "dark", "small", "multi_cat"]

@@ -28,6 +28,7 @@ def rows_for_clip(clip: dict[str, Any], manifest: dict[str, Any]) -> list[dict[s
             method = METHOD_FOR_PART[part]
             if method == "tail" and "tail_seed" not in clip:
                 continue
+            # The anchored method needs only body keypoints, so it is always generated.
             rows.append(
                 {
                     "clip_id": clip["clip_id"],
