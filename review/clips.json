@@ -1,0 +1,31 @@
+{
+  "schema_version": "0.1.0",
+  "notes": "Frame-review set. Sampling is fixed per clip so the SAM2 tail seed fixture lands on an exact sampled frame; changing fps or duration invalidates the seed index.",
+  "clips": [
+    {
+      "clip_id": "commons-cat-plays",
+      "manifest": "bakeoff/clips/commons-cat-plays.json",
+      "sample_fps": 4.0,
+      "max_seconds": 8.3,
+      "subject": "Single tuxedo cat, portrait phone video.",
+      "tail_seed": {
+        "fixture": "detail/fixtures/superanimal-tail-prompt-frame1.json",
+        "fixture_timestamp_s": 0.25,
+        "review_frame_index": 1
+      }
+    },
+    {
+      "clip_id": "commons-cat-jumping-backwards",
+      "manifest": "bakeoff/clips/commons-cat-jumping-backwards.json",
+      "sample_fps": 3.0,
+      "max_seconds": 8.0,
+      "notes": "Original-motion portion only; the 1/4-speed replay after 8 s is excluded.",
+      "subject": "Two cats: a grey tabby and a black-and-white tuxedo (the one that jumps). The tail seed is on the grey tabby, so tail_curve is judged against the tabby's tail; a curve on the tuxedo cat is wrong with condition multi_cat. Body skeletons are judged on whichever cat they are drawn on.",
+      "tail_seed": {
+        "fixture": "detail/fixtures/superanimal-jumping-tail-seed-frame5.json",
+        "fixture_timestamp_s": 3.3333333333333335,
+        "review_frame_index": 10
+      }
+    }
+  ]
+}
