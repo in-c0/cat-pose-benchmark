@@ -25,6 +25,7 @@ import math
 from pathlib import Path
 from typing import Any
 
+import cv2
 import numpy as np
 from PIL import Image, ImageDraw
 
@@ -45,6 +46,13 @@ LIMB_NAMES = [
     "left_knee", "right_knee", "left_elbow", "right_elbow",
 ]
 HEAD_NAMES = ["nose", "left_eye", "right_eye"]
+
+# Geometry features measured on every accepted mask against a SAM2 cat mask (always
+# recorded), and the thresholds the optional ``geometry_rules`` pass applies to them.
+TRUNK_OPENING_RADIUS_FRACTION = 0.045
+BODY_CONTACT_BAND_FRACTION = 0.012
+MAX_BODY_CONTACT_FRACTION = 0.45
+MIN_ELONGATION = 2.5
 
 Box = list[float]  # x0, y0, x1, y1
 
@@ -109,6 +117,45 @@ def keypoints_inside(mask: np.ndarray, kps: dict[str, tuple[float, float]], name
         if mask[row, col]:
             hits.append(name)
     return hits
+
+
+def geometry_features(
+    tail_mask: np.ndarray,
+    cat_mask: np.ndarray,
+    cat_box: Box,
+    samples: list[dict[str, Any]] | None,
+) -> dict[str, float]:
+    """How the grounded tail mask sits against the cat: fraction inside the thick body
+    (cat mask opened with a trunk-sized disc), fraction within a thin band around that
+    body, and centreline elongation. Recorded for analysis; only used to refuse when
+    ``geometry_rules`` is on."""
+    diag = math.hypot(cat_box[2] - cat_box[0], cat_box[3] - cat_box[1])
+    r = max(2, int(TRUNK_OPENING_RADIUS_FRACTION * diag))
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * r + 1, 2 * r + 1))
+    body = cv2.morphologyEx(cat_mask.astype(np.uint8), cv2.MORPH_OPEN, kernel).astype(bool)
+    br = max(2, int(BODY_CONTACT_BAND_FRACTION * diag))
+    band_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * br + 1, 2 * br + 1))
+    band = cv2.dilate(body.astype(np.uint8), band_kernel).astype(bool)
+    area = max(int(tail_mask.sum()), 1)
+    length = 0.0
+    if samples:
+        for prev, cur in zip(samples, samples[1:]):
+            length += math.hypot(cur["x_px"] - prev["x_px"], cur["y_px"] - prev["y_px"])
+    return {
+        "inside_body_fraction": float(np.logical_and(tail_mask, body).sum() / area),
+        "body_contact_fraction": float(np.logical_and(tail_mask, band).sum() / area),
+        "elongation": float(length * length / area),
+        "tail_to_cat_area": float(area / max(int(cat_mask.sum()), 1)),
+    }
+
+
+def geometry_rejections(features: dict[str, float]) -> list[str]:
+    rejections = []
+    if features["body_contact_fraction"] > MAX_BODY_CONTACT_FRACTION:
+        rejections.append("attached_along_body")
+    if features["elongation"] < MIN_ELONGATION:
+        rejections.append("not_elongated")
+    return rejections
 
 
 def base_point(mask: np.ndarray, root: tuple[float, float] | None, cat_box: Box) -> tuple[float, float]:
@@ -193,6 +240,7 @@ def run(
     sample_count: int,
     clip_id: str | None = None,
     veto_keypoints: bool = False,
+    geometry_rules: bool = False,
 ) -> dict[str, Any]:
     manifest = json.loads(frames_manifest.read_text(encoding="utf-8"))
     clip_id = clip_id or manifest["clip_id"]
@@ -261,11 +309,23 @@ def run(
                         sample_count=sample_count,
                         provenance="grounding_dino_tail_box_sam2_mask_to_skeleton_v1",
                     )
-                    record["status"] = "ok"
-                    record["curve"] = {"samples": samples}
-                    record["root_xy"] = [samples[0]["x_px"], samples[0]["y_px"]]
-                    record["tip_xy"] = [samples[-1]["x_px"], samples[-1]["y_px"]]
-                    record["base_from"] = "tail_root_keypoint" if root else "cat_box_centre"
+                    cat_masks, cat_scores, _ = predictor.predict(
+                        box=np.array(cat["box"], dtype=np.float32), multimask_output=True
+                    )
+                    cat_mask = np.asarray(cat_masks)[int(np.argmax(np.asarray(cat_scores).reshape(-1)))].astype(bool)
+                    features = geometry_features(mask, cat_mask, cat["box"], samples)
+                    record["geometry"] = features
+                    rejections = geometry_rejections(features)
+                    record["geometry_rejections"] = rejections
+                    if geometry_rules and rejections:
+                        record["status"] = "geometry_rejected"
+                        mask = None
+                    else:
+                        record["status"] = "ok"
+                        record["curve"] = {"samples": samples}
+                        record["root_xy"] = [samples[0]["x_px"], samples[0]["y_px"]]
+                        record["tip_xy"] = [samples[-1]["x_px"], samples[-1]["y_px"]]
+                        record["base_from"] = "tail_root_keypoint" if root else "cat_box_centre"
                 except ValueError as exception:
                     record["status"] = "centreline_failed"
                     record["centreline_error"] = str(exception)
@@ -300,6 +360,13 @@ def run(
             "max_tail_to_cat_area": MAX_TAIL_TO_CAT_AREA,
             "cat_box_preference": "body-run bbox when present, else highest score",
             "keypoint_veto": {"enabled": veto_keypoints, "limb": LIMB_NAMES, "head": HEAD_NAMES},
+            "geometry_rules": {
+                "enabled": geometry_rules,
+                "max_body_contact_fraction": MAX_BODY_CONTACT_FRACTION,
+                "min_elongation": MIN_ELONGATION,
+                "trunk_opening_radius_fraction": TRUNK_OPENING_RADIUS_FRACTION,
+                "body_contact_band_fraction": BODY_CONTACT_BAND_FRACTION,
+            },
         },
         "evidence_tier": "S2",
         "summary": {
@@ -327,6 +394,7 @@ def main() -> None:
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--samples", type=int, default=24)
     parser.add_argument("--veto-keypoints", action="store_true", help="refuse masks containing a limb/head keypoint")
+    parser.add_argument("--geometry-rules", action="store_true", help="refuse masks that fail the anchored-style body-contact and elongation rules")
     args = parser.parse_args()
     result = run(
         frames_dir=args.frames_dir,
@@ -336,6 +404,7 @@ def main() -> None:
         device=args.device,
         sample_count=args.samples,
         veto_keypoints=args.veto_keypoints,
+        geometry_rules=args.geometry_rules,
     )
     print(json.dumps(result["summary"], indent=2, sort_keys=True))
 

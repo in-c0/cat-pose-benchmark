@@ -5,9 +5,13 @@ import unittest
 import numpy as np
 
 from detail.grounded_tail import (
+    MAX_BODY_CONTACT_FRACTION,
     MAX_TAIL_TO_CAT_AREA,
+    MIN_ELONGATION,
     MIN_TAIL_SCORE,
     base_point,
+    geometry_features,
+    geometry_rejections,
     keypoints_inside,
     pick_cat_box,
     pick_tail_box,
@@ -73,6 +77,37 @@ class MaskHelperTests(unittest.TestCase):
         kps = {"left_front_paw": (7.0, 7.0), "right_front_paw": (15.0, 15.0), "nose": (7.2, 8.9)}
         self.assertEqual(keypoints_inside(mask, kps, ["left_front_paw", "right_front_paw"]), ["left_front_paw"])
         self.assertEqual(keypoints_inside(mask, kps, ["nose", "left_eye"]), ["nose"])
+
+
+class GeometryTests(unittest.TestCase):
+    def _cat_and_tail(self, tail_along_body: bool) -> tuple[np.ndarray, np.ndarray, list[dict]]:
+        import cv2
+
+        cat = np.zeros((300, 500), dtype=np.uint8)
+        cv2.ellipse(cat, (250, 150), (150, 60), 0, 0, 360, 1, -1)
+        tail = np.zeros_like(cat)
+        if tail_along_body:
+            # a strip lying along the top edge of the trunk
+            cv2.rectangle(tail, (120, 88), (380, 100), 1, -1)
+        else:
+            # a thin tail leaving the rump and going up
+            cv2.line(tail, (100, 150), (40, 40), 1, thickness=10)
+        cat_all = np.logical_or(cat.astype(bool), tail.astype(bool))
+        ys, xs = np.nonzero(tail)
+        order = np.argsort(xs)
+        samples = [{"x_px": float(xs[i]), "y_px": float(ys[i])} for i in order[:: max(1, len(order) // 12)]]
+        return tail.astype(bool), cat_all, samples
+
+    def test_extended_tail_passes_and_strip_fails(self) -> None:
+        box = [90.0, 30.0, 400.0, 210.0]
+        tail, cat, samples = self._cat_and_tail(tail_along_body=False)
+        f = geometry_features(tail, cat, box, samples)
+        self.assertLessEqual(f["body_contact_fraction"], MAX_BODY_CONTACT_FRACTION)
+        self.assertGreaterEqual(f["elongation"], MIN_ELONGATION)
+        self.assertEqual(geometry_rejections(f), [])
+        strip, cat2, samples2 = self._cat_and_tail(tail_along_body=True)
+        f2 = geometry_features(strip, cat2, box, samples2)
+        self.assertIn("attached_along_body", geometry_rejections(f2))
 
 
 if __name__ == "__main__":
