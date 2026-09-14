@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw
 
 from review.common import clip_workdir, frames_dir, load_clips, load_frames_manifest
 
-METHODS = ["body", "tail", "tail_anchored"]
+METHODS = ["body", "tail", "tail_anchored", "tail_grounded"]
 
 
 def _tile(image: Image.Image, width: int) -> Image.Image:
