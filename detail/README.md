@@ -109,3 +109,9 @@ review found the propagated mask tracking a leg. Report: `reports/anchored-tail-
 chosen tail box with SAM2. Semantics with no geometry: it finds an extended tail on both
 cats of the jumping clip, and draws a white paw when the tail is tucked. Report:
 `reports/grounded-tail-v0.md`.
+
+## Grounded tail v1 (2026-09-14)
+
+`grounded_tail_v1.py` adds a SigLIP crop check and a Viterbi pass with a "no tail" state
+to the grounded method. Precision 0.52 → 0.95 at recall 0.72 on the review set (proxy
+scoring, parameters fitted on the same frames). Report: `reports/grounded-tail-v1.md`.

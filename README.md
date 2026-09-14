@@ -6,7 +6,10 @@ ear, tail, contact, and scene-relative motion in real environments.**
 > The repository name is provisional. The consumer cat brand and its products should
 > remain separate from this research artefact.
 
-**Latest note (14 Sep 2026):** [*Where, not whether: finding a cat's tail in ordinary video with a text-grounded detector*](paper/README.md) ([PDF](paper/where-not-whether-v0.1.pdf)). Three per-frame tail methods compared on 57 real frames. Asking Grounding DINO for `"cat. tail."` finds an extended tail on 14 of 15 frames across two cats; when the tail is tucked it draws a paw. A one-phrase prompt grounds the whole animal, a keypoint veto trades one model's errors for another's, and geometry raises precision but cannot decide whether a tail is visible.
+**Technical notes**
+
+- **02 (14 Sep 2026):** [*Whether: teaching a text-grounded tail detector to say "no"*](paper/02-whether/README.md) ([PDF](paper/02-whether/whether-v0.1.pdf)). A SigLIP crop check plus a Viterbi pass with an explicit "no tail" state take the grounded method from precision 0.52 to 0.95 at recall 0.72 on the same 57 frames; every tucked-tail frame becomes a refusal. Parameters fitted on the same frames; not yet held-out.
+- **01 (14 Sep 2026):** [*Where, not whether: finding a cat's tail in ordinary video with a text-grounded detector*](paper/01-where-not-whether/README.md) ([PDF](paper/01-where-not-whether/where-not-whether-v0.1.pdf)). Three per-frame tail methods on 57 real frames. Asking Grounding DINO for `"cat. tail."` finds an extended tail on 14 of 15 frames across two cats; when the tail is tucked it draws a paw.
 
 ---
 

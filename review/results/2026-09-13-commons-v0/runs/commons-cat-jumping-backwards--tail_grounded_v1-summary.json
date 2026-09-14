@@ -1,0 +1,44 @@
+{
+  "clip_id": "commons-cat-jumping-backwards",
+  "evidence_tier": "S2",
+  "method": "tail_grounded_v1",
+  "models": {
+    "crop_classifier": "google/siglip-base-patch16-224",
+    "crop_texts": [
+      "a photo of a cat's tail",
+      "a photo of a cat's paw",
+      "a photo of a cat's leg",
+      "a photo of a cat's face",
+      "a photo of a cat's belly",
+      "a photo of a carpet or floor"
+    ],
+    "detector": "IDEA-Research/grounding-dino-tiny",
+    "device": "cuda",
+    "prompt": "cat. tail.",
+    "segmenter": "facebook/sam2.1-hiera-tiny"
+  },
+  "options": {
+    "candidates_per_frame": 2,
+    "crop_check": true,
+    "crop_pad": 0.25,
+    "min_cat_score": 0.3,
+    "min_paw_to_refuse": 0.1,
+    "min_tail_score": 0.2,
+    "move_weight": 0.5,
+    "none_emission": 0.2,
+    "none_switch_cost": 0.2,
+    "temporal": true,
+    "zoom": false
+  },
+  "schema_version": "0.1.0",
+  "summary": {
+    "frames_total": 24,
+    "frames_with_curve": 13,
+    "status_counts": {
+      "no_cat": 6,
+      "no_tail_box": 3,
+      "ok": 13,
+      "temporal_none": 2
+    }
+  }
+}
