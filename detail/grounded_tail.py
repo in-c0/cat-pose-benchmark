@@ -77,7 +77,10 @@ def _centre_inside(inner: Box, outer: Box, margin: float = 0.0) -> bool:
 def pick_cat_box(detections: list[dict[str, Any]], prefer: Box | None) -> dict[str, Any] | None:
     """Highest-scoring 'cat' detection, or the one overlapping ``prefer`` most when a
     reference cat box (e.g. from the body run) is given."""
-    cats = [d for d in detections if d["label"] == "cat" and d["score"] >= MIN_CAT_SCORE]
+    # The detector sometimes merges the two phrases and labels the whole animal
+    # "cat tail"; that box is still the cat. (Found 2026-09-14; four jumping-clip frames
+    # had no cat before this, so note 01's coverage numbers predate the fix.)
+    cats = [d for d in detections if "cat" in d["label"].split() and d["score"] >= MIN_CAT_SCORE]
     if not cats:
         return None
     if prefer is not None:

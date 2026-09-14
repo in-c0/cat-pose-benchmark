@@ -8,19 +8,20 @@ It does not measure pixel error. A verdict of `ok` means "the tail curve is on t
 
 ## What gets reviewed
 
-Five methods:
+Six methods:
 
-- **body** — RTMPose-m AP-10K, the same checkpoint the bake-off runs, here via OpenMMLab's ONNX export and rtmlib so it runs on Windows without MMPose. Detection is YOLOX-m; the largest cat-or-dog box is used. Keypoints below score 0.3 are drawn hollow and are not judged.
+- **body** — RTMPose-m AP-10K, the same checkpoint the bake-off runs, here via OpenMMLab's ONNX export and rtmlib so it runs on Windows without MMPose. Detection is Grounding DINO prompted with `"cat."` (since 2026-09-14; `--detector yolox` restores YOLOX-m); the largest box is used. Keypoints below score 0.3 are drawn hollow and are not judged.
 - **tail** — the existing SAM2 tail propagation (`detail/sam2_tail_video.py`), seeded from the committed SuperAnimal fixtures with the seed frame index re-mapped to the review sampling.
 - **tail_anchored** — `detail/anchored_tail.py`, added after the first review found the propagated mask on a hind leg. SAM2 segments the whole cat; the body is subtracted geometrically using the RTMPose keypoints; what is left at the tail root is the candidate, and anatomical rules reject anything that contains a limb keypoint, is speckle, or is a strip peeled off the back. It refuses more often than it guesses. Needs only body keypoints, so it runs on every clip.
 - **tail_grounded** — `detail/grounded_tail.py`. Grounding DINO is asked for `"cat. tail."` on every frame; the highest-scoring tail box inside the cat box goes to SAM2 for a mask. Semantics only, no geometry, no propagation. Finds an extended tail well; when the tail is tucked it tends to draw a paw. Runs on every clip and needs no body run.
 - **tail_grounded_v1** — `detail/grounded_tail_v1.py`. The grounded method plus a SigLIP crop check (refuse a box that looks more like a paw than a tail) and a Viterbi pass over the clip with an explicit "no tail" state. Refuses on tucked frames instead of drawing a paw; loses some true tails doing so. A `not_visible` verdict on a refused frame means the method and reviewer agree.
+- **tail_grounded_v2** — `detail/tail_bridge.py` on top of v1: SAM2 video propagation from each accepted frame into an adjacent frame refused for lack of evidence (never into a paw refusal), accepted if the mask area stays within 0.4–2.5× the seed's. Orange mask = propagated.
 
 Frames are sampled at a fixed rate per clip (`clips.json`). The rate is chosen so the tail seed fixture lands exactly on a sampled frame; do not change it without re-checking the seed index. `sample_frames.py` refuses to run if they disagree.
 
 ## The rubric
 
-One row per clip, frame and part. Eight parts:
+One row per clip, frame and part. Nine parts:
 
 | part | method | you are judging |
 |---|---|---|
@@ -32,6 +33,7 @@ One row per clip, frame and part. Eight parts:
 | `tail_curve_anchored` | tail_anchored | the yellow curve follows the tail of the cat the body skeleton is on |
 | `tail_curve_grounded` | tail_grounded | the yellow curve (inside the cyan box) follows the tail of the boxed cat |
 | `tail_curve_grounded_v1` | tail_grounded_v1 | same as above; a refused frame with a visible tail is `wrong`, with a hidden tail `not_visible` |
+| `tail_curve_grounded_v2` | tail_grounded_v2 | same as v1; orange masks were propagated from a neighbour and are judged the same way |
 
 Three verdicts:
 
@@ -69,6 +71,7 @@ python -m review.run_tail --device cuda
 python -m review.run_tail_anchored --device cuda
 python -m review.run_tail_grounded --device cuda
 python -m review.run_tail_grounded_v1 --device cuda
+python -m review.run_tail_grounded_v2 --device cuda
 python -m review.sheets --output-dir review/work/sheets
 python -m review.template --output review/results/<set>/reviews/TEMPLATE.csv
 ```

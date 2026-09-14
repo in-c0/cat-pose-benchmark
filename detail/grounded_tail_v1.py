@@ -175,7 +175,7 @@ def viterbi(
     return [None if s == 0 else s - 1 for s in path]
 
 
-def _load_models(device: str) -> dict[str, Any]:
+def _load_models(device: str, detector_id: str = DETECTOR_ID, classifier_id: str = CLASSIFIER_ID) -> dict[str, Any]:
     import torch
     from transformers import AutoModel, AutoModelForZeroShotObjectDetection, AutoProcessor
 
@@ -186,11 +186,13 @@ def _load_models(device: str) -> dict[str, Any]:
 
     torch.set_grad_enabled(False)
     return {
-        "det_processor": AutoProcessor.from_pretrained(DETECTOR_ID),
-        "detector": AutoModelForZeroShotObjectDetection.from_pretrained(DETECTOR_ID).to(device).eval(),
-        "clf_processor": AutoProcessor.from_pretrained(CLASSIFIER_ID),
-        "classifier": AutoModel.from_pretrained(CLASSIFIER_ID).to(device).eval(),
+        "det_processor": AutoProcessor.from_pretrained(detector_id),
+        "detector": AutoModelForZeroShotObjectDetection.from_pretrained(detector_id).to(device).eval(),
+        "clf_processor": AutoProcessor.from_pretrained(classifier_id),
+        "classifier": AutoModel.from_pretrained(classifier_id).to(device).eval(),
         "predictor": SAM2ImagePredictor.from_pretrained("facebook/sam2.1-hiera-tiny", device=device),
+        "detector_id": detector_id,
+        "classifier_id": classifier_id,
     }
 
 
@@ -200,7 +202,7 @@ def _crop_probs(models: dict[str, Any], image: Image.Image, box: Box, device: st
     crop = image.crop(tuple(pad_box(box, CROP_CHECK_PAD, image.width, image.height)))
     inputs = models["clf_processor"](text=CROP_TEXTS, images=crop, padding="max_length", return_tensors="pt").to(device)
     logits = models["classifier"](**inputs).logits_per_image[0]
-    probs = torch.sigmoid(logits).cpu().numpy().tolist()
+    probs = torch.sigmoid(logits).detach().cpu().numpy().tolist()
     keys = ["tail", "paw", "leg", "face", "belly", "floor"]
     return {k: float(v) for k, v in zip(keys, probs)}
 
@@ -243,13 +245,15 @@ def run(
     zoom: bool = False,
     crop_check: bool = True,
     temporal: bool = True,
+    detector_id: str = DETECTOR_ID,
+    classifier_id: str = CLASSIFIER_ID,
 ) -> dict[str, Any]:
     manifest = json.loads(frames_manifest.read_text(encoding="utf-8"))
     clip_id = clip_id or manifest["clip_id"]
     body_frames: dict[int, dict[str, Any]] = {}
     if body_json and body_json.exists():
         body_frames = {int(f["frame_index"]): f for f in json.loads(body_json.read_text(encoding="utf-8"))["frames"]}
-    models = _load_models(device)
+    models = _load_models(device, detector_id, classifier_id)
     predictor = models["predictor"]
 
     # Pass 1: detection (and crop check) on every frame, collecting candidates.
@@ -371,9 +375,9 @@ def run(
         "clip_id": clip_id,
         "method": "tail_grounded_v1",
         "models": {
-            "detector": DETECTOR_ID,
+            "detector": detector_id,
             "prompt": "cat. tail.",
-            "crop_classifier": CLASSIFIER_ID,
+            "crop_classifier": classifier_id,
             "crop_texts": CROP_TEXTS,
             "segmenter": "facebook/sam2.1-hiera-tiny",
             "device": device,
@@ -419,11 +423,14 @@ def main() -> None:
     parser.add_argument("--zoom", action="store_true", help="detect on a padded cat crop (hurt on the review set; off by default)")
     parser.add_argument("--no-crop-check", action="store_true")
     parser.add_argument("--no-temporal", action="store_true")
+    parser.add_argument("--detector", default=DETECTOR_ID)
+    parser.add_argument("--classifier", default=CLASSIFIER_ID)
     args = parser.parse_args()
     result = run(
         frames_dir=args.frames_dir, frames_manifest=args.frames_manifest, output_dir=args.output_dir,
         body_json=args.body_json, device=args.device, sample_count=args.samples,
         zoom=args.zoom, crop_check=not args.no_crop_check, temporal=not args.no_temporal,
+        detector_id=args.detector, classifier_id=args.classifier,
     )
     print(json.dumps(result["summary"], indent=2, sort_keys=True))
 

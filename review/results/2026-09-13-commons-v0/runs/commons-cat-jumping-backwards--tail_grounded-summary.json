@@ -44,11 +44,11 @@
   },
   "summary": {
     "frames_total": 24,
-    "frames_with_curve": 15,
+    "frames_with_curve": 17,
     "status_counts": {
-      "no_cat": 6,
-      "no_tail_box": 3,
-      "ok": 15
+      "no_cat": 2,
+      "no_tail_box": 5,
+      "ok": 17
     }
   }
 }
