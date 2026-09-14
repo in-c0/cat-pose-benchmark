@@ -89,12 +89,12 @@
   "schema_version": "0.1.0",
   "summary": {
     "frames_total": 24,
-    "frames_with_curve": 6,
+    "frames_with_curve": 13,
     "status_counts": {
-      "all_candidates_rejected": 10,
-      "no_detection": 7,
+      "all_candidates_rejected": 8,
+      "no_detection": 2,
       "no_tail_root": 1,
-      "ok": 6
+      "ok": 13
     }
   }
 }

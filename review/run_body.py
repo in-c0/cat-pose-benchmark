@@ -98,6 +98,33 @@ def _load_models(device: str) -> tuple[Any, Any]:
     return detector, pose
 
 
+class GroundingCatDetector:
+    """Grounding DINO prompted with "cat." as a drop-in for YOLOX. Returns boxes and a
+    class id of 15 (COCO cat) so the rest of the run is unchanged. Slower, but on the
+    review clips it finds cats YOLOX-m misses (motion blur, small)."""
+
+    def __init__(self, device: str, model_id: str = "IDEA-Research/grounding-dino-tiny", threshold: float = 0.3):
+        import torch
+        from transformers import AutoModelForZeroShotObjectDetection, AutoProcessor
+
+        torch.set_grad_enabled(False)
+        self.processor = AutoProcessor.from_pretrained(model_id)
+        self.model = AutoModelForZeroShotObjectDetection.from_pretrained(model_id).to(device).eval()
+        self.device = device
+        self.model_id = model_id
+        self.threshold = threshold
+
+    def __call__(self, image_bgr: np.ndarray) -> tuple[list[list[float]], list[int]]:
+        image = Image.fromarray(image_bgr[:, :, ::-1])
+        inputs = self.processor(images=image, text="cat.", return_tensors="pt").to(self.device)
+        outputs = self.model(**inputs)
+        result = self.processor.post_process_grounded_object_detection(
+            outputs, inputs.input_ids, threshold=self.threshold, text_threshold=self.threshold, target_sizes=[image.size[::-1]]
+        )[0]
+        boxes = [[float(v) for v in box] for box in result["boxes"]]
+        return boxes, [15] * len(boxes)
+
+
 def _pick_box(bboxes: Any, classes: Any) -> tuple[list[float] | None, int | None]:
     candidates = [
         (bbox, int(cls))
@@ -146,10 +173,15 @@ def _draw_overlay(
     image.save(output_path, quality=90)
 
 
-def run_clip(clip_id: str, *, device: str) -> dict[str, Any]:
+def run_clip(clip_id: str, *, device: str, detector_kind: str = "yolox") -> dict[str, Any]:
     import cv2
 
     detector, pose = _load_models(device)
+    if detector_kind == "grounding":
+        # ONNX runtime stays on CPU for pose; the grounding detector wants the GPU when there is one.
+        import torch
+
+        detector = GroundingCatDetector("cuda" if torch.cuda.is_available() else "cpu")
     manifest = load_frames_manifest(clip_id)
     src_dir = frames_dir(clip_id)
     out_dir = clip_workdir(clip_id) / "overlays" / "body"
@@ -195,7 +227,8 @@ def run_clip(clip_id: str, *, device: str) -> dict[str, Any]:
         "clip_id": clip_id,
         "method": "body",
         "model": {
-            "detector": DETECTOR_ONNX,
+            "detector": getattr(detector, "model_id", DETECTOR_ONNX),
+            "detector_kind": detector_kind,
             "pose": POSE_ONNX,
             "runtime": "rtmlib/onnxruntime",
             "device": device,
@@ -217,11 +250,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Run RTMPose AP-10K over the review frames.")
     parser.add_argument("--clip", action="append")
     parser.add_argument("--device", default="cpu")
+    parser.add_argument("--detector", choices=["yolox", "grounding"], default="grounding", help="grounding (default since 2026-09-14) finds cats YOLOX-m misses on the review clips")
     args = parser.parse_args()
     for clip in load_clips():
         if args.clip and clip["clip_id"] not in args.clip:
             continue
-        payload = run_clip(clip["clip_id"], device=args.device)
+        payload = run_clip(clip["clip_id"], device=args.device, detector_kind=args.detector)
         print(json.dumps({"clip_id": clip["clip_id"], **payload["summary"]}))
 
 

@@ -115,3 +115,9 @@ cats of the jumping clip, and draws a white paw when the tail is tucked. Report:
 `grounded_tail_v1.py` adds a SigLIP crop check and a Viterbi pass with a "no tail" state
 to the grounded method. Precision 0.52 → 0.95 at recall 0.72 on the review set (proxy
 scoring, parameters fitted on the same frames). Report: `reports/grounded-tail-v1.md`.
+
+## Grounded tail v2 and coverage (2026-09-14)
+
+`tail_bridge.py` propagates each v1-accepted mask one frame into refused neighbours
+(never into paw refusals). With Grounding DINO as the body-run detector, coverage goes
+from 43 to 55 of 57 frames with a cat. Report: `reports/grounded-tail-v2.md`.

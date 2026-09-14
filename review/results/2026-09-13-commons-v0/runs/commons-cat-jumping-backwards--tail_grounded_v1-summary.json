@@ -33,12 +33,12 @@
   "schema_version": "0.1.0",
   "summary": {
     "frames_total": 24,
-    "frames_with_curve": 13,
+    "frames_with_curve": 12,
     "status_counts": {
-      "no_cat": 6,
-      "no_tail_box": 3,
-      "ok": 13,
-      "temporal_none": 2
+      "no_cat": 2,
+      "no_tail_box": 5,
+      "ok": 12,
+      "temporal_none": 5
     }
   }
 }

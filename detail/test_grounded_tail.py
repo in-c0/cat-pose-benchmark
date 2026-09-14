@@ -31,6 +31,10 @@ class CatBoxTests(unittest.TestCase):
     def test_preference_falls_back_when_nothing_overlaps(self) -> None:
         self.assertIs(pick_cat_box([CAT, OTHER_CAT], [0.0, 900.0, 10.0, 950.0]), OTHER_CAT)
 
+    def test_merged_cat_tail_label_counts_as_cat(self) -> None:
+        merged = {"label": "cat tail", "score": 0.66, "box": [0.0, 0.0, 300.0, 200.0]}
+        self.assertIs(pick_cat_box([merged], None), merged)
+
     def test_low_score_and_non_cat_labels_ignored(self) -> None:
         weak = {"label": "cat", "score": 0.1, "box": [0.0, 0.0, 10.0, 10.0]}
         tail = {"label": "tail", "score": 0.9, "box": [0.0, 0.0, 10.0, 10.0]}
