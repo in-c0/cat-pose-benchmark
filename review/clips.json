@@ -1,6 +1,6 @@
 {
   "schema_version": "0.1.0",
-  "notes": "Frame-review set. Sampling is fixed per clip so the SAM2 tail seed fixture lands on an exact sampled frame; changing fps or duration invalidates the seed index.",
+  "notes": "Frame-review set. Sampling is fixed per clip so the SAM2 tail seed fixture lands on an exact sampled frame; changing fps or duration invalidates the seed index. Clips marked held_out were added after every threshold was fixed and must not be used to tune anything.",
   "clips": [
     {
       "clip_id": "commons-cat-plays",
@@ -26,6 +26,38 @@
         "fixture_timestamp_s": 3.3333333333333335,
         "review_frame_index": 10
       }
+    },
+    {
+      "clip_id": "commons-black-cat-walking",
+      "manifest": "bakeoff/clips/commons-black-cat-walking.json",
+      "sample_fps": 2.0,
+      "max_seconds": 18.875,
+      "subject": "One black cat walking, 1080p. Held-out: no threshold in the repository was chosen on it.",
+      "held_out": true
+    },
+    {
+      "clip_id": "commons-cat-licking-tail",
+      "manifest": "bakeoff/clips/commons-cat-licking-tail.json",
+      "sample_fps": 2.0,
+      "max_seconds": 25.92,
+      "subject": "One young cat licking its tail, 640x480; the tail is held against the face and body for much of the clip. Held-out: no threshold in the repository was chosen on it.",
+      "held_out": true
+    },
+    {
+      "clip_id": "commons-cat-plays-dense",
+      "manifest": "bakeoff/clips/commons-cat-plays.json",
+      "sample_fps": 8.0,
+      "max_seconds": 8.3,
+      "subject": "Dense (8 fps) resampling of Cat Plays used only to harvest pseudo-labels for the tail probe. Not a review clip.",
+      "review": false
+    },
+    {
+      "clip_id": "commons-cat-jumping-backwards-dense",
+      "manifest": "bakeoff/clips/commons-cat-jumping-backwards.json",
+      "sample_fps": 8.0,
+      "max_seconds": 8.0,
+      "subject": "Dense (8 fps) resampling of the jumping clip used only to harvest pseudo-labels for the tail probe. Not a review clip.",
+      "review": false
     }
   ]
 }

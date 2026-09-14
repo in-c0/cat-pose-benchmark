@@ -133,6 +133,8 @@ def main() -> None:
     for clip in load_clips():
         if args.clip and clip["clip_id"] not in args.clip:
             continue
+        if not clip.get("review", True):
+            continue
         for method in METHODS:
             if method == "tail" and "tail_seed" not in clip:
                 continue

@@ -78,6 +78,13 @@ python -m review.template --output review/results/<set>/reviews/TEMPLATE.csv
 
 Requires `rtmlib`, `imageio-ffmpeg`, `transformers` (Grounding DINO), `sam2` (install with `SAM2_BUILD_CUDA=0`; the custom CUDA kernel is not needed) and the usual torch/PIL/scikit-image stack. Model weights download on first run. `review/work/` is git-ignored; the sheets, run summaries and frame manifests are copied into `results/` so a set can be reviewed without regenerating it.
 
+## Sets
+
+- `results/2026-09-13-commons-v0/` — the two clips every threshold was tuned on (513 rows).
+- `results/2026-09-14-heldout-v0/` — two clips added afterwards and never tuned on (720 rows). Verdicts here carry more weight.
+
+Entries in `clips.json` with `"review": false` are dense resamples used for training experiments and are excluded from templates and sheets.
+
 ## Adding a clip
 
 Add an entry to `clips.json` pointing at a licence-verified manifest in `bakeoff/clips/`. If there is no SuperAnimal tail seed for it, omit `tail_seed`; body, tail_anchored and tail_grounded rows are still generated. Phone video of your own cat is fine; the body method needs nothing but the video.
