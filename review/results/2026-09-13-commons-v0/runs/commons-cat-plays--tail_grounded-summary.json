@@ -12,6 +12,13 @@
   "selection": {
     "box_threshold": 0.15,
     "cat_box_preference": "body-run bbox when present, else highest score",
+    "geometry_rules": {
+      "body_contact_band_fraction": 0.012,
+      "enabled": false,
+      "max_body_contact_fraction": 0.45,
+      "min_elongation": 2.5,
+      "trunk_opening_radius_fraction": 0.045
+    },
     "keypoint_veto": {
       "enabled": false,
       "head": [

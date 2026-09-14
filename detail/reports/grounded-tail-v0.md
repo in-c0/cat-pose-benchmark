@@ -58,12 +58,38 @@ Three things stand out.
   errors for another's, so it is off by default and the keypoints inside the mask are
   recorded as diagnostics instead.
 
+## Addendum 2026-09-14: grounded + anchored geometry
+
+The owner asked for the combination: apply the anchored method's body-contact and
+elongation rules to the grounded tail mask (against a SAM2 cat mask), so a paw lying
+against the body is refused. Implemented as `--geometry-rules`, off by default; the
+features are recorded on every accepted frame regardless.
+
+Measured on the same frames (eyeball truth):
+
+| clip | grounded alone: accepted / right | + geometry rules: accepted / right | true tails lost to the rules |
+|---|---|---|---|
+| commons-cat-plays | 33 / 11 | 10 / 5 | f000, 004, 007, 008, 011, 019 |
+| commons-cat-jumping-backwards | 15 / 14 | 10 / 10 | f016, 020, 022, 023 |
+
+Precision goes up (33 % → 50 % on *Cat Plays*, 93 % → 100 % on the jumping clip) and
+recall roughly halves. The features do not separate the two classes: right tails span
+body-contact 0.0–0.93 and elongation 1.1–6.4; paws span 0.19–1.0 and 0–6.0. A tucked
+paw and a tail curled against the flank look the same to these measures, and the
+centreline skeleton is noisy enough on small masks that elongation is unreliable below
+about 3 000 px of area. A counter-prompt (`"cat. tail. leg. paw."`) was also tried: the
+detector returns merged labels such as `tail leg` on right and wrong frames alike, so it
+does not separate them either.
+
+So the honest state is: the detector decides *where* well and *whether* badly, and
+neither geometry nor a second prompt fixes *whether* on this footage. Left off.
+
 ## What would move it further
 
-- A better "no tail visible" decision. Candidates: require the tail box to be elongated
-  and to touch the cat silhouette at one end only (the anchored rules, applied to the
-  grounded box rather than to the whole cat mask); or compare the tail box against a
-  second prompt such as `"paw."` and refuse when a paw box overlaps it more.
+- A better "no tail visible" decision. Geometry on the box and a paw counter-prompt were
+  both tried (addendum above) and do not do it. Temporal consistency is untested: a real
+  tail box moves smoothly between frames, a paw picked by default jumps. So is asking a
+  vision-language model the direct question, "is this cat's tail visible?", per frame.
 - A stronger grounding model. This is the tiny variant. SAM 3 accepts text concepts
   natively and tracks them through video; its licence needs checking before it goes
   anywhere near the product path.

@@ -10,7 +10,7 @@ from detail.grounded_tail import run as grounded
 from review.common import clip_workdir, frames_dir, frames_manifest_path, load_clips, write_json
 
 
-def run_clip(clip_id: str, *, device: str, samples: int) -> dict:
+def run_clip(clip_id: str, *, device: str, samples: int, geometry_rules: bool = False) -> dict:
     work = clip_workdir(clip_id)
     out_dir = work / "tail_grounded"
     if out_dir.exists():
@@ -24,6 +24,7 @@ def run_clip(clip_id: str, *, device: str, samples: int) -> dict:
         device=device,
         sample_count=samples,
         clip_id=clip_id,
+        geometry_rules=geometry_rules,
     )
     overlay_dir = work / "overlays" / "tail_grounded"
     if overlay_dir.exists():
@@ -44,6 +45,8 @@ def run_clip(clip_id: str, *, device: str, samples: int) -> dict:
                 "status": f["status"],
                 "tail_score": f["tail"]["score"] if f.get("tail") else None,
                 "limb_keypoints_inside": f.get("limb_keypoints_inside"),
+                "geometry": f.get("geometry"),
+                "geometry_rejections": f.get("geometry_rejections"),
                 "cat_score": f["cat"]["score"] if f.get("cat") else None,
             }
             for f in result["frames"]
@@ -58,11 +61,12 @@ def main() -> None:
     parser.add_argument("--clip", action="append")
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--samples", type=int, default=24)
+    parser.add_argument("--geometry-rules", action="store_true")
     args = parser.parse_args()
     for clip in load_clips():
         if args.clip and clip["clip_id"] not in args.clip:
             continue
-        payload = run_clip(clip["clip_id"], device=args.device, samples=args.samples)
+        payload = run_clip(clip["clip_id"], device=args.device, samples=args.samples, geometry_rules=args.geometry_rules)
         print(json.dumps({"clip_id": clip["clip_id"], **payload["summary"]}))
 
 

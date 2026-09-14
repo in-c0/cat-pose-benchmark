@@ -6,6 +6,8 @@ ear, tail, contact, and scene-relative motion in real environments.**
 > The repository name is provisional. The consumer cat brand and its products should
 > remain separate from this research artefact.
 
+**Latest note (14 Sep 2026):** [*Where, not whether: finding a cat's tail in ordinary video with a text-grounded detector*](paper/README.md) ([PDF](paper/where-not-whether-v0.1.pdf)). Three per-frame tail methods compared on 57 real frames. Asking Grounding DINO for `"cat. tail."` finds an extended tail on 14 of 15 frames across two cats; when the tail is tucked it draws a paw. A one-phrase prompt grounds the whole animal, a keypoint veto trades one model's errors for another's, and geometry raises precision but cannot decide whether a tail is visible.
+
 ---
 
 ## Status: research direction v0.2 + Stage 0 design + model bake-off
@@ -188,6 +190,7 @@ detail/                             feline detail head: SAM2 ear geometry and ta
 temporal/                           whole-animal tracking and identity assignment across frames (#12)
 identity/                           ID1 persistent identity: REMIND baseline, DINOv3 pin, YouTube-VIS adapter
 review/                             human frame review: overlays, contact sheets, verdict rubric and scorer
+paper/                              technical notes (Markdown source, PDF build, figures)
 
 Each experiment directory has its own README and a reports/ or results/ folder with
 what was actually run.
