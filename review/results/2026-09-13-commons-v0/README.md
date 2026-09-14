@@ -4,12 +4,12 @@ Sheets, run summaries and the empty verdict template for the first human frame r
 
 No human verdicts have been recorded yet. Everything below is what the models produced, not how correct it is.
 
-| clip | licence | fps | frames | body: frames with a detection | tail: frames with a curve | tail: no curve | tail: mask expansion flagged | tail_anchored: frames with a curve |
-|---|---|---|---|---|---|---|---|---|
-| commons-cat-plays | CC-BY-SA-4.0 | 4.0 | 33 | 26 | 20 | 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 | — | 7 (f001, 002, 011, 015, 016, 019, 020) |
-| commons-cat-jumping-backwards | CC-BY-3.0 | 3.0 | 24 | 17 | 21 | 0, 17, 19 | 21, 22, 23 | 6 (f004, 010, 011, 012, 020, 021) |
+| clip | licence | fps | frames | body: frames with a detection | tail: frames with a curve | tail: no curve | tail: mask expansion flagged | tail_anchored: frames with a curve | tail_grounded: frames with a curve |
+|---|---|---|---|---|---|---|---|---|---|
+| commons-cat-plays | CC-BY-SA-4.0 | 4.0 | 33 | 26 | 20 | 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 | — | 7 (f001, 002, 011, 015, 016, 019, 020) | 33 |
+| commons-cat-jumping-backwards | CC-BY-3.0 | 3.0 | 24 | 17 | 21 | 0, 17, 19 | 21, 22, 23 | 6 (f004, 010, 011, 012, 020, 021) | 15 (no cat box on f000–004, 013, 015, 018, 019) |
 
-`tail_anchored` was added after the owner's first look at the sheets found the propagated tail on a hind leg. See `detail/reports/anchored-tail-v0.md` for what it does and an eyeball comparison. The template now has 342 rows (six parts).
+`tail_anchored` was added after the owner's first look at the sheets found the propagated tail on a hind leg. See `detail/reports/anchored-tail-v0.md` for what it does and an eyeball comparison. `tail_grounded` (Grounding DINO + SAM2) was added 2026-09-14; see `detail/reports/grounded-tail-v0.md`. The template now has 399 rows (seven parts).
 
 Things visible on the sheets before any verdict is entered, for the reviewer to confirm or reject:
 

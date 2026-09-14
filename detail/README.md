@@ -102,3 +102,10 @@ feline-detail JSON contract
 whole cat, the body is subtracted using RTMPose keypoints, and the thin piece left at the
 tail root is checked against anatomical rules before it is reported. Added after human
 review found the propagated mask tracking a leg. Report: `reports/anchored-tail-v0.md`.
+
+## Grounded tail (2026-09-14)
+
+`grounded_tail.py` asks Grounding DINO for `"cat. tail."` on every frame and segments the
+chosen tail box with SAM2. Semantics with no geometry: it finds an extended tail on both
+cats of the jumping clip, and draws a white paw when the tail is tucked. Report:
+`reports/grounded-tail-v0.md`.
