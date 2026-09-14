@@ -1,0 +1,22 @@
+{
+  "schema_version": "0.1.0",
+  "clip_id": "commons-cat-licking-tail",
+  "source": {
+    "kind": "redistributable",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/0a/Cat_licking_tail.ogv",
+    "local_path": "bakeoff/media/cat-licking-tail.ogv"
+  },
+  "licence": {
+    "status": "verified",
+    "identifier": "CC-BY-SA-3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Cat_licking_tail.ogv",
+    "redistribution": "allowed",
+    "notes": "Author: Ammoniumnitrate. Wikimedia Commons records the uploader's own work under Creative Commons Attribution-ShareAlike 3.0 (checked via the Commons API extmetadata on 2026-09-14). Preserve attribution and share-alike obligations for redistributed adaptations."
+  },
+  "slices": [
+    "self_occlusion",
+    "face_ear_detail",
+    "tail_dynamics"
+  ],
+  "notes": "25.9 s 640x480 clip of a young cat licking its tail; tail held against the face and body for much of the clip. Held-out clip for the tail methods: never used to choose a threshold."
+}

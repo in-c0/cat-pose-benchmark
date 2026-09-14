@@ -1,0 +1,321 @@
+{
+  "clip_id": "commons-black-cat-walking",
+  "frame_count": 38,
+  "frames": [
+    {
+      "file": "00000.jpg",
+      "frame_index": 0,
+      "height_px": 1080,
+      "sha256": "7d6ce305065b374ba9e3169cdc04ff80b4a9bf43b07f77d3442adee4a51219e4",
+      "timestamp_s": 0.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00001.jpg",
+      "frame_index": 1,
+      "height_px": 1080,
+      "sha256": "df532c21b5c9e538b78577781ee25d8fd80d47354f00856b32bf4512ead2a560",
+      "timestamp_s": 0.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00002.jpg",
+      "frame_index": 2,
+      "height_px": 1080,
+      "sha256": "9497b6318d50a01a2357f866e18231ee404d03e4e01c150eb775f8ec87a9aecb",
+      "timestamp_s": 1.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00003.jpg",
+      "frame_index": 3,
+      "height_px": 1080,
+      "sha256": "023c4120f31e66575f1c38b9c28fbc6b9b4a927da727895e7f134d05244f209e",
+      "timestamp_s": 1.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00004.jpg",
+      "frame_index": 4,
+      "height_px": 1080,
+      "sha256": "558f118775bf1817ed44b55fc91f6d5a62e2a790bac893f136a3487edc8bfed6",
+      "timestamp_s": 2.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00005.jpg",
+      "frame_index": 5,
+      "height_px": 1080,
+      "sha256": "5a0dfb92cf733974c416503651389b8cfb1a7d9f15930770c9850da978b72272",
+      "timestamp_s": 2.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00006.jpg",
+      "frame_index": 6,
+      "height_px": 1080,
+      "sha256": "9df0c2e2e1ee9e52e49611b7be44dd9d4089be546f1e6009c6d18939cd3ba999",
+      "timestamp_s": 3.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00007.jpg",
+      "frame_index": 7,
+      "height_px": 1080,
+      "sha256": "fb6e408df599223ae9b9b4452380fde440cbc9913b65caff8cfa6941af1bee47",
+      "timestamp_s": 3.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00008.jpg",
+      "frame_index": 8,
+      "height_px": 1080,
+      "sha256": "6ed745e6301797c86c5a3ba52e629018c0cb999641002216d65c21a0b5a3aef2",
+      "timestamp_s": 4.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00009.jpg",
+      "frame_index": 9,
+      "height_px": 1080,
+      "sha256": "742cfed19b0f1509b24eb817a0f2deabc8e8d23cba788ddd33ff6d27cd0a5237",
+      "timestamp_s": 4.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00010.jpg",
+      "frame_index": 10,
+      "height_px": 1080,
+      "sha256": "0c2589b8b7f38689cb988862e2f7e11f8efd3cc4d3f9625669650ceabba03716",
+      "timestamp_s": 5.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00011.jpg",
+      "frame_index": 11,
+      "height_px": 1080,
+      "sha256": "f91abf135c72c15bd64a3b6a22fa94c51d5e8f409457841b3920827f32a5c319",
+      "timestamp_s": 5.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00012.jpg",
+      "frame_index": 12,
+      "height_px": 1080,
+      "sha256": "d9fdf2e8f490a1b32f03b91e85c2cc234755a59d096b43974cb98616d910b19a",
+      "timestamp_s": 6.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00013.jpg",
+      "frame_index": 13,
+      "height_px": 1080,
+      "sha256": "689b6a10e58500ada8fd925aad85e3c5c4c81a24d2e4d603acd8bbe8a1efc091",
+      "timestamp_s": 6.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00014.jpg",
+      "frame_index": 14,
+      "height_px": 1080,
+      "sha256": "b2e43ca3332b56b36a9aedf22d4559c2685b90f05024a9b7d10e9639ab862540",
+      "timestamp_s": 7.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00015.jpg",
+      "frame_index": 15,
+      "height_px": 1080,
+      "sha256": "aba8083699140773e5681c05b0f71fbcbe2eab8a405641494c1380105152b030",
+      "timestamp_s": 7.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00016.jpg",
+      "frame_index": 16,
+      "height_px": 1080,
+      "sha256": "1a2575afd8f68ea23909610e66e8b5ca3362e89dfb55e6ebe50fbdcf431b17b7",
+      "timestamp_s": 8.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00017.jpg",
+      "frame_index": 17,
+      "height_px": 1080,
+      "sha256": "12b4e87d0e8b608eaa11780edb7596a4fc1a7be1a0dc18690bfc18e18ed227aa",
+      "timestamp_s": 8.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00018.jpg",
+      "frame_index": 18,
+      "height_px": 1080,
+      "sha256": "053821e784e415d8cc34a83e897e985e8b8c28d1bf5eb30b9b3b26bc6eb94333",
+      "timestamp_s": 9.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00019.jpg",
+      "frame_index": 19,
+      "height_px": 1080,
+      "sha256": "4b5d522e629126056351c606f94c9445ade3b52e6d4ab926fee41bdb1734ae3f",
+      "timestamp_s": 9.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00020.jpg",
+      "frame_index": 20,
+      "height_px": 1080,
+      "sha256": "d266c812d4e4768ea492c269542d2d29f453f2a09dbc05cbb81626f37205e821",
+      "timestamp_s": 10.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00021.jpg",
+      "frame_index": 21,
+      "height_px": 1080,
+      "sha256": "cd88bbf5c884f3e597f2aa65550fed10b90f78ea304844201adfa7e920062f9a",
+      "timestamp_s": 10.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00022.jpg",
+      "frame_index": 22,
+      "height_px": 1080,
+      "sha256": "fd452605500aec4579240c15f11fdb075cc8cd72db5a63b0f2982ed3dea2d1fc",
+      "timestamp_s": 11.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00023.jpg",
+      "frame_index": 23,
+      "height_px": 1080,
+      "sha256": "ddf22fb4a41aee0d27d92156c18820aee58af7e4dcdcf2993efb86d025121706",
+      "timestamp_s": 11.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00024.jpg",
+      "frame_index": 24,
+      "height_px": 1080,
+      "sha256": "6f6d5e0f696af40428d039945708c38ea42f2bb6d12837eb88a71bcea1f9ddff",
+      "timestamp_s": 12.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00025.jpg",
+      "frame_index": 25,
+      "height_px": 1080,
+      "sha256": "5bf084f3feec1782b4064efb6cc2b8e2f9945bf4e58f500bfdf012e0100ae4e0",
+      "timestamp_s": 12.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00026.jpg",
+      "frame_index": 26,
+      "height_px": 1080,
+      "sha256": "8134dcbf93404fb16e197621199d6be590a651c76b68ae9704e133a7f28a2a11",
+      "timestamp_s": 13.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00027.jpg",
+      "frame_index": 27,
+      "height_px": 1080,
+      "sha256": "8231ce7dcac232299baa653699833a7bec4d8c4b8df9f696893c822dbe03381c",
+      "timestamp_s": 13.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00028.jpg",
+      "frame_index": 28,
+      "height_px": 1080,
+      "sha256": "01294b6fd73733d33311b7232273c50a2e80783b2028df01c8e2690b961d849d",
+      "timestamp_s": 14.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00029.jpg",
+      "frame_index": 29,
+      "height_px": 1080,
+      "sha256": "25e7fa7fea9bcee7e7fec978196c6da41d750de702bbf70ccfd6ed583f852781",
+      "timestamp_s": 14.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00030.jpg",
+      "frame_index": 30,
+      "height_px": 1080,
+      "sha256": "d833bf4cab1b8a94444a087f4b507217f9f78b049193178f8cb7daba4f59a938",
+      "timestamp_s": 15.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00031.jpg",
+      "frame_index": 31,
+      "height_px": 1080,
+      "sha256": "e60bb7b678564209c0788030020755ae432bde96f38f3f267b3f04470006261a",
+      "timestamp_s": 15.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00032.jpg",
+      "frame_index": 32,
+      "height_px": 1080,
+      "sha256": "c9dc1787b8b2019d1f85a4ead355e9b15e176f1f8c00dd00363b2990d0f4e2ba",
+      "timestamp_s": 16.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00033.jpg",
+      "frame_index": 33,
+      "height_px": 1080,
+      "sha256": "4d37bc4d0d17b70a64293387db736e9b296a26a30c3331c2bc2b022dcbc60fbf",
+      "timestamp_s": 16.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00034.jpg",
+      "frame_index": 34,
+      "height_px": 1080,
+      "sha256": "c30752ab02f0154c840b5551a4b1770c3ada62ef95534fa4468b9d9e4ca566bf",
+      "timestamp_s": 17.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00035.jpg",
+      "frame_index": 35,
+      "height_px": 1080,
+      "sha256": "0e7fd5893cc413412c300b58196ab808f9e3501d928ae54b441751ad8f1a2e4c",
+      "timestamp_s": 17.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00036.jpg",
+      "frame_index": 36,
+      "height_px": 1080,
+      "sha256": "79a05b268edd88974674904b134ad3796d17d459a21da28e0a565a9a122265e7",
+      "timestamp_s": 18.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00037.jpg",
+      "frame_index": 37,
+      "height_px": 1080,
+      "sha256": "c6d672757aa84422fb9af1278b045b72b88f6270dd1579a11e95722841a790ad",
+      "timestamp_s": 18.5,
+      "width_px": 1920
+    }
+  ],
+  "sampling": {
+    "fps": 2.0,
+    "max_seconds": 18.875
+  },
+  "schema_version": "0.1.0",
+  "source": {
+    "licence": "CC0-1.0",
+    "manifest": "bakeoff/clips/commons-black-cat-walking.json",
+    "media_path": "bakeoff\\media\\black-cat-walking.webm",
+    "media_sha256": "9f83c28163e899214df26c0a8f2d962dc5002153c6242aad8eb2236cd86ef491"
+  }
+}

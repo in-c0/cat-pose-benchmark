@@ -1,0 +1,53 @@
+{
+  "clip_id": "commons-cat-licking-tail",
+  "evidence_tier": "S2",
+  "method": "tail_grounded",
+  "models": {
+    "detector": "IDEA-Research/grounding-dino-tiny",
+    "device": "cuda",
+    "prompt": "cat. tail.",
+    "segmenter": "facebook/sam2.1-hiera-tiny"
+  },
+  "schema_version": "0.1.0",
+  "selection": {
+    "box_threshold": 0.15,
+    "cat_box_preference": "body-run bbox when present, else highest score",
+    "geometry_rules": {
+      "body_contact_band_fraction": 0.012,
+      "enabled": false,
+      "max_body_contact_fraction": 0.45,
+      "min_elongation": 2.5,
+      "trunk_opening_radius_fraction": 0.045
+    },
+    "keypoint_veto": {
+      "enabled": false,
+      "head": [
+        "nose",
+        "left_eye",
+        "right_eye"
+      ],
+      "limb": [
+        "left_front_paw",
+        "right_front_paw",
+        "left_back_paw",
+        "right_back_paw",
+        "left_knee",
+        "right_knee",
+        "left_elbow",
+        "right_elbow"
+      ]
+    },
+    "max_tail_to_cat_area": 0.5,
+    "min_cat_score": 0.3,
+    "min_tail_score": 0.2,
+    "text_threshold": 0.15
+  },
+  "summary": {
+    "frames_total": 52,
+    "frames_with_curve": 34,
+    "status_counts": {
+      "no_tail_box": 18,
+      "ok": 34
+    }
+  }
+}

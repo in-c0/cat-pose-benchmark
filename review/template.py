@@ -63,7 +63,7 @@ def main() -> None:
     parser.add_argument("--clip", action="append")
     args = parser.parse_args()
 
-    clips = [c for c in load_clips() if not args.clip or c["clip_id"] in args.clip]
+    clips = [c for c in load_clips() if (not args.clip or c["clip_id"] in args.clip) and c.get("review", True)]
     manifests = {c["clip_id"]: load_frames_manifest(c["clip_id"]) for c in clips}
     count = write_template(args.output, clips, manifests)
     print(f"{count} rows -> {args.output}")

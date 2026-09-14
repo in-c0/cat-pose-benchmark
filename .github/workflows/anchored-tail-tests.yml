@@ -12,6 +12,8 @@ on:
       - "detail/test_grounded_tail_v1.py"
       - "detail/tail_bridge.py"
       - "detail/test_tail_bridge.py"
+      - "detail/tail_probe.py"
+      - "detail/test_tail_probe.py"
       - "detail/mask_centerline.py"
       - ".github/workflows/anchored-tail-tests.yml"
   pull_request:
@@ -24,6 +26,8 @@ on:
       - "detail/test_grounded_tail_v1.py"
       - "detail/tail_bridge.py"
       - "detail/test_tail_bridge.py"
+      - "detail/tail_probe.py"
+      - "detail/test_tail_probe.py"
       - "detail/mask_centerline.py"
       - ".github/workflows/anchored-tail-tests.yml"
 
@@ -44,6 +48,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
-        run: python -m pip install --disable-pip-version-check pytest numpy pillow scikit-image opencv-python-headless
+        run: python -m pip install --disable-pip-version-check pytest numpy pillow scikit-image scikit-learn opencv-python-headless
       - name: Run rule tests without SAM2
-        run: python -m pytest -q detail/test_anchored_tail.py detail/test_grounded_tail.py detail/test_grounded_tail_v1.py detail/test_tail_bridge.py detail/test_mask_centerline.py
+        run: python -m pytest -q detail/test_anchored_tail.py detail/test_grounded_tail.py detail/test_grounded_tail_v1.py detail/test_tail_bridge.py detail/test_tail_probe.py detail/test_mask_centerline.py

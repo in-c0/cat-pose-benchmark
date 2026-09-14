@@ -36,6 +36,7 @@ jobs:
             numpy \
             pillow \
             scikit-image \
+            scikit-learn \
             opencv-python-headless
 
       - name: Run feline detail tests

@@ -1,0 +1,19 @@
+{
+  "clip_id": "commons-black-cat-walking",
+  "evidence_tier": "S2",
+  "method": "body",
+  "model": {
+    "detector": "IDEA-Research/grounding-dino-tiny",
+    "detector_kind": "grounding",
+    "device": "cpu",
+    "pose": "https://download.openmmlab.com/mmpose/v1/projects/rtmposev1/onnx_sdk/rtmpose-m_simcc-ap10k_pt-aic-coco_210e-256x256-7a041aa1_20230206.zip",
+    "runtime": "rtmlib/onnxruntime",
+    "score_threshold": 0.3
+  },
+  "schema_version": "0.1.0",
+  "summary": {
+    "frames": 38,
+    "frames_with_detection": 38,
+    "wall_seconds": 15.02
+  }
+}

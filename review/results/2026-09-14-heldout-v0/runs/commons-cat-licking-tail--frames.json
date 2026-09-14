@@ -1,0 +1,433 @@
+{
+  "clip_id": "commons-cat-licking-tail",
+  "frame_count": 52,
+  "frames": [
+    {
+      "file": "00000.jpg",
+      "frame_index": 0,
+      "height_px": 480,
+      "sha256": "fb198ba3ffe23b3db0cdc0946ccd93bab36c12ce259e8c5b463a843ec75de34b",
+      "timestamp_s": 0.0,
+      "width_px": 640
+    },
+    {
+      "file": "00001.jpg",
+      "frame_index": 1,
+      "height_px": 480,
+      "sha256": "ebe81109d8653703d9797061796fa6a179ef2f56871238d3c85c7b4f3a596033",
+      "timestamp_s": 0.5,
+      "width_px": 640
+    },
+    {
+      "file": "00002.jpg",
+      "frame_index": 2,
+      "height_px": 480,
+      "sha256": "b45363fa6ee317c002307dba30918cdbe776ac9cf0719f28d3cc717583a1c5d5",
+      "timestamp_s": 1.0,
+      "width_px": 640
+    },
+    {
+      "file": "00003.jpg",
+      "frame_index": 3,
+      "height_px": 480,
+      "sha256": "3df7ec287309355451865584ba7af9b5ba66569a2833ee3b80eb8854056a6639",
+      "timestamp_s": 1.5,
+      "width_px": 640
+    },
+    {
+      "file": "00004.jpg",
+      "frame_index": 4,
+      "height_px": 480,
+      "sha256": "af68c71e22cea0762b804394dfb3a2cfe7b620bf3b134a2a19a50a2c7fe1aecd",
+      "timestamp_s": 2.0,
+      "width_px": 640
+    },
+    {
+      "file": "00005.jpg",
+      "frame_index": 5,
+      "height_px": 480,
+      "sha256": "85122aef5b9c7f821e935c0d6e85e1a79f22428cbcebc2cec0c575477b146ef1",
+      "timestamp_s": 2.5,
+      "width_px": 640
+    },
+    {
+      "file": "00006.jpg",
+      "frame_index": 6,
+      "height_px": 480,
+      "sha256": "ed62b07725c575522b583295e7539c91d0a3d473a380d5a705d6543aa287a455",
+      "timestamp_s": 3.0,
+      "width_px": 640
+    },
+    {
+      "file": "00007.jpg",
+      "frame_index": 7,
+      "height_px": 480,
+      "sha256": "8faa2d4072010c16daa780d7a0f900accee8e22e2e51b091fdae78727c217340",
+      "timestamp_s": 3.5,
+      "width_px": 640
+    },
+    {
+      "file": "00008.jpg",
+      "frame_index": 8,
+      "height_px": 480,
+      "sha256": "61ea14fb2a61c81ea1927fb83f7d40b86071730c2c0415499a11dd653708d7ab",
+      "timestamp_s": 4.0,
+      "width_px": 640
+    },
+    {
+      "file": "00009.jpg",
+      "frame_index": 9,
+      "height_px": 480,
+      "sha256": "8fbc175b8a251b2897295c2821780af795e37b08e2b235417b867f2666dfc0ab",
+      "timestamp_s": 4.5,
+      "width_px": 640
+    },
+    {
+      "file": "00010.jpg",
+      "frame_index": 10,
+      "height_px": 480,
+      "sha256": "26cd8ddf6e4509bc28e2359965cb94afa1fefb280c5f8d4e217e0fd5317276cf",
+      "timestamp_s": 5.0,
+      "width_px": 640
+    },
+    {
+      "file": "00011.jpg",
+      "frame_index": 11,
+      "height_px": 480,
+      "sha256": "291d3671ca2c9f913de9ad2b7b96f7ae03dfee4b287051bca26da8d510e55567",
+      "timestamp_s": 5.5,
+      "width_px": 640
+    },
+    {
+      "file": "00012.jpg",
+      "frame_index": 12,
+      "height_px": 480,
+      "sha256": "782bd1226ae132dec469c8910ecf269547aacb78335417f96c818fafb279e7d5",
+      "timestamp_s": 6.0,
+      "width_px": 640
+    },
+    {
+      "file": "00013.jpg",
+      "frame_index": 13,
+      "height_px": 480,
+      "sha256": "1b430f9540ad32f9d2bace41abdf1bdda2b4a1807b9e7db1b95acd9cdee54d6b",
+      "timestamp_s": 6.5,
+      "width_px": 640
+    },
+    {
+      "file": "00014.jpg",
+      "frame_index": 14,
+      "height_px": 480,
+      "sha256": "6323078a65edf510ecc4ce0c760291fb278bfe4d0885820cbab8456b79ade993",
+      "timestamp_s": 7.0,
+      "width_px": 640
+    },
+    {
+      "file": "00015.jpg",
+      "frame_index": 15,
+      "height_px": 480,
+      "sha256": "4a5f6a9f19566d1527d1836adcb1940a92cb6bd7629c3ecaf4a578fa72a7a18d",
+      "timestamp_s": 7.5,
+      "width_px": 640
+    },
+    {
+      "file": "00016.jpg",
+      "frame_index": 16,
+      "height_px": 480,
+      "sha256": "460ede5372a84b4f046f5985a8710bdc7afed808a244f5bf8a65619139190d30",
+      "timestamp_s": 8.0,
+      "width_px": 640
+    },
+    {
+      "file": "00017.jpg",
+      "frame_index": 17,
+      "height_px": 480,
+      "sha256": "a19f9c866f88ce4ee27c376c709d2284792f5cea9eca8dc3b1214217ee187a01",
+      "timestamp_s": 8.5,
+      "width_px": 640
+    },
+    {
+      "file": "00018.jpg",
+      "frame_index": 18,
+      "height_px": 480,
+      "sha256": "63427e7c9ae77623f08cb4d17e26c83d07f810056061a911e58cc92a29b309fa",
+      "timestamp_s": 9.0,
+      "width_px": 640
+    },
+    {
+      "file": "00019.jpg",
+      "frame_index": 19,
+      "height_px": 480,
+      "sha256": "10f6f396a8c3f54c7c7e45f745fa4e97fa6fd72f9c4bfd4d2d9f82cda61af582",
+      "timestamp_s": 9.5,
+      "width_px": 640
+    },
+    {
+      "file": "00020.jpg",
+      "frame_index": 20,
+      "height_px": 480,
+      "sha256": "7465153a8f23b090a531932ec293db4ddb84e08bf0ce2f8ff8706bcb8d5906a7",
+      "timestamp_s": 10.0,
+      "width_px": 640
+    },
+    {
+      "file": "00021.jpg",
+      "frame_index": 21,
+      "height_px": 480,
+      "sha256": "25c58cc2f295d1abfb1b78bbf2b43d423ef230b0239b55bbc88675a3e4cef5b0",
+      "timestamp_s": 10.5,
+      "width_px": 640
+    },
+    {
+      "file": "00022.jpg",
+      "frame_index": 22,
+      "height_px": 480,
+      "sha256": "651f03a2921a2424459ec239aae9732302b00af1e383dbadaba2b5841a8ba843",
+      "timestamp_s": 11.0,
+      "width_px": 640
+    },
+    {
+      "file": "00023.jpg",
+      "frame_index": 23,
+      "height_px": 480,
+      "sha256": "bdf20c237754a9424afaa20d73129b0812dc4b1dd2c903ad4f51b53eef078fc6",
+      "timestamp_s": 11.5,
+      "width_px": 640
+    },
+    {
+      "file": "00024.jpg",
+      "frame_index": 24,
+      "height_px": 480,
+      "sha256": "2b8eb89a364c9a84bd3b177164f71e920cc1fe8c992700f0db0f318d1f1a69bc",
+      "timestamp_s": 12.0,
+      "width_px": 640
+    },
+    {
+      "file": "00025.jpg",
+      "frame_index": 25,
+      "height_px": 480,
+      "sha256": "179f5b0d0d506cee0bd46b7ceeadee37951632e3bf778aa9a135f7d8100f3a0e",
+      "timestamp_s": 12.5,
+      "width_px": 640
+    },
+    {
+      "file": "00026.jpg",
+      "frame_index": 26,
+      "height_px": 480,
+      "sha256": "9d37f8acacec8ca153644aeaedc24450b5b4a9ce4714f884acb193041fe5b3b2",
+      "timestamp_s": 13.0,
+      "width_px": 640
+    },
+    {
+      "file": "00027.jpg",
+      "frame_index": 27,
+      "height_px": 480,
+      "sha256": "4aa9d3dcfe8d1bc270ac63f5721b588bf22bed4220bdc4dc87e6c4acdae258b3",
+      "timestamp_s": 13.5,
+      "width_px": 640
+    },
+    {
+      "file": "00028.jpg",
+      "frame_index": 28,
+      "height_px": 480,
+      "sha256": "07c3d6a6b05d8887b8eddfc440f714192d107a476a95e9dd3375d46923f108e2",
+      "timestamp_s": 14.0,
+      "width_px": 640
+    },
+    {
+      "file": "00029.jpg",
+      "frame_index": 29,
+      "height_px": 480,
+      "sha256": "66032497cb485aa69fb097b01411e1fb9917c3991e6fc4295cfa74b5a5e57e8b",
+      "timestamp_s": 14.5,
+      "width_px": 640
+    },
+    {
+      "file": "00030.jpg",
+      "frame_index": 30,
+      "height_px": 480,
+      "sha256": "2a4ceced29cfec8e259b1061ced6ac26c22755e37ee9f44ec540a85b947d13c0",
+      "timestamp_s": 15.0,
+      "width_px": 640
+    },
+    {
+      "file": "00031.jpg",
+      "frame_index": 31,
+      "height_px": 480,
+      "sha256": "0f7886c5aeeac45cd0b4404823447fa4e59bc9bfa0371b07dc67fcb994503a6e",
+      "timestamp_s": 15.5,
+      "width_px": 640
+    },
+    {
+      "file": "00032.jpg",
+      "frame_index": 32,
+      "height_px": 480,
+      "sha256": "3c64818037f9bd518fe6e32f02b9bf2e7dd6fcf2d9d25cd3ed34e7f7b68dd749",
+      "timestamp_s": 16.0,
+      "width_px": 640
+    },
+    {
+      "file": "00033.jpg",
+      "frame_index": 33,
+      "height_px": 480,
+      "sha256": "fb7288b8fcd9c2eedca8382412dafebe0f415417f746592402154f59e3c788eb",
+      "timestamp_s": 16.5,
+      "width_px": 640
+    },
+    {
+      "file": "00034.jpg",
+      "frame_index": 34,
+      "height_px": 480,
+      "sha256": "fb0349c9e821b7c3310d93fb624c841cec7d356841535b0b0f7a5b772ccb54c8",
+      "timestamp_s": 17.0,
+      "width_px": 640
+    },
+    {
+      "file": "00035.jpg",
+      "frame_index": 35,
+      "height_px": 480,
+      "sha256": "b7c960fe612a05e0c4545c08efa68e338321442fde9abe4d2ae9e7d9e8b9befc",
+      "timestamp_s": 17.5,
+      "width_px": 640
+    },
+    {
+      "file": "00036.jpg",
+      "frame_index": 36,
+      "height_px": 480,
+      "sha256": "9aea1dd31cba147ddfcf8b66c3b6a65e74181433f1f6b9ae3aa49f4833f82cfd",
+      "timestamp_s": 18.0,
+      "width_px": 640
+    },
+    {
+      "file": "00037.jpg",
+      "frame_index": 37,
+      "height_px": 480,
+      "sha256": "04d3f7cecbcbd4ca302a59e51b33f278b9a215514d3a10fce2a95c34de4efc97",
+      "timestamp_s": 18.5,
+      "width_px": 640
+    },
+    {
+      "file": "00038.jpg",
+      "frame_index": 38,
+      "height_px": 480,
+      "sha256": "4c017b3ee3d48c2dacd0216fba9e7bcb5d8fe06287ab54c796415c79016c159c",
+      "timestamp_s": 19.0,
+      "width_px": 640
+    },
+    {
+      "file": "00039.jpg",
+      "frame_index": 39,
+      "height_px": 480,
+      "sha256": "def1cab9363ea78d48450ef6ead678d3d0d48f9765c13a82e477a81f01edc8f6",
+      "timestamp_s": 19.5,
+      "width_px": 640
+    },
+    {
+      "file": "00040.jpg",
+      "frame_index": 40,
+      "height_px": 480,
+      "sha256": "0c5532904be2a65ad5d0f182a7cc00f6568864f39dd62200f08d9a34806535a4",
+      "timestamp_s": 20.0,
+      "width_px": 640
+    },
+    {
+      "file": "00041.jpg",
+      "frame_index": 41,
+      "height_px": 480,
+      "sha256": "a1dcd463ec344112141a1226703a3d4b224ebd6223787d9b69f27d43bdb8ea37",
+      "timestamp_s": 20.5,
+      "width_px": 640
+    },
+    {
+      "file": "00042.jpg",
+      "frame_index": 42,
+      "height_px": 480,
+      "sha256": "a74d5d1f80afd54a86ebd10ab4a29b719d8bad6ee4eded9fced2b1a474993323",
+      "timestamp_s": 21.0,
+      "width_px": 640
+    },
+    {
+      "file": "00043.jpg",
+      "frame_index": 43,
+      "height_px": 480,
+      "sha256": "e9999a55cc67b050e2bd3a38bc74d07c804f2370603fa34c92dd1796fc77408d",
+      "timestamp_s": 21.5,
+      "width_px": 640
+    },
+    {
+      "file": "00044.jpg",
+      "frame_index": 44,
+      "height_px": 480,
+      "sha256": "6c606269d57c26c8daece20318d97abbd6434523cd06a1bf8b6e387367b7f24c",
+      "timestamp_s": 22.0,
+      "width_px": 640
+    },
+    {
+      "file": "00045.jpg",
+      "frame_index": 45,
+      "height_px": 480,
+      "sha256": "7f85f08eb6685b9a7367c9b4bcef912b463af30ccb353e576c7c3dbc36024a10",
+      "timestamp_s": 22.5,
+      "width_px": 640
+    },
+    {
+      "file": "00046.jpg",
+      "frame_index": 46,
+      "height_px": 480,
+      "sha256": "9ecef1b871752ff55831b8d01217a6fddf469542c2d58a1daea712be47a031e5",
+      "timestamp_s": 23.0,
+      "width_px": 640
+    },
+    {
+      "file": "00047.jpg",
+      "frame_index": 47,
+      "height_px": 480,
+      "sha256": "a59982150b8a55a101879499f870e01c03341218093307f2ce983c58c8d891d7",
+      "timestamp_s": 23.5,
+      "width_px": 640
+    },
+    {
+      "file": "00048.jpg",
+      "frame_index": 48,
+      "height_px": 480,
+      "sha256": "58845e3255d32402b7a9dd9f180b121526e4652082529f693236a48a4793152e",
+      "timestamp_s": 24.0,
+      "width_px": 640
+    },
+    {
+      "file": "00049.jpg",
+      "frame_index": 49,
+      "height_px": 480,
+      "sha256": "52b7871848ee127ff08df6913b94d02f4fc43c9d2c86e7a0dd224f0c76ce922d",
+      "timestamp_s": 24.5,
+      "width_px": 640
+    },
+    {
+      "file": "00050.jpg",
+      "frame_index": 50,
+      "height_px": 480,
+      "sha256": "14e617085fd4e6740602b9c84e911ac454c1cd465062625b6f0501eb0f5a34f0",
+      "timestamp_s": 25.0,
+      "width_px": 640
+    },
+    {
+      "file": "00051.jpg",
+      "frame_index": 51,
+      "height_px": 480,
+      "sha256": "59cf8e50874db6b53994061f98ad16f3b02a6f5914a0d2d2b43ec1019ba100f6",
+      "timestamp_s": 25.5,
+      "width_px": 640
+    }
+  ],
+  "sampling": {
+    "fps": 2.0,
+    "max_seconds": 25.92
+  },
+  "schema_version": "0.1.0",
+  "source": {
+    "licence": "CC-BY-SA-3.0",
+    "manifest": "bakeoff/clips/commons-cat-licking-tail.json",
+    "media_path": "bakeoff\\media\\cat-licking-tail.ogv",
+    "media_sha256": "b083cce3c97a2fd4f83c62278175ce0855872b0b6abc822b91f08df413aaa16e"
+  }
+}

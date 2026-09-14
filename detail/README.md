@@ -121,3 +121,10 @@ scoring, parameters fitted on the same frames). Report: `reports/grounded-tail-v
 `tail_bridge.py` propagates each v1-accepted mask one frame into refused neighbours
 (never into paw refusals). With Grounding DINO as the body-run detector, coverage goes
 from 43 to 55 of 57 frames with a cat. Report: `reports/grounded-tail-v2.md`.
+
+## Held-out clips and the tail probe (2026-09-14)
+
+Two clips added after every threshold was fixed: v1/v2 hold (61 of 61 accepted frames on
+the tail by eyeball), the anchored method does not. `tail_probe.py` trains a logistic probe
+on SigLIP crop embeddings from pseudo-labels; leave-one-clip-out precision 0.31 / 0.50, so
+it is stored (`models/tail_probe_v0.json`) and not used. Report: `reports/held-out-and-probe-v0.md`.

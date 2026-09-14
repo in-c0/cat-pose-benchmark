@@ -1,0 +1,99 @@
+{
+  "clip_id": "commons-black-cat-walking",
+  "evidence_tier": "S2",
+  "method": "tail_anchored",
+  "model": {
+    "anchors": "review/work/<clip>/body.json",
+    "checkpoint": "facebook/sam2.1-hiera-tiny",
+    "device": "cuda"
+  },
+  "rules": {
+    "body_contact_band_fraction": 0.012,
+    "body_region": {
+      "dilation_fraction": 0.02,
+      "head_polygon": [
+        "nose",
+        "left_eye",
+        "right_eye",
+        "neck"
+      ],
+      "leg_bones": [
+        [
+          "left_shoulder",
+          "left_elbow"
+        ],
+        [
+          "left_elbow",
+          "left_front_paw"
+        ],
+        [
+          "right_shoulder",
+          "right_elbow"
+        ],
+        [
+          "right_elbow",
+          "right_front_paw"
+        ],
+        [
+          "left_hip",
+          "left_knee"
+        ],
+        [
+          "left_knee",
+          "left_back_paw"
+        ],
+        [
+          "right_hip",
+          "right_knee"
+        ],
+        [
+          "right_knee",
+          "right_back_paw"
+        ]
+      ],
+      "leg_tube_width_fraction": 0.09,
+      "trunk_opening_radius_fraction": 0.045,
+      "trunk_polygon": [
+        "neck",
+        "left_shoulder",
+        "right_shoulder",
+        "left_hip",
+        "right_hip"
+      ]
+    },
+    "head_reject_names": [
+      "nose",
+      "left_eye",
+      "right_eye"
+    ],
+    "keypoint_score_threshold": 0.3,
+    "leg_reject_names": [
+      "left_back_paw",
+      "left_elbow",
+      "left_front_paw",
+      "left_knee",
+      "right_back_paw",
+      "right_elbow",
+      "right_front_paw",
+      "right_knee"
+    ],
+    "max_area_fraction_of_bbox": 0.3,
+    "max_body_contact_fraction": 0.35,
+    "max_root_distance_fraction": 0.12,
+    "min_area_px": 40,
+    "min_elongation": 3.0,
+    "min_solid_fraction": 0.5,
+    "opening_radius_px": 3,
+    "root_tolerance_fraction": 0.1
+  },
+  "schema_version": "0.1.0",
+  "summary": {
+    "frames_total": 38,
+    "frames_with_curve": 30,
+    "status_counts": {
+      "all_candidates_rejected": 7,
+      "no_tail_root": 1,
+      "ok": 30
+    }
+  }
+}
