@@ -113,7 +113,7 @@ python -m review.run_tail --device cuda
 python -m review.run_tail_anchored --device cuda
 python -m review.run_tail_grounded --device cuda
 python -m review.sheets --output-dir review/work/sheets
-python paper/make_figures.py
+python paper/01-where-not-whether/make_figures.py
 ```
 
 Model weights download on first run. The sheets, run summaries and the empty verdict template for this set are committed under `review/results/2026-09-13-commons-v0/`. The per-method reports with more detail are `detail/reports/anchored-tail-v0.md` and `detail/reports/grounded-tail-v0.md`.

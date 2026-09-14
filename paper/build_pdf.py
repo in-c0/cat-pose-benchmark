@@ -1,11 +1,15 @@
-"""Render paper/README.md to paper/<slug>.pdf with reportlab. Deliberately small: it
-handles the Markdown this note uses (headings, paragraphs, bullets, pipe tables, fenced
-code, one image, bold/italic/inline code) and nothing else."""
+"""Render a note's README.md to a PDF with reportlab.
+
+    python paper/build_pdf.py paper/01-where-not-whether where-not-whether-v0.1.pdf
+
+Deliberately small: it handles the Markdown these notes use (headings, paragraphs,
+bullets, pipe tables, fenced code, images, bold/italic/inline code) and nothing else."""
 
 from __future__ import annotations
 
 import html
 import re
+import sys
 from pathlib import Path
 
 from reportlab.lib import colors
@@ -26,9 +30,9 @@ from reportlab.platypus import (
     TableStyle,
 )
 
-HERE = Path(__file__).resolve().parent
+HERE = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else Path(__file__).resolve().parent
 SOURCE = HERE / "README.md"
-OUTPUT = HERE / "where-not-whether-v0.1.pdf"
+OUTPUT = HERE / (sys.argv[2] if len(sys.argv) > 2 else "note.pdf")
 
 styles = getSampleStyleSheet()
 BODY = ParagraphStyle("body", parent=styles["Normal"], fontName="Helvetica", fontSize=9.5, leading=13, alignment=TA_JUSTIFY, spaceAfter=6)
@@ -91,7 +95,7 @@ def build() -> Path:
     text = SOURCE.read_text(encoding="utf-8").splitlines()
     doc = SimpleDocTemplate(
         str(OUTPUT), pagesize=A4, leftMargin=20 * mm, rightMargin=20 * mm, topMargin=18 * mm, bottomMargin=18 * mm,
-        title="Where, not whether", author="Ava Kim",
+        title=SOURCE.read_text(encoding="utf-8").splitlines()[0].lstrip("# ").strip(), author="Ava Kim",
     )
     width = A4[0] - 40 * mm
     story = []
