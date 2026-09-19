@@ -277,4 +277,3 @@ holdout2-katze-katzengras,1,tail_grounded_v3a+holdout2,correct,,usable,curve lie
 holdout2-katze-katzengras,2,tail_grounded_v3a+holdout2,correct,,usable,curve lies on the curled tail; the blind reference box ends ~80 px short on the right (checked on the overlay after the freeze)
 holdout2-katze-katzengras,3,tail_grounded_v3a+holdout2,correct,,usable,curve lies on the curled tail; the blind reference box ends ~80 px short on the right (checked on the overlay after the freeze)
 holdout2-katze-katzengras,4,tail_grounded_v3a+holdout2,correct,,usable,consensus curve on the curled tail, extends ~80 px past the blind reference box on the right (as f000-f003)
-holdout2-katze-katzengras,5,tail_grounded_v3a+holdout2,correct,,usable,consensus curve on the curled tail, extends ~80 px past the blind reference box on the right (as f000-f003)

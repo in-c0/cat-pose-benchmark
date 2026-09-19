@@ -1511,25 +1511,25 @@
   "tail_grounded_v3a": {
    "adjudicated": {
     "pooled": {
-     "TP": 67,
-     "FPv": 7,
+     "TP": 66,
+     "FPv": 8,
      "FN": 16,
      "FPn": 20,
      "TN": 142,
      "excluded": 44,
-     "TP_partial": 41,
+     "TP_partial": 40,
      "FN_partial": 3,
      "assoc_mismatch": 0,
      "ambiguous_asserted": 8,
      "ambiguous_no_output": 36,
      "ambiguous_correct": 1,
-     "precision": 0.713,
-     "recall": 0.744,
-     "false_runs": 7,
+     "precision": 0.702,
+     "recall": 0.733,
+     "false_runs": 8,
      "frames_scored": 296,
-     "macro_recall": 0.552,
+     "macro_recall": 0.545,
      "macro_recall_n_clips": 4,
-     "macro_precision": 0.527,
+     "macro_precision": 0.522,
      "macro_precision_n_clips": 5
     },
     "per_clip": {
@@ -1591,17 +1591,17 @@
       "recall": 0.767
      },
      "holdout2-katze-katzengras": {
-      "TP": 40,
-      "FPv": 0,
+      "TP": 39,
+      "FPv": 1,
       "FN": 0,
       "FPn": 0,
       "TN": 0,
       "excluded": 0,
-      "TP_partial": 40,
+      "TP_partial": 39,
       "FN_partial": 0,
       "assoc_mismatch": 0,
-      "precision": 1.0,
-      "recall": 1.0
+      "precision": 0.975,
+      "recall": 0.975
      },
      "holdout2-koetjing-cito": {
       "TP": 0,
