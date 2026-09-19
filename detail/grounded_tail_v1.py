@@ -76,6 +76,12 @@ MIN_PAW_TO_REFUSE = 0.10  # paw sigmoid must be at least this and above tail
 NONE_EMISSION = 0.20  # what "no tail" scores per frame, on the detector-score scale
 MOVE_WEIGHT = 0.5  # cost per cat-box diagonal of centre displacement
 NONE_SWITCH_COST = 0.20  # entering or leaving the "no tail" state
+# The three constants above were fitted at 4 fps (frame interval 0.25 s). Emissions
+# accumulate per frame, so at a denser sampling a stretch of frames carries more emission
+# mass against the same per-switch cost and the path changes shape at sequence edges.
+# With ``time_scale`` on, per-frame emissions are multiplied by (frame interval / 0.25 s)
+# so the same clip carries the same emission mass at any sampling rate.
+REFERENCE_INTERVAL_S = 0.25
 
 
 def pad_box(box: Box, pad: float, width: int, height: int) -> Box:
@@ -123,6 +129,7 @@ def looks_like_paw(probs: dict[str, float]) -> bool:
 def viterbi(
     frames: list[list[dict[str, Any]]],
     diagonals: list[float],
+    emission_scale: float = 1.0,
 ) -> list[int | None]:
     """Choose one candidate (index) or None per frame.
 
@@ -143,7 +150,7 @@ def viterbi(
     back: list[list[int]] = []
     for t in range(n):
         states = 1 + len(frames[t])
-        emis = [NONE_EMISSION] + [c["score"] for c in frames[t]]
+        emis = [NONE_EMISSION * emission_scale] + [c["score"] * emission_scale for c in frames[t]]
         cur = [-math.inf] * states
         prev_idx = [0] * states
         if t == 0:
@@ -247,8 +254,11 @@ def run(
     temporal: bool = True,
     detector_id: str = DETECTOR_ID,
     classifier_id: str = CLASSIFIER_ID,
+    time_scale: bool = False,
 ) -> dict[str, Any]:
     manifest = json.loads(frames_manifest.read_text(encoding="utf-8"))
+    frame_interval_s = 1.0 / float(manifest.get("sampling", {}).get("fps") or (1.0 / REFERENCE_INTERVAL_S))
+    emission_scale = (frame_interval_s / REFERENCE_INTERVAL_S) if time_scale else 1.0
     clip_id = clip_id or manifest["clip_id"]
     body_frames: dict[int, dict[str, Any]] = {}
     if body_json and body_json.exists():
@@ -303,7 +313,7 @@ def run(
         for r in per_frame
     ]
     if temporal:
-        choice = viterbi(surviving, diagonals)
+        choice = viterbi(surviving, diagonals, emission_scale)
     else:
         choice = [0 if s else None for s in surviving]
 
@@ -391,6 +401,9 @@ def run(
             "none_emission": NONE_EMISSION,
             "move_weight": MOVE_WEIGHT,
             "none_switch_cost": NONE_SWITCH_COST,
+            "time_scale": time_scale,
+            "frame_interval_s": frame_interval_s,
+            "emission_scale": emission_scale,
             "candidates_per_frame": CANDIDATES_PER_FRAME,
             "min_cat_score": MIN_CAT_SCORE,
             "min_tail_score": MIN_TAIL_SCORE,
@@ -425,12 +438,13 @@ def main() -> None:
     parser.add_argument("--no-temporal", action="store_true")
     parser.add_argument("--detector", default=DETECTOR_ID)
     parser.add_argument("--classifier", default=CLASSIFIER_ID)
+    parser.add_argument("--time-scale", action="store_true", help="scale per-frame emissions by frame interval / 0.25 s")
     args = parser.parse_args()
     result = run(
         frames_dir=args.frames_dir, frames_manifest=args.frames_manifest, output_dir=args.output_dir,
         body_json=args.body_json, device=args.device, sample_count=args.samples,
         zoom=args.zoom, crop_check=not args.no_crop_check, temporal=not args.no_temporal,
-        detector_id=args.detector, classifier_id=args.classifier,
+        detector_id=args.detector, classifier_id=args.classifier, time_scale=args.time_scale,
     )
     print(json.dumps(result["summary"], indent=2, sort_keys=True))
 
