@@ -49,15 +49,49 @@
       "sample_fps": 8.0,
       "max_seconds": 8.3,
       "subject": "Dense (8 fps) resampling of Cat Plays used only to harvest pseudo-labels for the tail probe. Not a review clip.",
-      "review": false
+      "review": false,
+      "dense_of": "commons-cat-plays",
+      "dense_factor": 2
     },
     {
       "clip_id": "commons-cat-jumping-backwards-dense",
       "manifest": "bakeoff/clips/commons-cat-jumping-backwards.json",
       "sample_fps": 8.0,
       "max_seconds": 8.0,
-      "subject": "Dense (8 fps) resampling of the jumping clip used only to harvest pseudo-labels for the tail probe. Not a review clip.",
-      "review": false
+      "subject": "Dense (8 fps) resampling of the jumping clip used only to harvest pseudo-labels for the tail probe. Not a review clip. 8 fps does not align to the 3 fps review frames; use -dense6 for fixed-timestamp scoring.",
+      "review": false,
+      "dense_of": null,
+      "dense_factor": null
+    },
+    {
+      "clip_id": "commons-cat-jumping-backwards-dense6",
+      "manifest": "bakeoff/clips/commons-cat-jumping-backwards.json",
+      "sample_fps": 6.0,
+      "max_seconds": 8.0,
+      "subject": "Dense (6 fps) resampling aligned to the 3 fps review frames (dense index = 2 x review index). Not a review clip.",
+      "review": false,
+      "dense_of": "commons-cat-jumping-backwards",
+      "dense_factor": 2
+    },
+    {
+      "clip_id": "commons-black-cat-walking-dense",
+      "manifest": "bakeoff/clips/commons-black-cat-walking.json",
+      "sample_fps": 8.0,
+      "max_seconds": 18.875,
+      "subject": "Dense (8 fps) resampling aligned to the 2 fps review frames (factor 4). Not a review clip.",
+      "review": false,
+      "dense_of": "commons-black-cat-walking",
+      "dense_factor": 4
+    },
+    {
+      "clip_id": "commons-cat-licking-tail-dense",
+      "manifest": "bakeoff/clips/commons-cat-licking-tail.json",
+      "sample_fps": 8.0,
+      "max_seconds": 25.92,
+      "subject": "Dense (8 fps) resampling aligned to the 2 fps review frames (factor 4). Not a review clip.",
+      "review": false,
+      "dense_of": "commons-cat-licking-tail",
+      "dense_factor": 4
     }
   ]
 }
