@@ -26,9 +26,11 @@ from review.common import clip_workdir, load_clips
 
 # Frames on which the v0 grounded box was read as on the tail. Notes 01 and 04.
 VISIBLE: dict[str, set[int]] = {
-    # 1, 2, 3, 18 added 2026-09-20: the tail is out (pointing up) on those frames; v0 had
-    # picked a paw, so note 01 counted them as "v0 wrong", not "tail hidden".
-    "commons-cat-plays": {0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 18, 19, 20},
+    # Re-derived 2026-09-20 from the raw frames with one rule: this tuxedo cat's tail is
+    # all black; a limb with a white tip is a leg. That removes f000 and f009-f012 from
+    # note 01's reading (v0's boxes there were on white-tipped hind legs) and rejects the
+    # pass-1 idea that f001-f003 and f018 show the tail (they show a raised hind leg).
+    "commons-cat-plays": {4, 5, 7, 8, 19, 20},
     "commons-cat-jumping-backwards": {5, 6, 7, 8, 9, 10, 11, 12, 16, 17, 20, 21, 22, 23},
     "commons-black-cat-walking": set(range(0, 36)),
     "commons-cat-licking-tail": set(range(0, 27)),
@@ -39,10 +41,6 @@ IOU_MIN = 0.3
 # scorer: walking f006, v0 grounded the ear, v1 the tail.
 REFERENCE_OVERRIDE: dict[tuple[str, int], tuple[str, str, int]] = {
     ("commons-black-cat-walking", 6): ("commons-black-cat-walking", "tail_grounded_v1", 6),
-    ("commons-cat-plays", 1): ("commons-cat-plays-dense", "tail_grounded_v1", 2),
-    ("commons-cat-plays", 2): ("commons-cat-plays-dense", "tail_grounded_v1", 4),
-    ("commons-cat-plays", 3): ("commons-cat-plays-dense", "tail_grounded_v1", 6),
-    ("commons-cat-plays", 18): ("commons-cat-plays-dense", "tail_grounded_v1", 36),
 }
 
 
