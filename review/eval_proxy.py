@@ -26,7 +26,9 @@ from review.common import clip_workdir, load_clips
 
 # Frames on which the v0 grounded box was read as on the tail. Notes 01 and 04.
 VISIBLE: dict[str, set[int]] = {
-    "commons-cat-plays": {0, 4, 5, 7, 8, 9, 10, 11, 12, 19, 20},
+    # 1, 2, 3, 18 added 2026-09-20: the tail is out (pointing up) on those frames; v0 had
+    # picked a paw, so note 01 counted them as "v0 wrong", not "tail hidden".
+    "commons-cat-plays": {0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 18, 19, 20},
     "commons-cat-jumping-backwards": {5, 6, 7, 8, 9, 10, 11, 12, 16, 17, 20, 21, 22, 23},
     "commons-black-cat-walking": set(range(0, 36)),
     "commons-cat-licking-tail": set(range(0, 27)),
@@ -35,7 +37,13 @@ IOU_MIN = 0.3
 # Frames where the v0 box itself was later seen to be wrong although the tail is visible;
 # the reference box is taken from the named method instead. Found while building this
 # scorer: walking f006, v0 grounded the ear, v1 the tail.
-REFERENCE_OVERRIDE: dict[tuple[str, int], str] = {("commons-black-cat-walking", 6): "tail_grounded_v1"}
+REFERENCE_OVERRIDE: dict[tuple[str, int], tuple[str, str, int]] = {
+    ("commons-black-cat-walking", 6): ("commons-black-cat-walking", "tail_grounded_v1", 6),
+    ("commons-cat-plays", 1): ("commons-cat-plays-dense", "tail_grounded_v1", 2),
+    ("commons-cat-plays", 2): ("commons-cat-plays-dense", "tail_grounded_v1", 4),
+    ("commons-cat-plays", 3): ("commons-cat-plays-dense", "tail_grounded_v1", 6),
+    ("commons-cat-plays", 18): ("commons-cat-plays-dense", "tail_grounded_v1", 36),
+}
 
 
 def _matches(box: list[float], ref: list[float]) -> bool:
@@ -65,11 +73,11 @@ def _box_of(frame: dict[str, Any]) -> list[float] | None:
 def score_clip(review_clip: str, method: str, run_clip: str | None = None, factor: int = 1) -> dict[str, Any]:
     run_clip = run_clip or review_clip
     v0 = {f["frame_index"]: f for f in json.loads((clip_workdir(review_clip) / "tail_grounded" / "result.json").read_text(encoding="utf-8"))["frames"]}
-    for (clip, idx), src in REFERENCE_OVERRIDE.items():
+    for (clip, idx), (src_clip, src_method, src_idx) in REFERENCE_OVERRIDE.items():
         if clip == review_clip:
-            alt = {f["frame_index"]: f for f in json.loads((clip_workdir(review_clip) / src / "result.json").read_text(encoding="utf-8"))["frames"]}
-            if idx in alt and alt[idx].get("tail"):
-                v0[idx] = alt[idx]
+            alt = {f["frame_index"]: f for f in json.loads((clip_workdir(src_clip) / src_method / "result.json").read_text(encoding="utf-8"))["frames"]}
+            if src_idx in alt and alt[src_idx].get("tail"):
+                v0[idx] = alt[src_idx]
     run = {f["frame_index"]: f for f in json.loads((clip_workdir(run_clip) / method / "result.json").read_text(encoding="utf-8"))["frames"]}
     visible = VISIBLE[review_clip]
     counts = {"right": 0, "wrong": 0, "missed": 0, "refused_not_visible": 0}
