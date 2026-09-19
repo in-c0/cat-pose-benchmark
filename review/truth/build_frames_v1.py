@@ -66,7 +66,11 @@ DECISIONS: dict[str, dict[int, tuple[str, str, str, str]]] = {
     },
     "commons-cat-licking-tail": {
         **{i: (V, "high", "dark", "tail along the sofa edge") for i in rng(0, 26)},
-        **{i: (P, "low", "occlusion", "curled; dark strip under chin is the tucked tail") for i in rng(27, 35)},
+        # pass 10 blinded re-review with +-1 s of raw 8 fps context: the strip under the chin
+        # cannot be separated from the dark body / foreleg shadow; the tail was along the
+        # sofa edge at f025-f026 and the head comes down onto that spot, which is consistent
+        # with the tail being licked but does not make it resolvable. identity: unresolved.
+        **{i: (P, "low", "occlusion", "curled; dark strip under chin, unresolved (re-reviewed with temporal context, pass 10)") for i in rng(27, 35)},
         **{i: (N, "medium", "occlusion", "curled tight, tail under body") for i in rng(36, 51)},
     },
 }
@@ -136,7 +140,7 @@ def main() -> None:
                     ref = idx
                     rows.append({
                         "clip_id": clip, "frame_index": i, "timestamp_s": f"{f['timestamp_s']:.4f}", "target_cat": TARGET[clip],
-                        "tail_visibility": vis, "tail_identity_confidence": conf, "condition": cond, "note": note, "reference_box": ref,
+                        "tail_visibility": vis, "tail_identity_confidence": conf, "identity": "tail", "condition": cond, "note": note, "reference_box": ref,
                         "alt_cat": "", "alt_tail_visibility": "", "alt_identity_confidence": "", "alt_note": "", "alt_reference_box": "",
                     })
                     continue
@@ -146,14 +150,15 @@ def main() -> None:
                 if fr and fr.get("tail"):
                     ref = " ".join(f"{v:.0f}" for v in fr["tail"]["box"])
             alt = ALT.get(clip, {}).get(i, ("", "", "", "", ""))
+            identity = ("tail" if conf in ("high", "medium") else "unresolved") if vis in (V, P) else ""
             rows.append({
                 "clip_id": clip, "frame_index": i, "timestamp_s": f"{f['timestamp_s']:.4f}", "target_cat": TARGET[clip],
-                "tail_visibility": vis, "tail_identity_confidence": conf, "condition": cond, "note": note, "reference_box": ref,
+                "tail_visibility": vis, "tail_identity_confidence": conf, "identity": identity, "condition": cond, "note": note, "reference_box": ref,
                 "alt_cat": alt[0], "alt_tail_visibility": alt[1], "alt_identity_confidence": alt[2], "alt_note": alt[3], "alt_reference_box": alt[4],
             })
     out = HERE / "frames.csv"
     with out.open("w", newline="", encoding="utf-8") as h:
-        h.write(f"# annotation_protocol_version: 1.2; reviewer_id: claude-809c44f2 (model); frozen_at_commit: {commit}; date: 2026-09-20\n")
+        h.write(f"# annotation_protocol_version: 1.3; reviewer_id: claude-809c44f2 (model); frozen_at_commit: {commit}; date: 2026-09-20\n")
         w = csv.DictWriter(h, fieldnames=list(rows[0].keys()))
         w.writeheader()
         w.writerows(rows)

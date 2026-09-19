@@ -9,7 +9,8 @@ writes review/truth/methods/<method>.csv, and prints the confusion counts:
   FN  a tail is visible/partial, method produced nothing
   FPn no annotated tail is visible, method asserted a tail
   TN  no annotated tail is visible, method produced nothing
-  frames whose only unmatched annotated tail is ``uncertain`` are excluded.
+  ambiguous frames (only a low-identity-confidence or ``uncertain`` tail) are excluded from
+  P/R and reported as a separate stratum (asserted / correct / no_output).
 
 Precision = TP / (TP + FPv + FPn); recall = TP / (TP + FPv + FN).
 
@@ -83,13 +84,15 @@ def _same(box: list[float], ref: list[float]) -> bool:
 
 
 def frame_class(t: dict[str, Any]) -> str:
-    """'visible' if any annotated tail is visible/partial, 'not_visible' if none is and none
-    is uncertain, else 'uncertain'."""
-    vis = {t["tail_visibility"], t.get("alt_vis", "")} - {""}
-    if vis & {"visible", "partial"}:
+    """Primary stratum (truth 1.3): 'visible' if any annotated tail is visible/partial with
+    identity confidence high or medium; 'ambiguous' (excluded from the primary metric,
+    reported separately) if the only visible tail has low identity confidence or a tail is
+    'uncertain'; 'not_visible' otherwise."""
+    pairs = [(t["tail_visibility"], t["tail_identity_confidence"]), (t.get("alt_vis", ""), t.get("alt_identity_confidence", ""))]
+    if any(v in ("visible", "partial") and c in ("high", "medium") for v, c in pairs):
         return "visible"
-    if "uncertain" in vis:
-        return "uncertain"
+    if any(v in ("visible", "partial", "uncertain") for v, _ in pairs):
+        return "ambiguous"
     return "not_visible"
 
 
@@ -137,8 +140,11 @@ def tally(rows: list[dict[str, Any]], truth: dict) -> dict[str, Any]:
         vis = t["tail_visibility"]
         s = r["output_status"]
         fc = frame_class(t)
-        if fc == "uncertain":
+        if fc == "ambiguous":
             c["excluded"] += 1
+            c["ambiguous_" + ("asserted" if s not in ("no_output",) else "no_output")] = c.get("ambiguous_" + ("asserted" if s not in ("no_output",) else "no_output"), 0) + 1
+            if s in ("correct", "partial"):
+                c["ambiguous_correct"] = c.get("ambiguous_correct", 0) + 1
         elif fc == "visible":
             if s in ("correct", "partial"):
                 c["TP"] += 1
@@ -195,7 +201,7 @@ def main() -> None:
     total = tally(all_rows, truth)
     for clip, c in per_clip.items():
         print(f"{clip}: TP {c['TP']} FPv {c['FPv']} FN {c['FN']} FPn {c['FPn']} TN {c['TN']} excl {c['excluded']}  P {c['precision']} R {c['recall']}")
-    print(f"TOTAL {tag}: TP {total['TP']} FPv {total['FPv']} FN {total['FN']} FPn {total['FPn']} TN {total['TN']} excl {total['excluded']}  P {total['precision']} R {total['recall']}  (partial: TP {total['TP_partial']} FN {total['FN_partial']}; assoc_mismatch {total['assoc_mismatch']})")
+    print(f"TOTAL {tag}: TP {total['TP']} FPv {total['FPv']} FN {total['FN']} FPn {total['FPn']} TN {total['TN']} excl {total['excluded']}  P {total['precision']} R {total['recall']}  (partial: TP {total['TP_partial']} FN {total['FN_partial']}; assoc_mismatch {total['assoc_mismatch']}; ambiguous stratum: asserted {total.get('ambiguous_asserted', 0)} correct {total.get('ambiguous_correct', 0)} no_output {total.get('ambiguous_no_output', 0)})")
     wrongs = [r for r in all_rows if r["output_status"] not in ("correct", "no_output", "partial")]
     fns = [r for r in all_rows if r["output_status"] == "no_output" and frame_class(truth[(r["clip_id"], r["frame_index"])]) == "visible"]
     print("  asserted-wrong:", [f"{r['clip_id'][8:14]} f{r['frame_index']:03d}" for r in wrongs])

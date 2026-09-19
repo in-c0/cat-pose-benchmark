@@ -4,7 +4,7 @@ Two layers, so that what is in the frame is never entangled with what a method d
 
 ## Layer 1 — frame truth (`frames.csv`), method-independent, annotated once and frozen
 
-Columns: `clip_id, frame_index, timestamp_s, target_cat, tail_visibility, tail_identity_confidence, condition, note, reference_box`
+Columns: `clip_id, frame_index, timestamp_s, target_cat, tail_visibility, tail_identity_confidence, identity, condition, note, reference_box, alt_cat, alt_tail_visibility, alt_identity_confidence, alt_note, alt_reference_box`
 
 - `tail_visibility`: `visible` | `partial` | `not_visible` | `uncertain`
 - `tail_identity_confidence`: `high` | `medium` | `low` — how sure the annotator is that the appendage judged is the tail (Cat Plays showed that "I can see an appendage" and "that appendage is the tail" are different claims).
@@ -35,6 +35,7 @@ Columns: `clip_id, frame_index, method, output_status, wrong_part, box_quality, 
 
 - **1.1** (pass 8, 2026-09-20): instance-complete. `alt_cat`, `alt_tail_visibility`, `alt_identity_confidence`, `alt_note`, `alt_reference_box` carry a second cat's tail where one is discernible (only the jumping clip). The primary metric is instance-agnostic — an output on any annotated tail is correct; `assoc_mismatch` in the scorer counts TPs that sit on the other cat's tail while the method's cat box is on the target.
 - **1.2** (pass 9): walking f006/f007 reference boxes replaced. Both had been taken from detector boxes that cover the whole cat with the tail tip at the top edge, so a whole-body box scored as a tail. The references are now the tail tip itself. The scorer's containment rule became one-way at the same time (a box no larger than the reference with 80 % of itself inside it), so a box that merely contains the tail no longer matches.
+- **1.3** (pass 10): primary stratum rule. A frame counts as positive only when a tail is `visible`/`partial` **and** its identity confidence is `high` or `medium`; frames whose only visible tail is `low` confidence, or that are `uncertain`, form an *ambiguous* stratum that is excluded from P/R and reported separately (asserted / correct / no_output). New `identity` column (`tail` | `unresolved`, blank when nothing is visible). All `partial` and `low` frames were re-reviewed blinded to method output with ±1 s of raw 8 fps context: walking f001/f020/f030–f033 and Cat Plays f007/f008 stay `tail`; licking f027–f035 stay `low` → `unresolved` (the strip under the chin cannot be separated from the body/foreleg shadow even with context).
 
 ## Provenance
 
