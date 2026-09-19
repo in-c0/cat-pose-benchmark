@@ -71,3 +71,35 @@ paw is a leg); walking f006 v0 box was on the ear; pass-5 oracle labels on jumpi
 f013/f015 were the other cat's tail. Truth v1.1 adds the second cat's tail on the jumping
 clip, including the tuxedo tail standing upright on the scratcher on f007–f017 with the
 body hidden, which no earlier annotation had.
+
+## Zero-shot semantic verification (passes 13–14) — rejected
+
+`detail/semantic_audit.py`, `detail/semantic_audit_mask.py`. The parameter-free rule
+`tail > max(paw, leg, face, belly, floor)` on the SigLIP crop scores refuses 31 of 75 dev
+true tails and all 40 of Larry's (a cream tail hanging vertically scores as "a photo of a
+cat's leg"); mask-tight crops make it worse (leg 0.23–0.92). Belly does beat tail on 12 of
+17 rump frames, so the class exists; absolute tail scores do not (half the true tails
+score ≈ 0 for every class).
+
+## Single-feature mask geometry (pass 16) — rejected
+
+`detail/structural_audit.py`: tail-to-cat area, inside-body fraction, body contact,
+elongation, box ratio, mask/cat-box on 191 TP / 46 FP across dev + both holdouts. No
+feature replicates its direction across the three sets (max pooled AUROC 0.67): whole-cat
+masks are large and attached, edge strips and leaves are small and detached, and true
+tails span both (Larry detached, Katzengras attached).
+
+## Linear verifier on frozen SigLIP embeddings (pass 18, exploratory) — rejected
+
+`detail/verifier_probe.py`: L2 logistic regression, clip- and run-weighted,
+leave-two-clips-out over the 11 clips with accepted frames, threshold at 98 % of weighted
+training TPs. Held-out TP 191 → 44, FP 46 → 15. The embedding separates cats, not tails
+from non-tails, at this scale. Labels are model-annotated; nothing here is promotable.
+
+## Scorer v1 (pass 19) — corrected
+
+The scorer judged the detector's box before the reported curve and scored any assertion
+on a visible frame without a reference box as correct. Scorer v2 judges the curve, marks a
+collapsed centreline `unusable_curve` (six accepted frames had one), and requires a hand
+judgement where no reference exists. Numbers in notes 05 v0.3 / 06 v0.2 come from
+`review/truth/methods/aggregate.json`.
