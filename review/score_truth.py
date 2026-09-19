@@ -179,12 +179,13 @@ def main() -> None:
     parser.add_argument("--dense", action="store_true")
     parser.add_argument("--tag", help="name for the methods/<tag>.csv output (default: method[+dense])")
     parser.add_argument("--holdout", action="store_true", help="score against holdout_frames.csv instead of frames.csv")
+    parser.add_argument("--holdout2", action="store_true", help="score against holdout2_frames.csv")
     args = parser.parse_args()
-    truth = load_truth("holdout_frames.csv" if args.holdout else "frames.csv")
+    truth = load_truth("holdout2_frames.csv" if args.holdout2 else ("holdout_frames.csv" if args.holdout else "frames.csv"))
     overrides = load_overrides()
     clips = load_clips()
     dense_for = {c["dense_of"]: c for c in clips if c.get("dense_of") and c.get("dense_factor")}
-    tag = args.tag or (args.method + ("+dense" if args.dense else "") + ("+holdout" if args.holdout else ""))
+    tag = args.tag or (args.method + ("+dense" if args.dense else "") + ("+holdout" if args.holdout else "") + ("+holdout2" if args.holdout2 else ""))
     all_rows: list[dict[str, Any]] = []
     per_clip = {}
     for review_clip in sorted({k[0] for k in truth}):

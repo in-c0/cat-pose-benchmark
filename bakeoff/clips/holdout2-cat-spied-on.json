@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "clip_id": "holdout2-cat-spied-on",
+  "source": {
+    "kind": "redistributable",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/74/Cat_discovers_it_was_being_spied_on.webm",
+    "local_path": "bakeoff/media/holdout2-cat-spied-on.webm"
+  },
+  "licence": {
+    "status": "verified",
+    "identifier": "CC0-1.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Cat_discovers_it_was_being_spied_on.webm",
+    "redistribution": "allowed",
+    "notes": "Commons metadata: licence CC0, uploader Yourusernamewillbepublic2, artist Yourusernamewillbepublic2. Holdout #2: continuation of the frozen seed-20260920 order (review/holdout/selection2.json, rank 10); nothing about the content was seen before selection."
+  },
+  "slices": [
+    "holdout"
+  ],
+  "notes": "Prospective holdout #2. Commons description: Cat discovers it was being spied on from the person upstairs"
+}

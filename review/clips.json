@@ -128,6 +128,78 @@
       "subject": "Prospective holdout (protocol: first 10 s at 4 fps, fixed before anything was watched).",
       "held_out": true,
       "review": true
+    },
+    {
+      "clip_id": "holdout2-ljubljana-domaca-macka",
+      "manifest": "bakeoff/clips/holdout2-ljubljana-domaca-macka.json",
+      "sample_fps": 4.0,
+      "max_seconds": 10.0,
+      "subject": "Prospective holdout #2 (protocol: first 10 s at 4 fps, fixed before anything was watched).",
+      "held_out": true,
+      "review": true
+    },
+    {
+      "clip_id": "holdout2-andra-and-billy",
+      "manifest": "bakeoff/clips/holdout2-andra-and-billy.json",
+      "sample_fps": 4.0,
+      "max_seconds": 10.0,
+      "subject": "Prospective holdout #2 (protocol: first 10 s at 4 fps, fixed before anything was watched).",
+      "held_out": true,
+      "review": true
+    },
+    {
+      "clip_id": "holdout2-koetjing-cito",
+      "manifest": "bakeoff/clips/holdout2-koetjing-cito.json",
+      "sample_fps": 4.0,
+      "max_seconds": 10.0,
+      "subject": "Prospective holdout #2 (protocol: first 10 s at 4 fps, fixed before anything was watched).",
+      "held_out": true,
+      "review": true
+    },
+    {
+      "clip_id": "holdout2-sophy-ledge",
+      "manifest": "bakeoff/clips/holdout2-sophy-ledge.json",
+      "sample_fps": 4.0,
+      "max_seconds": 10.0,
+      "subject": "Prospective holdout #2 (protocol: first 10 s at 4 fps, fixed before anything was watched).",
+      "held_out": true,
+      "review": true
+    },
+    {
+      "clip_id": "holdout2-cat-spied-on",
+      "manifest": "bakeoff/clips/holdout2-cat-spied-on.json",
+      "sample_fps": 4.0,
+      "max_seconds": 10.0,
+      "subject": "Prospective holdout #2 (protocol: first 10 s at 4 fps, fixed before anything was watched).",
+      "held_out": true,
+      "review": true
+    },
+    {
+      "clip_id": "holdout2-dierenasyl",
+      "manifest": "bakeoff/clips/holdout2-dierenasyl.json",
+      "sample_fps": 4.0,
+      "max_seconds": 10.0,
+      "subject": "Prospective holdout #2 (protocol: first 10 s at 4 fps, fixed before anything was watched).",
+      "held_out": true,
+      "review": true
+    },
+    {
+      "clip_id": "holdout2-katze-katzengras",
+      "manifest": "bakeoff/clips/holdout2-katze-katzengras.json",
+      "sample_fps": 4.0,
+      "max_seconds": 10.0,
+      "subject": "Prospective holdout #2 (protocol: first 10 s at 4 fps, fixed before anything was watched).",
+      "held_out": true,
+      "review": true
+    },
+    {
+      "clip_id": "holdout2-katten-naar-buiten",
+      "manifest": "bakeoff/clips/holdout2-katten-naar-buiten.json",
+      "sample_fps": 4.0,
+      "max_seconds": 10.0,
+      "subject": "Prospective holdout #2 (protocol: first 10 s at 4 fps, fixed before anything was watched).",
+      "held_out": true,
+      "review": true
     }
   ]
 }

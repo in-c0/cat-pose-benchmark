@@ -1,12 +1,12 @@
 # Frozen truth: ten passes against fixed frame labels, and a prospective holdout that undid one of them
 
-**Ava Kim** — cat-pose-benchmark, technical note 05, v0.1, 20 September 2026
+**Ava Kim** — cat-pose-benchmark, technical note 05, v0.2, 20 September 2026 (v0.1 earlier the same day; §6b added)
 
 Repository: https://github.com/in-c0/cat-pose-benchmark · Follows notes 01–04 · Licence of this note: CC-BY-4.0
 
 ## Abstract
 
-Notes 01–04 scored every method by one person reading contact sheets after the fact. This note replaces that with a frame truth written down before scoring: for each of 147 development frames, whether a tail is visible, how sure the annotator is that the thing seen is the tail, and a reference box; method judgements are derived from it by a scorer, and every hand override carries a reason. Against that truth, one change survived from a series of twelve back-and-forth passes with a second model acting as reviewer: a two-sided SAM2 bridge that fills a short refusal gap only where the masks propagated from both sides intersect (v3). It takes the grounded method from 75 to 82 true frames at the same two false positives (precision 0.953, recall 0.911). Six other ideas were tried and rejected against the same truth, including one that looked like a gain under the old proxy and is a loss under the truth. An audit that turns the same bridge on the accepted frames (v3a) corrected two more, but the two it corrected turned out to be errors in the truth as well, so it stays a candidate. Then four new clips were chosen by a precommitted metadata-only protocol, annotated before any method ran, and scored once. The bridge gained nothing there, and on one clip the detector read the orange patch on a rolling cat's rump as its tail for 17 consecutive frames, which none of the temporal machinery can touch because it is temporally consistent. Precision on unseen ordinary video is 0.70, not 0.95, and the note says why.
+Notes 01–04 scored every method by one person reading contact sheets after the fact. This note replaces that with a frame truth written down before scoring: for each of 147 development frames, whether a tail is visible, how sure the annotator is that the thing seen is the tail, and a reference box; method judgements are derived from it by a scorer, and every hand override carries a reason. Against that truth, one change survived from a series of twelve back-and-forth passes with a second model acting as reviewer: a two-sided SAM2 bridge that fills a short refusal gap only where the masks propagated from both sides intersect (v3). It takes the grounded method from 75 to 82 true frames at the same two false positives (precision 0.953, recall 0.911). Six other ideas were tried and rejected against the same truth, including one that looked like a gain under the old proxy and is a loss under the truth. An audit that turns the same bridge on the accepted frames (v3a) corrected two more, but the two it corrected turned out to be errors in the truth as well, so it stays a candidate. Then four new clips were chosen by a precommitted metadata-only protocol, annotated before any method ran, and scored once. The bridge gained nothing there, and on one clip the detector read the orange patch on a rolling cat's rump as its tail for 17 consecutive frames, which none of the temporal machinery can touch because it is temporally consistent. Precision on unseen ordinary video is 0.70, not 0.95, and the note says why. A second holdout of eight clips drawn by the same protocol (§6b, added in v0.2) gives the other half of the picture: there the bridge's recall gain does generalise (0.73 → 0.77 at the same precision), and precision is again set by wrong-part assertions, 0.73, of four kinds the development clips never showed.
 
 ## 1. Why the proxy had to go
 
@@ -110,11 +110,42 @@ Against the criteria written down before the run: v3 was to show a recall gain o
 
 The result that matters is the other one. On unseen ordinary video, precision was set by a failure the four development clips never contained, a coloured patch of body read as a tail, and it was invisible to every piece of temporal machinery this session built because temporal machinery checks consistency, and the mistake is consistent. What is left to check it is the semantic component, which at present asks a single question of each crop. The reviewer model's proposal for the next cycle is to audit the six SigLIP scores the crop check already computes on every accepted candidate, offline, to see whether an existing negative class (leg, belly, face) already beats "tail" on the rump crops before adding any new prompt; and, if a rule comes out of that, to freeze it and buy a second holdout of eight clips by the same protocol before believing it. The Taiwan clip is a development clip from now on.
 
+## 6b. A second holdout (v0.2)
+
+The next question was whether the recall gain would generalise on a holdout that had gaps for the bridge to fill. Eight more clips were taken from the same frozen order, continuing from the position after the fourth clip of §6, with uploaders distinct across both holdouts and the same licence rule (`review/holdout/selection2.json`). One file, a 4K AV1 upload, does not decode with the bundled ffmpeg; the Commons 1080p transcode of the same file is used and the manifest says so. One clip is a produced university-series video that the keyword list did not catch; the protocol keeps it. The 296 frames were annotated from raw frames before any method ran (tag `holdout2-2026-09-pre-inference`).
+
+**Table 4.** Holdout #2, in selection order, and what the first ten seconds contain.
+
+| clip | licence | frames | what is there | primary truth |
+|---|---|---|---|---|
+| *Ljubljana domača mačka 2* | CC BY 3.0 | 40 | a silver tabby's head fills the frame, then it walks away with the tail straight up | 7 positive, 33 negative |
+| *Andra and Billy* | CC BY 4.0 | 40 | a small tabby on the ground beside a person: lying, sitting with the tail out, walking with it up | 13 positive, 21 negative, 6 uncertain |
+| *Koetjing gweh, Cito* | CC0 | 40 | an orange-and-white cat's face, close, dark | 40 negative |
+| *Sophy the Cat is Really High On A Ledge* | CC0 | 24 | a backlit cat on a ledge seen from below | 22 negative, 2 blur |
+| *Cat discovers it was being spied on* | CC0 | 32 | a street from a window; a cat about 80 px long on a balcony below | 32 uncertain |
+| *Dierenasyl* | public domain | 40 | a newsreel leader, a building, a child with a dog; no cat | 40 negative |
+| *Katze isst Katzengras* | CC BY 4.0 | 40 | a grey cat eating grass, seen from behind, tail curled along the rump | 40 partial |
+| *Dit is waarom katten nooit meer naar buiten mogen* | CC BY 3.0 | 40 | a ginger cat with its tail straight up under title overlays, then two other phone clips | 30 positive, 9 negative, 1 uncertain |
+
+After the freeze the overlays were checked and the judgements recorded as overrides with reasons. Two things came out of that check. My reference boxes for the ginger cat's tail on the 4K clip were 200–400 px too far right (a blurred upright tail is hard to place on a grid by eye), so the automatic match failed on frames where the mask is plainly on the tail; those are overrides, not truth edits. And on three frames of *Andra and Billy* the method drew a mask at ground level behind the rump where my blind reading had said the tail was hidden; looking again, it could be the tail. Under the rule from §2, a disagreement found after inference goes to uncertain, not to visible, and that is what the file says.
+
+**Table 5.** Holdout #2, primary stratum (252 frames), truth 1.3, no method changed after seeing it.
+
+| method | TP | wrong on a visible frame | missed | wrong on a hidden frame | correct refusal | precision | recall |
+|---|---|---|---|---|---|---|---|
+| v1 | 66 | 5 | 19 | 18 | 144 | 0.742 | 0.733 |
+| **v3** | 69 | 5 | 16 | 20 | 142 | 0.734 | 0.767 |
+| v3a | 69 | 5 | 16 | 20 | 142 | 0.734 | 0.767 |
+
+This time the criterion written down before the run is met: recall is up 3.4 points, precision down 0.8, and v3's three extra false assertions each extend an existing v1 false run by one frame rather than starting a new kind of error. The three frames it gains are real tails: the Ljubljana cat's upright tail on one more frame, the ginger cat's tail under the title overlay, the small tabby's tail as it turns away. So the bridge's gain generalises when a holdout contains gaps of the kind it fills, and does not when it does not; §6 and §6b together are the honest statement. v3a again corrects nothing and stays a candidate.
+
+Precision is 0.73, and the 25 false assertions are of four kinds, none of which the development clips contain: a thin strip at the edge of a face that fills the frame (11 frames of *Cito*); the whole body of a small or distant cat (5 frames of the tabby sitting on a dog — and the 40 correct frames on *Katzengras* are the same kind of mask, on a cat whose tail happens to lie inside it); a leaf or forepaw on the ground in front of a lying cat's face (9 frames of *Andra and Billy*); and, once, a person's face, reached by propagation. Together with §6 that is 42 wrong assertions on 372 unseen primary frames against 4 on 134 development frames. The next thing to look at is whether the four mask features the grounded method already records — tail-to-cat area, the fraction of the mask inside the body, its contact with the body, its elongation — separate these kinds of error from true tails across all three sets, before any new rule is written.
+
 ## 7. Where the programme is
 
-Five notes. The grounded method finds an extended tail, refuses a tucked one most of the time, and now has a truth to be measured against rather than a person's memory of a sheet. The two-sided bridge is a real gain on the clips that have gaps for it to fill, and there are not many. The audit found two truth errors and no method errors. The holdout found the failure that will decide the precision number on the next hundred clips, and the temporal machinery cannot see it.
+Five notes. The grounded method finds an extended tail, refuses a tucked one most of the time, and now has a truth to be measured against rather than a person's memory of a sheet. The two-sided bridge is a real gain on the clips that have gaps for it to fill, and there are not many. The audit found two truth errors and no method errors. The two holdouts found the failures that will decide the precision number on the next hundred clips, and the temporal machinery cannot see them.
 
-Two things are owed. A human has to go through the 307 frames of truth, without seeing any method output, and disagreements become uncertain. And the next holdout has to be bought before the next fix is made, not after.
+Two things are owed. A human has to go through the 603 frames of truth, without seeing any method output, and disagreements become uncertain. And the next holdout has to be bought before the next fix is made, not after.
 
 ## 8. Reproducing
 
@@ -137,6 +168,9 @@ python -m review.run_tail_grounded_v1 --device cuda --clip holdout-larry-nails -
 python -m review.run_tail_grounded_v2 --device cuda --clip holdout-larry-nails --clip holdout-boxing-cats-1894 --clip holdout-cat-playing-taiwan --clip holdout-dejeuner-des-minet-1906
 python -m review.run_tail_grounded_v3 --device cuda --clip holdout-larry-nails --clip holdout-boxing-cats-1894 --clip holdout-cat-playing-taiwan --clip holdout-dejeuner-des-minet-1906
 python -m review.score_truth tail_grounded_v3 --holdout
+python -m review.holdout.sample_pool --continue-from review/holdout/selection.json --n 8
+python -m review.truth.build_frames_holdout2
+python -m review.score_truth tail_grounded_v3 --holdout2
 python paper/05-frozen-truth/make_figures.py
 ```
 
