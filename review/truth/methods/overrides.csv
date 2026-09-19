@@ -118,3 +118,143 @@ holdout-cat-playing-taiwan,37,tail_grounded_v3a+holdout,wrong_part,torso,unusabl
 holdout-cat-playing-taiwan,38,tail_grounded_v3a+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
 holdout-cat-playing-taiwan,39,tail_grounded_v3a+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
 holdout-cat-playing-taiwan,22,tail_grounded_v3a+holdout,wrong_part,torso,unusable,reach-1 propagation from the f023 rump mask; the real tail rises at right
+holdout2-katten-naar-buiten,0,tail_grounded_v1+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,8,tail_grounded_v1+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,9,tail_grounded_v1+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,10,tail_grounded_v1+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,11,tail_grounded_v1+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,12,tail_grounded_v1+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,13,tail_grounded_v1+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,14,tail_grounded_v1+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,15,tail_grounded_v1+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,16,tail_grounded_v1+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,17,tail_grounded_v1+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,18,tail_grounded_v1+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,19,tail_grounded_v1+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,20,tail_grounded_v1+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,21,tail_grounded_v1+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,22,tail_grounded_v1+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,23,tail_grounded_v1+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,24,tail_grounded_v1+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,35,tail_grounded_v1+holdout2,wrong_part,torso,unusable,mask covers the tabby's whole body on the dog
+holdout2-katten-naar-buiten,36,tail_grounded_v1+holdout2,wrong_part,torso,unusable,mask covers the tabby's whole body on the dog
+holdout2-katten-naar-buiten,37,tail_grounded_v1+holdout2,wrong_part,torso,unusable,mask covers the tabby's whole body on the dog
+holdout2-katten-naar-buiten,38,tail_grounded_v1+holdout2,wrong_part,torso,unusable,mask covers the tabby's whole body on the dog
+holdout2-katten-naar-buiten,39,tail_grounded_v1+holdout2,wrong_part,torso,unusable,mask covers the tabby's whole body on the dog
+holdout2-andra-and-billy,17,tail_grounded_v1+holdout2,wrong_part,other,unusable,small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,18,tail_grounded_v1+holdout2,wrong_part,other,unusable,small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,19,tail_grounded_v1+holdout2,wrong_part,other,unusable,small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,20,tail_grounded_v1+holdout2,wrong_part,other,unusable,small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,21,tail_grounded_v1+holdout2,wrong_part,other,unusable,small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,22,tail_grounded_v1+holdout2,wrong_part,other,unusable,small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,35,tail_grounded_v1+holdout2,wrong_part,paw,unusable,mask on the forepaws of the walking cat
+holdout2-andra-and-billy,36,tail_grounded_v1+holdout2,wrong_part,paw,unusable,mask on the forepaws of the walking cat
+holdout2-andra-and-billy,37,tail_grounded_v1+holdout2,wrong_part,paw,unusable,mask on the forepaws of the walking cat
+holdout2-andra-and-billy,38,tail_grounded_v1+holdout2,wrong_part,paw,unusable,mask on the forepaws of the walking cat
+holdout2-andra-and-billy,39,tail_grounded_v1+holdout2,wrong_part,paw,unusable,mask on the forepaws of the walking cat
+holdout2-koetjing-cito,0,tail_grounded_v1+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,1,tail_grounded_v1+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,2,tail_grounded_v1+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,3,tail_grounded_v1+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,34,tail_grounded_v1+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,35,tail_grounded_v1+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,36,tail_grounded_v1+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,37,tail_grounded_v1+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,38,tail_grounded_v1+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,39,tail_grounded_v1+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-katten-naar-buiten,0,tail_grounded_v3+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,1,tail_grounded_v3+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,8,tail_grounded_v3+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,9,tail_grounded_v3+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,10,tail_grounded_v3+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,11,tail_grounded_v3+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,12,tail_grounded_v3+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,13,tail_grounded_v3+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,14,tail_grounded_v3+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,15,tail_grounded_v3+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,16,tail_grounded_v3+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,17,tail_grounded_v3+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,18,tail_grounded_v3+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,19,tail_grounded_v3+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,20,tail_grounded_v3+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,21,tail_grounded_v3+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,22,tail_grounded_v3+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,23,tail_grounded_v3+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,24,tail_grounded_v3+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,34,tail_grounded_v3+holdout2,wrong_part,other,unusable,propagated mask lands on the person's face (cone-cat clip)
+holdout2-katten-naar-buiten,35,tail_grounded_v3+holdout2,wrong_part,torso,unusable,mask covers the tabby's whole body on the dog
+holdout2-katten-naar-buiten,36,tail_grounded_v3+holdout2,wrong_part,torso,unusable,mask covers the tabby's whole body on the dog
+holdout2-katten-naar-buiten,37,tail_grounded_v3+holdout2,wrong_part,torso,unusable,mask covers the tabby's whole body on the dog
+holdout2-katten-naar-buiten,38,tail_grounded_v3+holdout2,wrong_part,torso,unusable,mask covers the tabby's whole body on the dog
+holdout2-katten-naar-buiten,39,tail_grounded_v3+holdout2,wrong_part,torso,unusable,mask covers the tabby's whole body on the dog
+holdout2-andra-and-billy,17,tail_grounded_v3+holdout2,wrong_part,other,unusable,small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,18,tail_grounded_v3+holdout2,wrong_part,other,unusable,small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,19,tail_grounded_v3+holdout2,wrong_part,other,unusable,small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,20,tail_grounded_v3+holdout2,wrong_part,other,unusable,small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,21,tail_grounded_v3+holdout2,wrong_part,other,unusable,small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,22,tail_grounded_v3+holdout2,wrong_part,other,unusable,small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,24,tail_grounded_v3+holdout2,correct,,partial,propagated mask on the tail dropping to the right (blind box roughly there; auto-match failed)
+holdout2-andra-and-billy,35,tail_grounded_v3+holdout2,wrong_part,paw,unusable,mask on the forepaws of the walking cat
+holdout2-andra-and-billy,36,tail_grounded_v3+holdout2,wrong_part,paw,unusable,mask on the forepaws of the walking cat
+holdout2-andra-and-billy,37,tail_grounded_v3+holdout2,wrong_part,paw,unusable,mask on the forepaws of the walking cat
+holdout2-andra-and-billy,38,tail_grounded_v3+holdout2,wrong_part,paw,unusable,mask on the forepaws of the walking cat
+holdout2-andra-and-billy,39,tail_grounded_v3+holdout2,wrong_part,paw,unusable,mask on the forepaws of the walking cat
+holdout2-koetjing-cito,0,tail_grounded_v3+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,1,tail_grounded_v3+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,2,tail_grounded_v3+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,3,tail_grounded_v3+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,33,tail_grounded_v3+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,34,tail_grounded_v3+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,35,tail_grounded_v3+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,36,tail_grounded_v3+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,37,tail_grounded_v3+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,38,tail_grounded_v3+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,39,tail_grounded_v3+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-katten-naar-buiten,0,tail_grounded_v3a+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,1,tail_grounded_v3a+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,8,tail_grounded_v3a+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,9,tail_grounded_v3a+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,10,tail_grounded_v3a+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,11,tail_grounded_v3a+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,12,tail_grounded_v3a+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,13,tail_grounded_v3a+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,14,tail_grounded_v3a+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,15,tail_grounded_v3a+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,16,tail_grounded_v3a+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,17,tail_grounded_v3a+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,18,tail_grounded_v3a+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,19,tail_grounded_v3a+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,20,tail_grounded_v3a+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,21,tail_grounded_v3a+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,22,tail_grounded_v3a+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,23,tail_grounded_v3a+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,24,tail_grounded_v3a+holdout2,correct,,usable,"mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,34,tail_grounded_v3a+holdout2,wrong_part,other,unusable,propagated mask lands on the person's face (cone-cat clip)
+holdout2-katten-naar-buiten,35,tail_grounded_v3a+holdout2,wrong_part,torso,unusable,mask covers the tabby's whole body on the dog
+holdout2-katten-naar-buiten,36,tail_grounded_v3a+holdout2,wrong_part,torso,unusable,mask covers the tabby's whole body on the dog
+holdout2-katten-naar-buiten,37,tail_grounded_v3a+holdout2,wrong_part,torso,unusable,mask covers the tabby's whole body on the dog
+holdout2-katten-naar-buiten,38,tail_grounded_v3a+holdout2,wrong_part,torso,unusable,mask covers the tabby's whole body on the dog
+holdout2-katten-naar-buiten,39,tail_grounded_v3a+holdout2,wrong_part,torso,unusable,mask covers the tabby's whole body on the dog
+holdout2-andra-and-billy,17,tail_grounded_v3a+holdout2,wrong_part,other,unusable,small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,18,tail_grounded_v3a+holdout2,wrong_part,other,unusable,small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,19,tail_grounded_v3a+holdout2,wrong_part,other,unusable,small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,20,tail_grounded_v3a+holdout2,wrong_part,other,unusable,small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,21,tail_grounded_v3a+holdout2,wrong_part,other,unusable,small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,22,tail_grounded_v3a+holdout2,wrong_part,other,unusable,small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,24,tail_grounded_v3a+holdout2,correct,,partial,propagated mask on the tail dropping to the right (blind box roughly there; auto-match failed)
+holdout2-andra-and-billy,35,tail_grounded_v3a+holdout2,wrong_part,paw,unusable,mask on the forepaws of the walking cat
+holdout2-andra-and-billy,36,tail_grounded_v3a+holdout2,wrong_part,paw,unusable,mask on the forepaws of the walking cat
+holdout2-andra-and-billy,37,tail_grounded_v3a+holdout2,wrong_part,paw,unusable,mask on the forepaws of the walking cat
+holdout2-andra-and-billy,38,tail_grounded_v3a+holdout2,wrong_part,paw,unusable,mask on the forepaws of the walking cat
+holdout2-andra-and-billy,39,tail_grounded_v3a+holdout2,wrong_part,paw,unusable,mask on the forepaws of the walking cat
+holdout2-koetjing-cito,0,tail_grounded_v3a+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,1,tail_grounded_v3a+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,2,tail_grounded_v3a+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,3,tail_grounded_v3a+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,33,tail_grounded_v3a+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,34,tail_grounded_v3a+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,35,tail_grounded_v3a+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,36,tail_grounded_v3a+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,37,tail_grounded_v3a+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,38,tail_grounded_v3a+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,39,tail_grounded_v3a+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)

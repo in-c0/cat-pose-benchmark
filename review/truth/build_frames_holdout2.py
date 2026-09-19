@@ -41,6 +41,10 @@ DECISIONS: dict[str, dict[int, tuple[str, str, str, str, str]]] = {
     # then at the left edge of the frame.
     "holdout2-andra-and-billy": {
         **{i: (N, "medium", "occlusion", "lying, tail behind the body", "") for i in rng(0, 15)},
+        # post-inference amendment (pass 15): v1 drew a mask at ground level behind the
+        # hindquarters on f012-f014 that could be the tail lying on the ground; the blind
+        # reading said not_visible. Disagreement resolves to uncertain, never to visible.
+        **{i: (U, "low", "appearance_ambiguous", "striped shape on the ground behind the rump: tail or shadow (post-inference disagreement -> uncertain)", "") for i in (12, 13, 14)},
         16: (V, "high", "none", "sitting, tail on the ground to the right", "610 545 790 660"),
         17: (V, "high", "none", "sitting, tail on the ground to the right", "610 545 800 660"),
         **{i: (V, "high", "none", "tail extended on the ground to the right", "620 545 880 660") for i in rng(18, 21)},

@@ -1,4 +1,4 @@
-# annotation_protocol_version: 1.3; reviewer_id: claude-809c44f2 (model); frozen_at_commit: 22c3df3; date: 2026-09-20; annotated before any method ran on these clips
+# annotation_protocol_version: 1.3; reviewer_id: claude-809c44f2 (model); frozen_at_commit: 633a390; date: 2026-09-20; annotated before any method ran on these clips
 clip_id,frame_index,timestamp_s,target_cat,tail_visibility,tail_identity_confidence,identity,condition,note,reference_box,alt_cat,alt_tail_visibility,alt_identity_confidence,alt_note,alt_reference_box
 holdout2-ljubljana-domaca-macka,0,0.0000,cat_0 silver tabby,not_visible,medium,,out_of_frame,"head close to the lens, tail out of frame",,,,,,
 holdout2-ljubljana-domaca-macka,1,0.2500,cat_0 silver tabby,not_visible,medium,,out_of_frame,"head close to the lens, tail out of frame",,,,,,
@@ -52,9 +52,9 @@ holdout2-andra-and-billy,8,2.0000,cat_0 tabby,not_visible,medium,,occlusion,"lyi
 holdout2-andra-and-billy,9,2.2500,cat_0 tabby,not_visible,medium,,occlusion,"lying, tail behind the body",,,,,,
 holdout2-andra-and-billy,10,2.5000,cat_0 tabby,not_visible,medium,,occlusion,"lying, tail behind the body",,,,,,
 holdout2-andra-and-billy,11,2.7500,cat_0 tabby,not_visible,medium,,occlusion,"lying, tail behind the body",,,,,,
-holdout2-andra-and-billy,12,3.0000,cat_0 tabby,not_visible,medium,,occlusion,"lying, tail behind the body",,,,,,
-holdout2-andra-and-billy,13,3.2500,cat_0 tabby,not_visible,medium,,occlusion,"lying, tail behind the body",,,,,,
-holdout2-andra-and-billy,14,3.5000,cat_0 tabby,not_visible,medium,,occlusion,"lying, tail behind the body",,,,,,
+holdout2-andra-and-billy,12,3.0000,cat_0 tabby,uncertain,low,,appearance_ambiguous,striped shape on the ground behind the rump: tail or shadow (post-inference disagreement -> uncertain),,,,,,
+holdout2-andra-and-billy,13,3.2500,cat_0 tabby,uncertain,low,,appearance_ambiguous,striped shape on the ground behind the rump: tail or shadow (post-inference disagreement -> uncertain),,,,,,
+holdout2-andra-and-billy,14,3.5000,cat_0 tabby,uncertain,low,,appearance_ambiguous,striped shape on the ground behind the rump: tail or shadow (post-inference disagreement -> uncertain),,,,,,
 holdout2-andra-and-billy,15,3.7500,cat_0 tabby,not_visible,medium,,occlusion,"lying, tail behind the body",,,,,,
 holdout2-andra-and-billy,16,4.0000,cat_0 tabby,visible,high,tail,none,"sitting, tail on the ground to the right",610 545 790 660,,,,,
 holdout2-andra-and-billy,17,4.2500,cat_0 tabby,visible,high,tail,none,"sitting, tail on the ground to the right",610 545 800 660,,,,,

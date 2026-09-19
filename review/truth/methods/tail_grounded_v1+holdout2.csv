@@ -1,0 +1,297 @@
+clip_id,frame_index,method,output_status,wrong_part,box_quality,instance,note
+holdout2-andra-and-billy,0,tail_grounded_v1,no_output,,,,all_look_like_paw
+holdout2-andra-and-billy,1,tail_grounded_v1,no_output,,,,all_look_like_paw
+holdout2-andra-and-billy,2,tail_grounded_v1,no_output,,,,all_look_like_paw
+holdout2-andra-and-billy,3,tail_grounded_v1,no_output,,,,all_look_like_paw
+holdout2-andra-and-billy,4,tail_grounded_v1,no_output,,,,all_look_like_paw
+holdout2-andra-and-billy,5,tail_grounded_v1,no_output,,,,all_look_like_paw
+holdout2-andra-and-billy,6,tail_grounded_v1,no_output,,,,all_look_like_paw
+holdout2-andra-and-billy,7,tail_grounded_v1,no_output,,,,all_look_like_paw
+holdout2-andra-and-billy,8,tail_grounded_v1,no_output,,,,all_look_like_paw
+holdout2-andra-and-billy,9,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-andra-and-billy,10,tail_grounded_v1,no_output,,,,all_look_like_paw
+holdout2-andra-and-billy,11,tail_grounded_v1,no_output,,,,all_look_like_paw
+holdout2-andra-and-billy,12,tail_grounded_v1,wrong_part,other,,,auto: box does not match any reference (or no tail visible)
+holdout2-andra-and-billy,13,tail_grounded_v1,wrong_part,other,,,auto: box does not match any reference (or no tail visible)
+holdout2-andra-and-billy,14,tail_grounded_v1,wrong_part,other,,,auto: box does not match any reference (or no tail visible)
+holdout2-andra-and-billy,15,tail_grounded_v1,no_output,,,,all_look_like_paw
+holdout2-andra-and-billy,16,tail_grounded_v1,no_output,,,,all_look_like_paw
+holdout2-andra-and-billy,17,tail_grounded_v1,wrong_part,other,unusable,,override: small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,18,tail_grounded_v1,wrong_part,other,unusable,,override: small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,19,tail_grounded_v1,wrong_part,other,unusable,,override: small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,20,tail_grounded_v1,wrong_part,other,unusable,,override: small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,21,tail_grounded_v1,wrong_part,other,unusable,,override: small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,22,tail_grounded_v1,wrong_part,other,unusable,,override: small mask on the ground in front of the cat's face (leaf / forepaw); the tail lies to the right
+holdout2-andra-and-billy,23,tail_grounded_v1,correct,,usable,target,
+holdout2-andra-and-billy,24,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-andra-and-billy,25,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-andra-and-billy,26,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-andra-and-billy,27,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-andra-and-billy,28,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-andra-and-billy,29,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-andra-and-billy,30,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-andra-and-billy,31,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-andra-and-billy,32,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-andra-and-billy,33,tail_grounded_v1,no_output,,,,no_cat
+holdout2-andra-and-billy,34,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-andra-and-billy,35,tail_grounded_v1,wrong_part,paw,unusable,,override: mask on the forepaws of the walking cat
+holdout2-andra-and-billy,36,tail_grounded_v1,wrong_part,paw,unusable,,override: mask on the forepaws of the walking cat
+holdout2-andra-and-billy,37,tail_grounded_v1,wrong_part,paw,unusable,,override: mask on the forepaws of the walking cat
+holdout2-andra-and-billy,38,tail_grounded_v1,wrong_part,paw,unusable,,override: mask on the forepaws of the walking cat
+holdout2-andra-and-billy,39,tail_grounded_v1,wrong_part,paw,unusable,,override: mask on the forepaws of the walking cat
+holdout2-cat-spied-on,0,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,1,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,2,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,3,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,4,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,5,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,6,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,7,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,8,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,9,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,10,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,11,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,12,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,13,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,14,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,15,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,16,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,17,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,18,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,19,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,20,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,21,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,22,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,23,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,24,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,25,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,26,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,27,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,28,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,29,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,30,tail_grounded_v1,no_output,,,,no_cat
+holdout2-cat-spied-on,31,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,0,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-dierenasyl,1,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,2,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,3,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,4,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,5,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,6,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,7,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,8,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,9,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,10,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,11,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,12,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,13,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,14,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,15,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,16,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,17,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,18,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,19,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,20,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,21,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,22,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,23,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,24,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,25,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,26,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,27,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,28,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,29,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,30,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,31,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,32,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,33,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,34,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,35,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,36,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,37,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,38,tail_grounded_v1,no_output,,,,no_cat
+holdout2-dierenasyl,39,tail_grounded_v1,no_output,,,,no_cat
+holdout2-katten-naar-buiten,0,tail_grounded_v1,correct,other,usable,,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,1,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-katten-naar-buiten,2,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-katten-naar-buiten,3,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-katten-naar-buiten,4,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-katten-naar-buiten,5,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-katten-naar-buiten,6,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-katten-naar-buiten,7,tail_grounded_v1,no_output,,,,all_look_like_paw
+holdout2-katten-naar-buiten,8,tail_grounded_v1,correct,other,usable,,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,9,tail_grounded_v1,correct,other,usable,,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,10,tail_grounded_v1,correct,other,usable,,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,11,tail_grounded_v1,correct,other,usable,,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,12,tail_grounded_v1,correct,other,usable,,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,13,tail_grounded_v1,correct,,usable,target,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,14,tail_grounded_v1,correct,,usable,target,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,15,tail_grounded_v1,correct,other,usable,,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,16,tail_grounded_v1,correct,other,usable,,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,17,tail_grounded_v1,correct,other,usable,,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,18,tail_grounded_v1,correct,other,usable,,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,19,tail_grounded_v1,correct,other,usable,,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,20,tail_grounded_v1,correct,other,usable,,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,21,tail_grounded_v1,correct,other,usable,,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,22,tail_grounded_v1,correct,other,usable,,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,23,tail_grounded_v1,correct,other,usable,,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,24,tail_grounded_v1,correct,other,usable,,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,25,tail_grounded_v1,correct,,usable,target,
+holdout2-katten-naar-buiten,26,tail_grounded_v1,correct,,usable,target,
+holdout2-katten-naar-buiten,27,tail_grounded_v1,correct,,usable,target,
+holdout2-katten-naar-buiten,28,tail_grounded_v1,correct,,usable,target,
+holdout2-katten-naar-buiten,29,tail_grounded_v1,correct,,usable,target,
+holdout2-katten-naar-buiten,30,tail_grounded_v1,correct,,usable,target,
+holdout2-katten-naar-buiten,31,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-katten-naar-buiten,32,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-katten-naar-buiten,33,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-katten-naar-buiten,34,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-katten-naar-buiten,35,tail_grounded_v1,wrong_part,torso,unusable,,override: mask covers the tabby's whole body on the dog
+holdout2-katten-naar-buiten,36,tail_grounded_v1,wrong_part,torso,unusable,,override: mask covers the tabby's whole body on the dog
+holdout2-katten-naar-buiten,37,tail_grounded_v1,wrong_part,torso,unusable,,override: mask covers the tabby's whole body on the dog
+holdout2-katten-naar-buiten,38,tail_grounded_v1,wrong_part,torso,unusable,,override: mask covers the tabby's whole body on the dog
+holdout2-katten-naar-buiten,39,tail_grounded_v1,wrong_part,torso,unusable,,override: mask covers the tabby's whole body on the dog
+holdout2-katze-katzengras,0,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,1,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,2,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,3,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,4,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,5,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,6,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,7,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,8,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,9,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,10,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,11,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,12,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,13,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,14,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,15,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,16,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,17,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,18,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,19,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,20,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,21,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,22,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,23,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,24,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,25,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,26,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,27,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,28,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,29,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,30,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,31,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,32,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,33,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,34,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,35,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,36,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,37,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,38,tail_grounded_v1,correct,,usable,target,
+holdout2-katze-katzengras,39,tail_grounded_v1,correct,,usable,target,
+holdout2-koetjing-cito,0,tail_grounded_v1,wrong_part,other,unusable,,override: thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,1,tail_grounded_v1,wrong_part,other,unusable,,override: thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,2,tail_grounded_v1,wrong_part,other,unusable,,override: thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,3,tail_grounded_v1,wrong_part,other,unusable,,override: thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,4,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-koetjing-cito,5,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-koetjing-cito,6,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-koetjing-cito,7,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-koetjing-cito,8,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-koetjing-cito,9,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-koetjing-cito,10,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-koetjing-cito,11,tail_grounded_v1,no_output,,,,all_look_like_paw
+holdout2-koetjing-cito,12,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-koetjing-cito,13,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-koetjing-cito,14,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-koetjing-cito,15,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-koetjing-cito,16,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-koetjing-cito,17,tail_grounded_v1,no_output,,,,all_look_like_paw
+holdout2-koetjing-cito,18,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-koetjing-cito,19,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-koetjing-cito,20,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-koetjing-cito,21,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-koetjing-cito,22,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-koetjing-cito,23,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-koetjing-cito,24,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-koetjing-cito,25,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-koetjing-cito,26,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-koetjing-cito,27,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-koetjing-cito,28,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-koetjing-cito,29,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-koetjing-cito,30,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-koetjing-cito,31,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-koetjing-cito,32,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-koetjing-cito,33,tail_grounded_v1,no_output,,,,no_cat
+holdout2-koetjing-cito,34,tail_grounded_v1,wrong_part,other,unusable,,override: thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,35,tail_grounded_v1,wrong_part,other,unusable,,override: thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,36,tail_grounded_v1,wrong_part,other,unusable,,override: thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,37,tail_grounded_v1,wrong_part,other,unusable,,override: thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,38,tail_grounded_v1,wrong_part,other,unusable,,override: thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-koetjing-cito,39,tail_grounded_v1,wrong_part,other,unusable,,override: thin strip at the right edge of the face close-up (ear/frame edge)
+holdout2-ljubljana-domaca-macka,0,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-ljubljana-domaca-macka,1,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-ljubljana-domaca-macka,2,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-ljubljana-domaca-macka,3,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-ljubljana-domaca-macka,4,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-ljubljana-domaca-macka,5,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-ljubljana-domaca-macka,6,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-ljubljana-domaca-macka,7,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-ljubljana-domaca-macka,8,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-ljubljana-domaca-macka,9,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-ljubljana-domaca-macka,10,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-ljubljana-domaca-macka,11,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-ljubljana-domaca-macka,12,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-ljubljana-domaca-macka,13,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-ljubljana-domaca-macka,14,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-ljubljana-domaca-macka,15,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-ljubljana-domaca-macka,16,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-ljubljana-domaca-macka,17,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-ljubljana-domaca-macka,18,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-ljubljana-domaca-macka,19,tail_grounded_v1,no_output,,,,all_look_like_paw
+holdout2-ljubljana-domaca-macka,20,tail_grounded_v1,no_output,,,,all_look_like_paw
+holdout2-ljubljana-domaca-macka,21,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-ljubljana-domaca-macka,22,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-ljubljana-domaca-macka,23,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-ljubljana-domaca-macka,24,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-ljubljana-domaca-macka,25,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-ljubljana-domaca-macka,26,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-ljubljana-domaca-macka,27,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-ljubljana-domaca-macka,28,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-ljubljana-domaca-macka,29,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-ljubljana-domaca-macka,30,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-ljubljana-domaca-macka,31,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-ljubljana-domaca-macka,32,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-ljubljana-domaca-macka,33,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-ljubljana-domaca-macka,34,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-ljubljana-domaca-macka,35,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-ljubljana-domaca-macka,36,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-ljubljana-domaca-macka,37,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-ljubljana-domaca-macka,38,tail_grounded_v1,correct,,usable,target,
+holdout2-ljubljana-domaca-macka,39,tail_grounded_v1,correct,,usable,target,
+holdout2-sophy-ledge,0,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-sophy-ledge,1,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-sophy-ledge,2,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-sophy-ledge,3,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-sophy-ledge,4,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-sophy-ledge,5,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-sophy-ledge,6,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-sophy-ledge,7,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-sophy-ledge,8,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-sophy-ledge,9,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-sophy-ledge,10,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-sophy-ledge,11,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-sophy-ledge,12,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-sophy-ledge,13,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-sophy-ledge,14,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-sophy-ledge,15,tail_grounded_v1,no_output,,,,temporal_none
+holdout2-sophy-ledge,16,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-sophy-ledge,17,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-sophy-ledge,18,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-sophy-ledge,19,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-sophy-ledge,20,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-sophy-ledge,21,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-sophy-ledge,22,tail_grounded_v1,no_output,,,,no_tail_box
+holdout2-sophy-ledge,23,tail_grounded_v1,no_output,,,,no_tail_box
