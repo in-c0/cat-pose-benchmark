@@ -75,14 +75,45 @@ def eligible(f: dict, min_s: float, min_h: int) -> tuple[bool, str]:
     return True, "ok"
 
 
+def continue_selection(prev_path: Path, n: int, out_path: Path) -> list[dict]:
+    """Holdout #2 (pass 15 ruling): no refetch, no reshuffle. Walk the frozen
+    ``shuffled_eligible_order`` of a previous selection from the position after its last
+    selected item and take the next ``n`` clips whose uploader has not appeared in any
+    earlier selection."""
+    prev = json.loads(prev_path.read_text(encoding="utf-8"))
+    pool = {f["title"]: f for f in json.loads((HERE / "pool.json").read_text(encoding="utf-8"))["files"]}
+    order = prev["shuffled_eligible_order"]
+    taken = {s["title"] for s in prev["selected"]}
+    seen_uploaders = {s["uploader"] for s in prev["selected"]}
+    start = max(order.index(s["title"]) for s in prev["selected"]) + 1
+    selected = []
+    for k in range(start, len(order)):
+        f = pool[order[k]]
+        if f["title"] in taken or not f["eligible"] or f["uploader"] in seen_uploaders:
+            continue
+        seen_uploaders.add(f["uploader"])
+        selected.append({"rank": k + 1, "shuffle_position": k, **f})
+        if len(selected) == n:
+            break
+    payload = {"protocol": "continuation of a frozen selection; see continue_selection()", "continues": prev_path.name, "n": n, "retrieved_at": prev["retrieved_at"], "selected_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"), "selected": selected}
+    out_path.write_text(json.dumps(payload, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    return selected
+
+
 def main() -> None:
     p = argparse.ArgumentParser()
+    p.add_argument("--continue-from", type=Path, help="previous selection.json; take the next N from its frozen order (no refetch)")
+    p.add_argument("--out", type=Path, default=None)
     p.add_argument("--category", default="Videos of cats")
     p.add_argument("--seed", type=int, default=20260920)
     p.add_argument("--n", type=int, default=4)
     p.add_argument("--min-seconds", type=float, default=4.0)
     p.add_argument("--min-height", type=int, default=360)
     a = p.parse_args()
+    if a.continue_from:
+        for s in continue_selection(a.continue_from, a.n, a.out or HERE / "selection2.json"):
+            print(s["rank"], s["title"], s["licence"], s["duration_s"], f"{s['width']}x{s['height']}", s["uploader"])
+        return
     titles = sorted(set(category_members(a.category)))
     files = file_info(titles)
     for f in files:
