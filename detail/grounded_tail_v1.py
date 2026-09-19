@@ -99,14 +99,28 @@ def map_box_from_crop(box: Box, crop: Box) -> Box:
     return [box[0] + crop[0], box[1] + crop[1], box[2] + crop[0], box[3] + crop[1]]
 
 
-def tail_candidates(detections: list[dict[str, Any]], cat_box: Box, limit: int) -> list[dict[str, Any]]:
+MIN_TAIL_IN_CAT = 0.3  # loose gate: this fraction of the tail box must lie inside the cat box
+
+
+def _fraction_inside(inner: Box, outer: Box) -> float:
+    x0, y0 = max(inner[0], outer[0]), max(inner[1], outer[1])
+    x1, y1 = min(inner[2], outer[2]), min(inner[3], outer[3])
+    inter = max(0.0, x1 - x0) * max(0.0, y1 - y0)
+    return inter / _area(inner) if _area(inner) > 0 else 0.0
+
+
+def tail_candidates(detections: list[dict[str, Any]], cat_box: Box, limit: int, loose_gate: bool = False) -> list[dict[str, Any]]:
+    """Tail proposals inside the cat. The default gate requires the box centre inside the
+    cat box (+5 % margin); ``loose_gate`` requires only 30 % of the tail box to overlap
+    it. The low-threshold oracle (pass 5, 2026-09-20) found three visible tails whose box
+    centre fell outside the detector's cat box because the tail sticks out of it."""
     margin = 0.05 * math.hypot(cat_box[2] - cat_box[0], cat_box[3] - cat_box[1])
     tails = [
         d
         for d in detections
         if "tail" in d["label"]
         and d["score"] >= MIN_TAIL_SCORE
-        and _centre_inside(d["box"], cat_box, margin)
+        and (_fraction_inside(d["box"], cat_box) >= MIN_TAIL_IN_CAT if loose_gate else _centre_inside(d["box"], cat_box, margin))
         and _area(d["box"]) <= MAX_TAIL_TO_CAT_AREA * _area(cat_box)
     ]
     tails.sort(key=lambda d: -d["score"])
@@ -130,6 +144,7 @@ def viterbi(
     frames: list[list[dict[str, Any]]],
     diagonals: list[float],
     emission_scale: float = 1.0,
+    free_boundaries: bool = False,
 ) -> list[int | None]:
     """Choose one candidate (index) or None per frame.
 
@@ -155,6 +170,26 @@ def viterbi(
         prev_idx = [0] * states
         if t == 0:
             cur = emis[:]
+        elif free_boundaries and t == n - 1:
+            # No "leaving" switch on the last frame: there is no next state to switch to.
+            # (No "entering" switch is charged on frame 0 already.) Boundary frames in v1
+            # lost to NONE by margins of ~0.02, below any evidence; see pass 2 log.
+            prev_states = 1 + len(frames[t - 1])
+            for s in range(states):
+                for p in range(prev_states):
+                    if s == 0 and p == 0:
+                        trans = 0.0
+                    elif s == 0 or p == 0:
+                        trans = -NONE_SWITCH_COST if (s == 0) else 0.0
+                    else:
+                        a = centre(frames[t - 1][p - 1]["box"])
+                        b = centre(frames[t][s - 1]["box"])
+                        d = math.hypot(a[0] - b[0], a[1] - b[1]) / max(diagonals[t], 1.0)
+                        trans = -MOVE_WEIGHT * d
+                    value = best[t - 1][p] + trans + emis[s]
+                    if value > cur[s]:
+                        cur[s] = value
+                        prev_idx[s] = p
         else:
             prev_states = 1 + len(frames[t - 1])
             for s in range(states):
@@ -255,6 +290,7 @@ def run(
     detector_id: str = DETECTOR_ID,
     classifier_id: str = CLASSIFIER_ID,
     time_scale: bool = False,
+    loose_gate: bool = False,
 ) -> dict[str, Any]:
     manifest = json.loads(frames_manifest.read_text(encoding="utf-8"))
     frame_interval_s = 1.0 / float(manifest.get("sampling", {}).get("fps") or (1.0 / REFERENCE_INTERVAL_S))
@@ -294,7 +330,7 @@ def run(
                 for d in full:
                     d["from"] = "full"
                 pool = full
-            candidates = tail_candidates(pool, cat["box"], CANDIDATES_PER_FRAME)
+            candidates = tail_candidates(pool, cat["box"], CANDIDATES_PER_FRAME, loose_gate)
             if crop_check:
                 for c in candidates:
                     c["crop_probs"] = _crop_probs(models, image, c["box"], device)
@@ -402,6 +438,7 @@ def run(
             "move_weight": MOVE_WEIGHT,
             "none_switch_cost": NONE_SWITCH_COST,
             "time_scale": time_scale,
+            "loose_gate": loose_gate,
             "frame_interval_s": frame_interval_s,
             "emission_scale": emission_scale,
             "candidates_per_frame": CANDIDATES_PER_FRAME,
@@ -439,12 +476,13 @@ def main() -> None:
     parser.add_argument("--detector", default=DETECTOR_ID)
     parser.add_argument("--classifier", default=CLASSIFIER_ID)
     parser.add_argument("--time-scale", action="store_true", help="scale per-frame emissions by frame interval / 0.25 s")
+    parser.add_argument("--loose-gate", action="store_true", help="require 30%% of the tail box inside the cat box instead of its centre")
     args = parser.parse_args()
     result = run(
         frames_dir=args.frames_dir, frames_manifest=args.frames_manifest, output_dir=args.output_dir,
         body_json=args.body_json, device=args.device, sample_count=args.samples,
         zoom=args.zoom, crop_check=not args.no_crop_check, temporal=not args.no_temporal,
-        detector_id=args.detector, classifier_id=args.classifier, time_scale=args.time_scale,
+        detector_id=args.detector, classifier_id=args.classifier, time_scale=args.time_scale, loose_gate=args.loose_gate,
     )
     print(json.dumps(result["summary"], indent=2, sort_keys=True))
 
