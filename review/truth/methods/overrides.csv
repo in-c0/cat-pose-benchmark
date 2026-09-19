@@ -258,3 +258,23 @@ holdout2-koetjing-cito,36,tail_grounded_v3a+holdout2,wrong_part,other,unusable,t
 holdout2-koetjing-cito,37,tail_grounded_v3a+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
 holdout2-koetjing-cito,38,tail_grounded_v3a+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
 holdout2-koetjing-cito,39,tail_grounded_v3a+holdout2,wrong_part,other,unusable,thin strip at the right edge of the face close-up (ear/frame edge)
+commons-black-cat-walking,36,tail_grounded_v3,correct,,usable,reach-1 propagated mask fills the close-up tail (checked on the overlay; no reference box exists for this frame)
+commons-black-cat-walking,36,tail_grounded_v3a,correct,,usable,as tail_grounded_v3
+commons-black-cat-walking,36,tail_grounded_v2,correct,,usable,as tail_grounded_v3
+commons-cat-jumping-backwards,15,tail_grounded_v3,correct,,partial,intersection mask is a small blob at the tabby's tail base (pass 6 check; no reference box exists)
+commons-cat-jumping-backwards,15,tail_grounded_v3a,correct,,partial,as tail_grounded_v3
+commons-cat-jumping-backwards,15,v2b_intersection,correct,,partial,as tail_grounded_v3
+holdout2-katze-katzengras,0,tail_grounded_v1+holdout2,correct,,usable,curve lies on the curled tail; the blind reference box ends ~80 px short on the right (checked on the overlay after the freeze)
+holdout2-katze-katzengras,1,tail_grounded_v1+holdout2,correct,,usable,curve lies on the curled tail; the blind reference box ends ~80 px short on the right (checked on the overlay after the freeze)
+holdout2-katze-katzengras,2,tail_grounded_v1+holdout2,correct,,usable,curve lies on the curled tail; the blind reference box ends ~80 px short on the right (checked on the overlay after the freeze)
+holdout2-katze-katzengras,3,tail_grounded_v1+holdout2,correct,,usable,curve lies on the curled tail; the blind reference box ends ~80 px short on the right (checked on the overlay after the freeze)
+holdout2-katze-katzengras,0,tail_grounded_v3+holdout2,correct,,usable,curve lies on the curled tail; the blind reference box ends ~80 px short on the right (checked on the overlay after the freeze)
+holdout2-katze-katzengras,1,tail_grounded_v3+holdout2,correct,,usable,curve lies on the curled tail; the blind reference box ends ~80 px short on the right (checked on the overlay after the freeze)
+holdout2-katze-katzengras,2,tail_grounded_v3+holdout2,correct,,usable,curve lies on the curled tail; the blind reference box ends ~80 px short on the right (checked on the overlay after the freeze)
+holdout2-katze-katzengras,3,tail_grounded_v3+holdout2,correct,,usable,curve lies on the curled tail; the blind reference box ends ~80 px short on the right (checked on the overlay after the freeze)
+holdout2-katze-katzengras,0,tail_grounded_v3a+holdout2,correct,,usable,curve lies on the curled tail; the blind reference box ends ~80 px short on the right (checked on the overlay after the freeze)
+holdout2-katze-katzengras,1,tail_grounded_v3a+holdout2,correct,,usable,curve lies on the curled tail; the blind reference box ends ~80 px short on the right (checked on the overlay after the freeze)
+holdout2-katze-katzengras,2,tail_grounded_v3a+holdout2,correct,,usable,curve lies on the curled tail; the blind reference box ends ~80 px short on the right (checked on the overlay after the freeze)
+holdout2-katze-katzengras,3,tail_grounded_v3a+holdout2,correct,,usable,curve lies on the curled tail; the blind reference box ends ~80 px short on the right (checked on the overlay after the freeze)
+holdout2-katze-katzengras,4,tail_grounded_v3a+holdout2,correct,,usable,consensus curve on the curled tail, extends ~80 px past the blind reference box on the right (as f000-f003)
+holdout2-katze-katzengras,5,tail_grounded_v3a+holdout2,correct,,usable,consensus curve on the curled tail, extends ~80 px past the blind reference box on the right (as f000-f003)

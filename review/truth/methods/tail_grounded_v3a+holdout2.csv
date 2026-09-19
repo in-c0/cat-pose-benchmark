@@ -125,7 +125,7 @@ holdout2-katten-naar-buiten,10,tail_grounded_v3a,correct,other,usable,,"override
 holdout2-katten-naar-buiten,11,tail_grounded_v3a,correct,other,usable,,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
 holdout2-katten-naar-buiten,12,tail_grounded_v3a,correct,,usable,target,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
 holdout2-katten-naar-buiten,13,tail_grounded_v3a,correct,,usable,target,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
-holdout2-katten-naar-buiten,14,tail_grounded_v3a,correct,,usable,target,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
+holdout2-katten-naar-buiten,14,tail_grounded_v3a,correct,other,usable,,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
 holdout2-katten-naar-buiten,15,tail_grounded_v3a,correct,other,usable,,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
 holdout2-katten-naar-buiten,16,tail_grounded_v3a,correct,other,usable,,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
 holdout2-katten-naar-buiten,17,tail_grounded_v3a,correct,other,usable,,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
@@ -138,7 +138,7 @@ holdout2-katten-naar-buiten,23,tail_grounded_v3a,correct,other,usable,,"override
 holdout2-katten-naar-buiten,24,tail_grounded_v3a,correct,other,usable,,"override: mask on the upright ginger tail; the blind reference box was placed 200-400 px too far right on the 4K frame (checked on overlays after the freeze, 2026-09-20)"
 holdout2-katten-naar-buiten,25,tail_grounded_v3a,correct,,usable,target,
 holdout2-katten-naar-buiten,26,tail_grounded_v3a,correct,,usable,target,
-holdout2-katten-naar-buiten,27,tail_grounded_v3a,correct,,usable,target,
+holdout2-katten-naar-buiten,27,tail_grounded_v3a,wrong_part,other,,,auto: box does not match any reference (or no tail visible)
 holdout2-katten-naar-buiten,28,tail_grounded_v3a,correct,,usable,target,
 holdout2-katten-naar-buiten,29,tail_grounded_v3a,correct,,usable,target,
 holdout2-katten-naar-buiten,30,tail_grounded_v3a,correct,,usable,target,
@@ -151,12 +151,12 @@ holdout2-katten-naar-buiten,36,tail_grounded_v3a,wrong_part,torso,unusable,,over
 holdout2-katten-naar-buiten,37,tail_grounded_v3a,wrong_part,torso,unusable,,override: mask covers the tabby's whole body on the dog
 holdout2-katten-naar-buiten,38,tail_grounded_v3a,wrong_part,torso,unusable,,override: mask covers the tabby's whole body on the dog
 holdout2-katten-naar-buiten,39,tail_grounded_v3a,wrong_part,torso,unusable,,override: mask covers the tabby's whole body on the dog
-holdout2-katze-katzengras,0,tail_grounded_v3a,correct,,usable,target,
-holdout2-katze-katzengras,1,tail_grounded_v3a,correct,,usable,target,
-holdout2-katze-katzengras,2,tail_grounded_v3a,correct,,usable,target,
-holdout2-katze-katzengras,3,tail_grounded_v3a,correct,,usable,target,
-holdout2-katze-katzengras,4,tail_grounded_v3a,correct,,usable,target,
-holdout2-katze-katzengras,5,tail_grounded_v3a,correct,,usable,target,
+holdout2-katze-katzengras,0,tail_grounded_v3a,correct,other,usable,,override: curve lies on the curled tail; the blind reference box ends ~80 px short on the right (checked on the overlay after the freeze)
+holdout2-katze-katzengras,1,tail_grounded_v3a,correct,other,usable,,override: curve lies on the curled tail; the blind reference box ends ~80 px short on the right (checked on the overlay after the freeze)
+holdout2-katze-katzengras,2,tail_grounded_v3a,correct,other,usable,,override: curve lies on the curled tail; the blind reference box ends ~80 px short on the right (checked on the overlay after the freeze)
+holdout2-katze-katzengras,3,tail_grounded_v3a,correct,other,usable,,override: curve lies on the curled tail; the blind reference box ends ~80 px short on the right (checked on the overlay after the freeze)
+holdout2-katze-katzengras,4,tail_grounded_v3a,wrong_part,other,,,auto: box does not match any reference (or no tail visible)
+holdout2-katze-katzengras,5,tail_grounded_v3a,unusable_curve,,unusable,,centreline collapsed to a point
 holdout2-katze-katzengras,6,tail_grounded_v3a,correct,,usable,target,
 holdout2-katze-katzengras,7,tail_grounded_v3a,correct,,usable,target,
 holdout2-katze-katzengras,8,tail_grounded_v3a,correct,,usable,target,
@@ -269,7 +269,7 @@ holdout2-ljubljana-domaca-macka,34,tail_grounded_v3a,no_output,,,,temporal_none
 holdout2-ljubljana-domaca-macka,35,tail_grounded_v3a,no_output,,,,temporal_none
 holdout2-ljubljana-domaca-macka,36,tail_grounded_v3a,no_output,,,,temporal_none
 holdout2-ljubljana-domaca-macka,37,tail_grounded_v3a,correct,,usable,target,
-holdout2-ljubljana-domaca-macka,38,tail_grounded_v3a,correct,,usable,target,
+holdout2-ljubljana-domaca-macka,38,tail_grounded_v3a,unusable_curve,,unusable,,centreline collapsed to a point
 holdout2-ljubljana-domaca-macka,39,tail_grounded_v3a,correct,,usable,target,
 holdout2-sophy-ledge,0,tail_grounded_v3a,no_output,,,,no_tail_box
 holdout2-sophy-ledge,1,tail_grounded_v3a,no_output,,,,temporal_none
