@@ -4,14 +4,19 @@ Derives one method-judgement row per frame (layer 2) from the method's result.js
 the truth reference boxes, applies hand overrides from review/truth/methods/overrides.csv,
 writes review/truth/methods/<method>.csv, and prints the confusion counts:
 
-  TP  visible/partial frame, method asserted a tail on the reference
-  FPv visible/partial frame, method asserted a tail elsewhere (wrong_part / wrong_cat)
-  FN  visible/partial frame, method produced nothing
-  FPn not_visible frame, method asserted a tail
-  TN  not_visible frame, method produced nothing
-  uncertain frames are excluded.
+  TP  a tail is visible/partial, method asserted a tail on one of the annotated tails
+  FPv a tail is visible/partial, method asserted a tail elsewhere (wrong_part)
+  FN  a tail is visible/partial, method produced nothing
+  FPn no annotated tail is visible, method asserted a tail
+  TN  no annotated tail is visible, method produced nothing
+  frames whose only unmatched annotated tail is ``uncertain`` are excluded.
 
 Precision = TP / (TP + FPv + FPn); recall = TP / (TP + FPv + FN).
+
+Truth v1.1 (pass 8) is instance-complete: a frame may carry a second cat's tail
+(``alt_*`` columns). The primary metric is instance-agnostic, so an output on ANY
+annotated tail is a TP. The association-aware count ``assoc_mismatch`` reports the TPs
+that matched the *other* cat's tail while the method's cat box was on the target cat.
 """
 
 from __future__ import annotations
@@ -35,7 +40,8 @@ def load_truth() -> dict[tuple[str, int], dict[str, Any]]:
         lines = [l for l in h if not l.startswith("#")]
     for r in csv.DictReader(lines):
         ref = [float(v) for v in r["reference_box"].split()] if r["reference_box"] else None
-        rows[(r["clip_id"], int(r["frame_index"]))] = {**r, "frame_index": int(r["frame_index"]), "ref": ref}
+        alt = [float(v) for v in r["alt_reference_box"].split()] if r.get("alt_reference_box") else None
+        rows[(r["clip_id"], int(r["frame_index"]))] = {**r, "frame_index": int(r["frame_index"]), "ref": ref, "alt": alt, "alt_vis": r.get("alt_tail_visibility", "")}
     return rows
 
 
@@ -71,6 +77,17 @@ def _same(box: list[float], ref: list[float]) -> bool:
     return smaller > 0 and inter / smaller >= 0.8
 
 
+def frame_class(t: dict[str, Any]) -> str:
+    """'visible' if any annotated tail is visible/partial, 'not_visible' if none is and none
+    is uncertain, else 'uncertain'."""
+    vis = {t["tail_visibility"], t.get("alt_vis", "")} - {""}
+    if vis & {"visible", "partial"}:
+        return "visible"
+    if "uncertain" in vis:
+        return "uncertain"
+    return "not_visible"
+
+
 def judge(method: str, run_clip: str, review_clip: str, factor: int, truth: dict, overrides: dict, tag: str | None = None) -> list[dict[str, Any]]:
     tag = tag or method
     result = json.loads((clip_workdir(run_clip) / method / "result.json").read_text(encoding="utf-8"))
@@ -83,21 +100,24 @@ def judge(method: str, run_clip: str, review_clip: str, factor: int, truth: dict
         if f is None:
             continue
         accepted = f["status"] in ("ok", "propagated")
-        row = {"clip_id": clip, "frame_index": i, "method": method, "output_status": "", "wrong_part": "", "box_quality": "", "note": ""}
+        row = {"clip_id": clip, "frame_index": i, "method": method, "output_status": "", "wrong_part": "", "box_quality": "", "instance": "", "note": ""}
         if not accepted:
             row["output_status"] = "no_output"
             row["note"] = f["status"]
         else:
             box = _box_of(f)
-            if t["tail_visibility"] in ("visible", "partial") and t["ref"] and box and _same(box, t["ref"]):
-                row["output_status"] = "correct"; row["box_quality"] = "usable"
-            elif t["tail_visibility"] in ("visible", "partial") and not t["ref"]:
-                row["output_status"] = "correct"; row["box_quality"] = "usable"; row["note"] = "no reference box; accepted on visibility alone — check by eye"
+            tv, av = t["tail_visibility"] in ("visible", "partial"), t.get("alt_vis", "") in ("visible", "partial")
+            if tv and t["ref"] and box and _same(box, t["ref"]):
+                row["output_status"] = "correct"; row["box_quality"] = "usable"; row["instance"] = "target"
+            elif av and t["alt"] and box and _same(box, t["alt"]):
+                row["output_status"] = "correct"; row["box_quality"] = "usable"; row["instance"] = "alt"; row["note"] = f"on the other cat's tail ({t.get('alt_cat', '')})"
+            elif tv and not t["ref"]:
+                row["output_status"] = "correct"; row["box_quality"] = "usable"; row["instance"] = "target"; row["note"] = "no reference box; accepted on visibility alone — check by eye"
             else:
-                row["output_status"] = "wrong_part"; row["wrong_part"] = "other"; row["note"] = "auto: box does not match reference (or frame not visible)"
+                row["output_status"] = "wrong_part"; row["wrong_part"] = "other"; row["note"] = "auto: box does not match any reference (or no tail visible)"
         ov = overrides.get((clip, i, tag))
         if ov:
-            for k in ("output_status", "wrong_part", "box_quality"):
+            for k in ("output_status", "wrong_part", "box_quality", "instance"):
                 if ov.get(k):
                     row[k] = ov[k]
             row["note"] = "override: " + ov.get("reason", "")
@@ -106,18 +126,21 @@ def judge(method: str, run_clip: str, review_clip: str, factor: int, truth: dict
 
 
 def tally(rows: list[dict[str, Any]], truth: dict) -> dict[str, Any]:
-    c = {"TP": 0, "FPv": 0, "FN": 0, "FPn": 0, "TN": 0, "excluded": 0, "TP_partial": 0, "FN_partial": 0}
+    c = {"TP": 0, "FPv": 0, "FN": 0, "FPn": 0, "TN": 0, "excluded": 0, "TP_partial": 0, "FN_partial": 0, "assoc_mismatch": 0}
     for r in rows:
         t = truth[(r["clip_id"], r["frame_index"])]
         vis = t["tail_visibility"]
         s = r["output_status"]
-        if vis == "uncertain":
+        fc = frame_class(t)
+        if fc == "uncertain":
             c["excluded"] += 1
-        elif vis in ("visible", "partial"):
+        elif fc == "visible":
             if s in ("correct", "partial"):
                 c["TP"] += 1
-                if vis == "partial":
+                if vis == "partial" and r.get("instance") != "alt":
                     c["TP_partial"] += 1
+                if r.get("instance") == "alt":
+                    c["assoc_mismatch"] += 1
             elif s == "no_output":
                 c["FN"] += 1
                 if vis == "partial":
@@ -162,14 +185,14 @@ def main() -> None:
     out = TRUTH / "methods" / f"{tag}.csv"
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("w", newline="", encoding="utf-8") as h:
-        w = csv.DictWriter(h, fieldnames=["clip_id", "frame_index", "method", "output_status", "wrong_part", "box_quality", "note"])
+        w = csv.DictWriter(h, fieldnames=["clip_id", "frame_index", "method", "output_status", "wrong_part", "box_quality", "instance", "note"])
         w.writeheader(); w.writerows(all_rows)
     total = tally(all_rows, truth)
     for clip, c in per_clip.items():
         print(f"{clip}: TP {c['TP']} FPv {c['FPv']} FN {c['FN']} FPn {c['FPn']} TN {c['TN']} excl {c['excluded']}  P {c['precision']} R {c['recall']}")
-    print(f"TOTAL {tag}: TP {total['TP']} FPv {total['FPv']} FN {total['FN']} FPn {total['FPn']} TN {total['TN']} excl {total['excluded']}  P {total['precision']} R {total['recall']}  (partial: TP {total['TP_partial']} FN {total['FN_partial']})")
+    print(f"TOTAL {tag}: TP {total['TP']} FPv {total['FPv']} FN {total['FN']} FPn {total['FPn']} TN {total['TN']} excl {total['excluded']}  P {total['precision']} R {total['recall']}  (partial: TP {total['TP_partial']} FN {total['FN_partial']}; assoc_mismatch {total['assoc_mismatch']})")
     wrongs = [r for r in all_rows if r["output_status"] not in ("correct", "no_output", "partial")]
-    fns = [r for r in all_rows if r["output_status"] == "no_output" and truth[(r["clip_id"], r["frame_index"])]["tail_visibility"] in ("visible", "partial")]
+    fns = [r for r in all_rows if r["output_status"] == "no_output" and frame_class(truth[(r["clip_id"], r["frame_index"])]) == "visible"]
     print("  asserted-wrong:", [f"{r['clip_id'][8:14]} f{r['frame_index']:03d}" for r in wrongs])
     print("  missed:", [f"{r['clip_id'][8:14]} f{r['frame_index']:03d}" for r in fns])
 

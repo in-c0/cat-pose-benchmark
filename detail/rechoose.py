@@ -28,6 +28,7 @@ def rechoose(
     frame_interval_s: float,
     time_scale: bool = False,
     emission_weight: float | None = None,
+    free_boundaries: bool = False,
     none_emission: float | None = None,
     move_weight: float | None = None,
     none_switch_cost: float | None = None,
@@ -53,7 +54,7 @@ def rechoose(
             scale = emission_weight
         else:
             scale = (frame_interval_s / v1.REFERENCE_INTERVAL_S) if time_scale else 1.0
-        choice = v1.viterbi(surviving, diagonals, scale)
+        choice = v1.viterbi(surviving, diagonals, scale, free_boundaries)
     finally:
         v1.NONE_EMISSION, v1.MOVE_WEIGHT, v1.NONE_SWITCH_COST = saved
 
@@ -83,6 +84,7 @@ def rechoose(
         "options": {
             "time_scale": time_scale,
             "emission_weight": scale,
+            "free_boundaries": free_boundaries,
             "frame_interval_s": frame_interval_s,
             "none_emission": none_emission if none_emission is not None else saved[0],
             "move_weight": move_weight if move_weight is not None else saved[1],
@@ -101,13 +103,14 @@ def main() -> None:
     parser.add_argument("--fps", type=float, required=True, help="sampling rate of the clip the result came from")
     parser.add_argument("--time-scale", action="store_true")
     parser.add_argument("--emission-weight", type=float, help="explicit per-frame emission weight (overrides --time-scale)")
+    parser.add_argument("--free-boundaries", action="store_true")
     parser.add_argument("--none-emission", type=float)
     parser.add_argument("--move-weight", type=float)
     parser.add_argument("--none-switch-cost", type=float)
     args = parser.parse_args()
     result = json.loads(args.result_json.read_text(encoding="utf-8"))
     out = rechoose(
-        result, frame_interval_s=1.0 / args.fps, time_scale=args.time_scale, emission_weight=args.emission_weight,
+        result, frame_interval_s=1.0 / args.fps, time_scale=args.time_scale, emission_weight=args.emission_weight, free_boundaries=args.free_boundaries,
         none_emission=args.none_emission, move_weight=args.move_weight, none_switch_cost=args.none_switch_cost,
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)

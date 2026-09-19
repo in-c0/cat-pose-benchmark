@@ -80,6 +80,34 @@ REFERENCE_SOURCE: dict[str, dict[int, tuple[str, int]]] = {
     "commons-cat-licking-tail": {i: ("tail_grounded", i) for i in rng(0, 26)},
 }
 
+# v1.1 (pass 8): instance-complete annotation. Every other cat whose tail is discernible on
+# a frame gets (cat, visibility, confidence, note, reference box). Only the jumping clip has
+# two cats. Reference boxes for the tabby on f004-f006 were confirmed by eye on the
+# pass-7 long-propagation overlays and taken from that mask's extent; the tuxedo tail on
+# f007-f017 (upright on the scratcher, body hidden) was boxed by eye on a 50 px grid,
+# roughly +-20 px.
+ALT: dict[str, dict[int, tuple[str, str, str, str, str]]] = {
+    "commons-cat-jumping-backwards": {
+        **{i: ("tuxedo", "uncertain", "low", "motion blur", "") for i in (0, 1)},
+        **{i: ("tuxedo", N, "low", "dark; tuxedo not resolvable", "") for i in (2, 3)},
+        4: ("tabby", V, "high", "tabby at the back, tail up right", "783 426 904 478"),
+        5: ("tabby", V, "high", "tabby in the doorway, tail to the right", "710 238 871 284"),
+        6: ("tabby", V, "high", "tabby in the doorway, tail to the right", "622 226 784 297"),
+        7: ("tuxedo", V, "high", "upright tail on the scratcher, body hidden", "1165 655 1300 840"),
+        8: ("tuxedo", V, "high", "upright tail on the scratcher, body hidden", "1125 655 1240 880"),
+        9: ("tuxedo", V, "high", "upright tail on the scratcher, body hidden", "1095 690 1190 910"),
+        10: ("tuxedo", V, "high", "upright tail on the scratcher, body hidden", "1095 660 1205 910"),
+        11: ("tuxedo", V, "high", "upright tail on the scratcher, body hidden", "1140 745 1275 960"),
+        12: ("tuxedo", V, "high", "upright tail on the scratcher, body hidden", "1065 745 1240 960"),
+        13: ("tuxedo", V, "high", "upright tail on the scratcher, body hidden", "1075 745 1215 960"),
+        14: ("tuxedo", V, "high", "upright tail on the scratcher, body hidden", "1130 745 1255 960"),
+        15: ("tuxedo", V, "high", "upright tail on the scratcher, body hidden", "1055 740 1205 960"),
+        16: ("tuxedo", V, "high", "upright tail on the scratcher, body hidden", "1055 720 1175 960"),
+        17: ("tuxedo", V, "high", "upright tail on the scratcher, body hidden", "1045 750 1165 960"),
+        **{i: ("tabby", "uncertain", "low", "tabby motion-blurred at the left", "") for i in rng(18, 23)},
+    },
+}
+
 TARGET = {
     "commons-cat-plays": "cat_0 tuxedo",
     "commons-cat-jumping-backwards": "cat boxed by the body run (tabby f002-f003, f007-f017; tuxedo otherwise)",
@@ -106,13 +134,15 @@ def main() -> None:
                 fr = results[method].get(idx)
                 if fr and fr.get("tail"):
                     ref = " ".join(f"{v:.0f}" for v in fr["tail"]["box"])
+            alt = ALT.get(clip, {}).get(i, ("", "", "", "", ""))
             rows.append({
                 "clip_id": clip, "frame_index": i, "timestamp_s": f"{f['timestamp_s']:.4f}", "target_cat": TARGET[clip],
                 "tail_visibility": vis, "tail_identity_confidence": conf, "condition": cond, "note": note, "reference_box": ref,
+                "alt_cat": alt[0], "alt_tail_visibility": alt[1], "alt_identity_confidence": alt[2], "alt_note": alt[3], "alt_reference_box": alt[4],
             })
     out = HERE / "frames.csv"
     with out.open("w", newline="", encoding="utf-8") as h:
-        h.write(f"# annotation_protocol_version: 1; reviewer_id: claude-809c44f2 (model); frozen_at_commit: {commit}; date: 2026-09-20\n")
+        h.write(f"# annotation_protocol_version: 1.1; reviewer_id: claude-809c44f2 (model); frozen_at_commit: {commit}; date: 2026-09-20\n")
         w = csv.DictWriter(h, fieldnames=list(rows[0].keys()))
         w.writeheader()
         w.writerows(rows)

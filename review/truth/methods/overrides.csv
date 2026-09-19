@@ -43,3 +43,16 @@ commons-cat-jumping-backwards,6,tail_grounded_v3,correct,,partial,as tail_ground
 commons-black-cat-walking,32,tail_grounded_v3,correct,,partial,as v2b_intersection
 commons-black-cat-walking,0,tail_grounded_v3,wrong_part,torso,unusable,as v1
 commons-cat-plays,6,tail_grounded_v3,wrong_part,paw,unusable,white hind paw
+commons-cat-plays,4,tail_grounded_v4,correct,,partial,same mask as tail_grounded_v2 (one-sided from f005; checked on the v4 overlay 2026-09-20)
+commons-black-cat-walking,32,tail_grounded_v4,correct,,partial,same intersection mask as v2b_intersection
+commons-black-cat-walking,0,tail_grounded_v4,wrong_part,torso,unusable,as v1
+commons-cat-plays,6,tail_grounded_v4,wrong_part,paw,unusable,white hind paw
+commons-cat-jumping-backwards,2,tail_grounded_v4,correct,,usable,tracked mask lies on the tabby tail (checked on the v4 overlay 2026-09-20); curve-extent box contains 0.796 of the reference just under the 0.8 rule
+commons-cat-plays,0,tail_grounded_v4,wrong_part,hind_leg,unusable,tracked mask on the black hind leg ending in the white paw (checked 2026-09-20)
+commons-cat-plays,1,tail_grounded_v4,wrong_part,hind_leg,unusable,as f000
+commons-cat-plays,2,tail_grounded_v4,wrong_part,hind_leg,unusable,as f000
+commons-cat-plays,3,tail_grounded_v4,wrong_part,hind_leg,unusable,as f000
+commons-cat-plays,15,tail_grounded_v4,wrong_part,hind_leg,unusable,tracked mask on a leg (checked 2026-09-20)
+commons-cat-plays,16,tail_grounded_v4,wrong_part,hind_leg,unusable,as f015
+commons-cat-plays,17,tail_grounded_v4,wrong_part,hind_leg,unusable,as f015
+commons-cat-plays,18,tail_grounded_v4,wrong_part,hind_leg,unusable,as f015
