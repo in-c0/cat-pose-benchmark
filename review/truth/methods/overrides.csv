@@ -38,3 +38,8 @@ commons-cat-jumping-backwards,6,v2b_union,correct,,partial,as tail_grounded_v2
 commons-black-cat-walking,32,v2b_union,correct,,partial,bidirectional mask on the tail tip above the back (checked 2026-09-20)
 commons-black-cat-walking,0,v2b_union,wrong_part,torso,unusable,as v1
 commons-cat-plays,6,v2b_union,wrong_part,paw,unusable,white hind paw
+commons-cat-plays,4,tail_grounded_v3,correct,,partial,as tail_grounded_v2
+commons-cat-jumping-backwards,6,tail_grounded_v3,correct,,partial,as tail_grounded_v2
+commons-black-cat-walking,32,tail_grounded_v3,correct,,partial,as v2b_intersection
+commons-black-cat-walking,0,tail_grounded_v3,wrong_part,torso,unusable,as v1
+commons-cat-plays,6,tail_grounded_v3,wrong_part,paw,unusable,white hind paw
