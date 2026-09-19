@@ -1,0 +1,120 @@
+clip_id,frame_index,method,output_status,wrong_part,box_quality,reason
+commons-black-cat-walking,7,tail_grounded_v1+dense,correct,,usable,dense box on the tail; IoU with reference low because the reference box spans body+tail
+commons-black-cat-walking,18,tail_grounded_v1+dense,correct,,usable,dense box on the tail; different extent from reference
+commons-black-cat-walking,20,tail_grounded_v1+dense,correct,,usable,dense box on the tail base; reference is the same region at a different extent
+commons-black-cat-walking,21,tail_grounded_v1+dense,correct,,usable,dense box on the tail tip; reference spans the full tail
+commons-black-cat-walking,32,tail_grounded_v1+dense,correct,,partial,dense box on the tail tip
+commons-cat-plays,19,tail_grounded_v1+dense,correct,,partial,dense box on the tail tip; reference spans the curl
+commons-black-cat-walking,7,v1_time_normalised+dense,correct,,usable,as tail_grounded_v1+dense
+commons-black-cat-walking,18,v1_time_normalised+dense,correct,,usable,as tail_grounded_v1+dense
+commons-black-cat-walking,20,v1_time_normalised+dense,correct,,usable,as tail_grounded_v1+dense
+commons-black-cat-walking,21,v1_time_normalised+dense,correct,,usable,as tail_grounded_v1+dense
+commons-cat-plays,19,v1_time_normalised+dense,correct,,partial,as tail_grounded_v1+dense
+commons-cat-plays,4,tail_grounded_v2,correct,,partial,propagated mask lies on the tail (checked on the overlay 2026-09-14); curve bbox smaller than reference
+commons-cat-jumping-backwards,6,tail_grounded_v2,correct,,partial,propagated mask lies on the tuxedo tail (checked 2026-09-14)
+commons-cat-plays,6,tail_grounded_v1,wrong_part,paw,unusable,white hind paw
+commons-cat-plays,6,tail_grounded,wrong_part,paw,unusable,white hind paw
+commons-cat-plays,6,tail_grounded_v2,wrong_part,paw,unusable,white hind paw
+commons-black-cat-walking,0,tail_grounded_v1,wrong_part,torso,unusable,tail hidden behind the frontal body; box on the back
+commons-black-cat-walking,0,tail_grounded_v2,wrong_part,torso,unusable,as v1
+commons-black-cat-walking,0,tail_grounded,wrong_part,ear,unusable,v0 grounded the ear (found 2026-09-20)
+commons-cat-plays,4,v2b_left,correct,,partial,as tail_grounded_v2 (reach-1 propagated mask on the tail)
+commons-cat-jumping-backwards,6,v2b_left,correct,,partial,as tail_grounded_v2
+commons-black-cat-walking,32,v2b_left,correct,,partial,bidirectional mask on the tail tip above the back (checked 2026-09-20)
+commons-black-cat-walking,0,v2b_left,wrong_part,torso,unusable,as v1
+commons-cat-plays,6,v2b_left,wrong_part,paw,unusable,white hind paw
+commons-cat-plays,4,v2b_right,correct,,partial,as tail_grounded_v2 (reach-1 propagated mask on the tail)
+commons-cat-jumping-backwards,6,v2b_right,correct,,partial,as tail_grounded_v2
+commons-black-cat-walking,32,v2b_right,correct,,partial,bidirectional mask on the tail tip above the back (checked 2026-09-20)
+commons-black-cat-walking,0,v2b_right,wrong_part,torso,unusable,as v1
+commons-cat-plays,6,v2b_right,wrong_part,paw,unusable,white hind paw
+commons-cat-plays,4,v2b_intersection,correct,,partial,as tail_grounded_v2 (reach-1 propagated mask on the tail)
+commons-cat-jumping-backwards,6,v2b_intersection,correct,,partial,as tail_grounded_v2
+commons-black-cat-walking,32,v2b_intersection,correct,,partial,bidirectional mask on the tail tip above the back (checked 2026-09-20)
+commons-black-cat-walking,0,v2b_intersection,wrong_part,torso,unusable,as v1
+commons-cat-plays,6,v2b_intersection,wrong_part,paw,unusable,white hind paw
+commons-cat-plays,4,v2b_union,correct,,partial,as tail_grounded_v2 (reach-1 propagated mask on the tail)
+commons-cat-jumping-backwards,6,v2b_union,correct,,partial,as tail_grounded_v2
+commons-black-cat-walking,32,v2b_union,correct,,partial,bidirectional mask on the tail tip above the back (checked 2026-09-20)
+commons-black-cat-walking,0,v2b_union,wrong_part,torso,unusable,as v1
+commons-cat-plays,6,v2b_union,wrong_part,paw,unusable,white hind paw
+commons-cat-plays,4,tail_grounded_v3,correct,,partial,as tail_grounded_v2
+commons-cat-jumping-backwards,6,tail_grounded_v3,correct,,partial,as tail_grounded_v2
+commons-black-cat-walking,32,tail_grounded_v3,correct,,partial,as v2b_intersection
+commons-black-cat-walking,0,tail_grounded_v3,wrong_part,torso,unusable,as v1
+commons-cat-plays,6,tail_grounded_v3,wrong_part,paw,unusable,white hind paw
+commons-cat-plays,4,tail_grounded_v4,correct,,partial,same mask as tail_grounded_v2 (one-sided from f005; checked on the v4 overlay 2026-09-20)
+commons-black-cat-walking,32,tail_grounded_v4,correct,,partial,same intersection mask as v2b_intersection
+commons-black-cat-walking,0,tail_grounded_v4,wrong_part,torso,unusable,as v1
+commons-cat-plays,6,tail_grounded_v4,wrong_part,paw,unusable,white hind paw
+commons-cat-jumping-backwards,2,tail_grounded_v4,correct,,usable,tracked mask lies on the tabby tail (checked on the v4 overlay 2026-09-20); curve-extent box contains 0.796 of the reference just under the 0.8 rule
+commons-cat-plays,0,tail_grounded_v4,wrong_part,hind_leg,unusable,tracked mask on the black hind leg ending in the white paw (checked 2026-09-20)
+commons-cat-plays,1,tail_grounded_v4,wrong_part,hind_leg,unusable,as f000
+commons-cat-plays,2,tail_grounded_v4,wrong_part,hind_leg,unusable,as f000
+commons-cat-plays,3,tail_grounded_v4,wrong_part,hind_leg,unusable,as f000
+commons-cat-plays,15,tail_grounded_v4,wrong_part,hind_leg,unusable,tracked mask on a leg (checked 2026-09-20)
+commons-cat-plays,16,tail_grounded_v4,wrong_part,hind_leg,unusable,as f015
+commons-cat-plays,17,tail_grounded_v4,wrong_part,hind_leg,unusable,as f015
+commons-cat-plays,18,tail_grounded_v4,wrong_part,hind_leg,unusable,as f015
+commons-cat-plays,4,tail_grounded_v3a,correct,,partial,as tail_grounded_v3 (frame untouched by the audit)
+commons-black-cat-walking,32,tail_grounded_v3a,correct,,partial,as tail_grounded_v3 (frame untouched by the audit)
+commons-black-cat-walking,0,tail_grounded_v3a,wrong_part,torso,unusable,as v1 (no left anchor; audit cannot form)
+commons-cat-plays,6,tail_grounded_v3a,wrong_part,other,unusable,consensus replaced the paw mask with a small blob near the raised hind leg; tail is under the body (checked 2026-09-20)
+commons-black-cat-walking,6,tail_grounded_v1,wrong_part,torso,unusable,box is the whole cat with the tail tip at its top edge (found by the pass-9 audit)
+commons-black-cat-walking,7,tail_grounded_v1,wrong_part,torso,unusable,as f006
+commons-black-cat-walking,6,tail_grounded_v3,wrong_part,torso,unusable,as v1
+commons-black-cat-walking,7,tail_grounded_v3,wrong_part,torso,unusable,as v1
+commons-black-cat-walking,7,tail_grounded,wrong_part,torso,unusable,as v1
+holdout-cat-playing-taiwan,23,tail_grounded_v1+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,24,tail_grounded_v1+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,25,tail_grounded_v1+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,26,tail_grounded_v1+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,27,tail_grounded_v1+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,28,tail_grounded_v1+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,29,tail_grounded_v1+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,30,tail_grounded_v1+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,31,tail_grounded_v1+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,32,tail_grounded_v1+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,33,tail_grounded_v1+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,34,tail_grounded_v1+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,35,tail_grounded_v1+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,36,tail_grounded_v1+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,37,tail_grounded_v1+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,38,tail_grounded_v1+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,39,tail_grounded_v1+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,23,tail_grounded_v3+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,24,tail_grounded_v3+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,25,tail_grounded_v3+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,26,tail_grounded_v3+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,27,tail_grounded_v3+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,28,tail_grounded_v3+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,29,tail_grounded_v3+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,30,tail_grounded_v3+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,31,tail_grounded_v3+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,32,tail_grounded_v3+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,33,tail_grounded_v3+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,34,tail_grounded_v3+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,35,tail_grounded_v3+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,36,tail_grounded_v3+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,37,tail_grounded_v3+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,38,tail_grounded_v3+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,39,tail_grounded_v3+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,22,tail_grounded_v3+holdout,wrong_part,torso,unusable,reach-1 propagation from the f023 rump mask; the real tail rises at right
+holdout-cat-playing-taiwan,23,tail_grounded_v3a+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,24,tail_grounded_v3a+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,25,tail_grounded_v3a+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,26,tail_grounded_v3a+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,27,tail_grounded_v3a+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,28,tail_grounded_v3a+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,29,tail_grounded_v3a+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,30,tail_grounded_v3a+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,31,tail_grounded_v3a+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,32,tail_grounded_v3a+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,33,tail_grounded_v3a+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,34,tail_grounded_v3a+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,35,tail_grounded_v3a+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,36,tail_grounded_v3a+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,37,tail_grounded_v3a+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,38,tail_grounded_v3a+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,39,tail_grounded_v3a+holdout,wrong_part,torso,unusable,detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,22,tail_grounded_v3a+holdout,wrong_part,torso,unusable,reach-1 propagation from the f023 rump mask; the real tail rises at right

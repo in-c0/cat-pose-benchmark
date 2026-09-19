@@ -10,7 +10,7 @@ from detail.grounded_tail_v1 import run as grounded_v1
 from review.common import clip_workdir, frames_dir, frames_manifest_path, load_clips, write_json
 
 
-def run_clip(clip_id: str, *, device: str, samples: int, zoom: bool, crop_check: bool, temporal: bool, tag: str = "tail_grounded_v1", detector_id: str | None = None, classifier_id: str | None = None) -> dict:
+def run_clip(clip_id: str, *, device: str, samples: int, zoom: bool, crop_check: bool, temporal: bool, tag: str = "tail_grounded_v1", detector_id: str | None = None, classifier_id: str | None = None, time_scale: bool = False, loose_gate: bool = False) -> dict:
     work = clip_workdir(clip_id)
     out_dir = work / tag
     if out_dir.exists():
@@ -29,6 +29,8 @@ def run_clip(clip_id: str, *, device: str, samples: int, zoom: bool, crop_check:
         temporal=temporal,
         **({"detector_id": detector_id} if detector_id else {}),
         **({"classifier_id": classifier_id} if classifier_id else {}),
+        time_scale=time_scale,
+        loose_gate=loose_gate,
     )
     overlay_dir = work / "overlays" / tag
     if overlay_dir.exists():
@@ -70,6 +72,8 @@ def main() -> None:
     parser.add_argument("--tag", default="tail_grounded_v1", help="output method name (for ablations)")
     parser.add_argument("--detector", default=None)
     parser.add_argument("--classifier", default=None)
+    parser.add_argument("--time-scale", action="store_true")
+    parser.add_argument("--loose-gate", action="store_true")
     args = parser.parse_args()
     for clip in load_clips():
         if args.clip and clip["clip_id"] not in args.clip:
@@ -77,7 +81,7 @@ def main() -> None:
         payload = run_clip(
             clip["clip_id"], device=args.device, samples=args.samples,
             zoom=args.zoom, crop_check=not args.no_crop_check, temporal=not args.no_temporal, tag=args.tag,
-            detector_id=args.detector, classifier_id=args.classifier,
+            detector_id=args.detector, classifier_id=args.classifier, time_scale=args.time_scale, loose_gate=args.loose_gate,
         )
         print(json.dumps({"clip_id": clip["clip_id"], **payload["summary"]}))
 
