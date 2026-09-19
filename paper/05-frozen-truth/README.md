@@ -1,12 +1,23 @@
 # Frozen truth: ten passes against fixed frame labels, and a prospective holdout that undid one of them
 
-**Ava Kim** — cat-pose-benchmark, technical note 05, v0.2, 20 September 2026 (v0.1 earlier the same day; §6b added)
+**Ava Kim** — cat-pose-benchmark, technical note 05, v0.3, 20 September 2026 (v0.1 and v0.2 earlier the same day; v0.3 rescored with scorer v2, see §0)
 
 Repository: https://github.com/in-c0/cat-pose-benchmark · Follows notes 01–04 · Licence of this note: CC-BY-4.0
 
 ## Abstract
 
-Notes 01–04 scored every method by one person reading contact sheets after the fact. This note replaces that with a frame truth written down before scoring: for each of 147 development frames, whether a tail is visible, how sure the annotator is that the thing seen is the tail, and a reference box; method judgements are derived from it by a scorer, and every hand override carries a reason. Against that truth, one change survived from a series of twelve back-and-forth passes with a second model acting as reviewer: a two-sided SAM2 bridge that fills a short refusal gap only where the masks propagated from both sides intersect (v3). It takes the grounded method from 75 to 82 true frames at the same two false positives (precision 0.953, recall 0.911). Six other ideas were tried and rejected against the same truth, including one that looked like a gain under the old proxy and is a loss under the truth. An audit that turns the same bridge on the accepted frames (v3a) corrected two more, but the two it corrected turned out to be errors in the truth as well, so it stays a candidate. Then four new clips were chosen by a precommitted metadata-only protocol, annotated before any method ran, and scored once. The bridge gained nothing there, and on one clip the detector read the orange patch on a rolling cat's rump as its tail for 17 consecutive frames, which none of the temporal machinery can touch because it is temporally consistent. Precision on unseen ordinary video is 0.70, not 0.95, and the note says why. A second holdout of eight clips drawn by the same protocol (§6b, added in v0.2) gives the other half of the picture: there the bridge's recall gain does generalise (0.73 → 0.77 at the same precision), and precision is again set by wrong-part assertions, 0.73, of four kinds the development clips never showed.
+Notes 01–04 scored every method by one person reading contact sheets after the fact. This note replaces that with a frame truth written down before scoring: for each of 147 development frames, whether a tail is visible, how sure the annotator is that the thing seen is the tail, and a reference box; method judgements are derived from it by a scorer, and every hand override carries a reason. Against that truth, one change survived from a series of twelve back-and-forth passes with a second model acting as reviewer: a two-sided SAM2 bridge that fills a short refusal gap only where the masks propagated from both sides intersect (v3). It takes the grounded method from 72 to 79 true frames with no new false assertion (precision 0.919, recall 0.878 under scorer v2, §0). Six other ideas were tried and rejected against the same truth, including one that looked like a gain under the old proxy and is a loss under the truth. An audit that turns the same bridge on the accepted frames (v3a) corrected two more, but the two it corrected turned out to be errors in the truth as well, so it stays a candidate. Then four new clips were chosen by a precommitted metadata-only protocol, annotated before any method ran, and scored once. The bridge gained nothing there, and on one clip the detector read the orange patch on a rolling cat's rump as its tail for 17 consecutive frames, which none of the temporal machinery can touch because it is temporally consistent. Precision on unseen ordinary video is 0.70, not 0.95, and the note says why. A second holdout of eight clips drawn by the same protocol (§6b, added in v0.2) gives the other half of the picture: there the bridge's recall gain does generalise (0.71 → 0.74 at the same precision), and precision is again set by wrong-part assertions, 0.71, of four kinds the development clips never showed.
+
+## 0. Corrections in v0.3
+
+A reviewer pass over the record (pass 19) found two scorer defects and several inconsistencies between the prose and the committed files. Every number in this version comes from one generated file, `review/truth/methods/aggregate.json`, produced by `python -m review.aggregate`; the tables below are copied from it.
+
+- **The scorer judged the detector's box, not the reported curve.** `review/score_truth.py` took a frame's `tail.box` when it existed and fell back to the curve's extent only otherwise, so on an ordinary accepted frame it was Grounding DINO's proposal that was being matched against the reference, while a propagated frame was judged from its curve. Scorer v2 judges the curve first on every frame. Doing so exposed six accepted frames on which the centreline had collapsed to a single point (walking f035, jumping f016 and f022, *Ljubljana* f038, the ginger cat's f027 and *Katzengras* f005 under v3a); those are now `unusable_curve`, and count as wrong.
+- **A visible tail with no reference box scored any assertion as correct.** Five development frames have no reference (jumping f004, f013, f015; walking f036, f037). Scorer v2 marks an assertion there `needs_review` and excludes it unless a hand override, with its reason, says what it is on. Two such overrides exist (walking f036, jumping f015).
+- **The holdouts are scored twice**: `adjudicated` (the current truth and overrides) and `as_frozen` (the same truth file with automatic judgements only, nothing applied after inference). Both are in the aggregate; §6b reports both.
+- **Prose corrected to the committed manifests**: the holdout pool had 24 eligible files, not 26, with six excluded by the keyword rule, not three; files whose MIME type Commons reports as `application/ogg` were excluded as "not video" by the mechanical rule, so the population was Commons files this filter accepts, not every cat video in the category. Table 4 now states the truth as frozen and the amendment separately. Counts that were added up by hand in v0.2 (42 unseen wrong assertions; 26 in the failure inventory) are replaced by the generated ones.
+
+The headline changes are small in direction and not in kind: on the development clips v3 is 0.919 / 0.878 rather than 0.953 / 0.911; holdout #1 is unchanged; on holdout #2 v3 is 0.713 / 0.744 rather than 0.734 / 0.767 and still meets the predeclared criterion against v1 under both scorings. What the reviewer pass mostly did was find six collapsed curves that a box-based scorer had been counting as correct.
 
 ## 1. Why the proxy had to go
 
@@ -30,14 +41,14 @@ Note 03 added a one-sided bridge: a refused frame next to an accepted one gets t
 
 **v3** is v1 plus the reach-1 bridge plus the two-sided intersection bridge for gaps of at most three frames. Against truth 1.3:
 
-**Table 1.** Development clips, primary stratum (134 frames), truth 1.3.
+**Table 1.** Development clips, primary stratum (134 frames; 1 needs review under v3/v3a, 4 under v4), truth 1.3, scorer v2, adjudicated.
 
 | method | TP | wrong on a visible frame | missed | wrong on a hidden frame | correct refusal | precision | recall |
 |---|---|---|---|---|---|---|---|
-| v1 (note 02) | 75 | 2 | 13 | 2 | 42 | 0.949 | 0.833 |
-| **v3** | **82** | 2 | 6 | 2 | 42 | **0.953** | **0.911** |
-| v3a (audit candidate, §5) | 84 | 0 | 6 | 2 | 42 | 0.977 | 0.933 |
-| v4 (rejected, §4) | 86 | 2 | 2 | 10 | 34 | 0.878 | 0.956 |
+| v1 (note 02) | 72 | 5 | 13 | 2 | 42 | 0.911 | 0.8 |
+| **v3** | **79** | 5 | 6 | 2 | 42 | **0.919** | **0.878** |
+| v3a (audit candidate, §5) | 82 | 2 | 6 | 2 | 42 | 0.953 | 0.911 |
+| v4 (rejected, §4) | 81 | 5 | 2 | 10 | 34 | 0.844 | 0.920 |
 
 ![Figure 1](figures/bridge.jpg)
 
@@ -65,7 +76,7 @@ Each of these was proposed by the reviewer model, built, scored against the trut
 
 Pass 9 turned the bridge round. For every frame the detector accepted, drop it as an anchor, propagate the nearest accepted frames on each side (at most three away) to it, and replace the local mask with the intersection when both propagated masks and their intersection are non-empty and a centreline can be drawn; otherwise keep the local output. `detail/tail_audit.py` does this and writes `tail_grounded_v3a`. It replaced 64 of 78 eligible frames; on 60 of them the consensus is within IoU 0.9 of the local mask and the score does not change.
 
-It changed two. On walking f006 and f007 the local output is a box over the whole cat with the tail tip at its top edge, and the consensus is the tail tip alone. The truth had those whole-cat boxes as its references, taken from a detector in note 04, so the method had been scoring as correct on two frames where it was wrong. Revision 1.2 fixed the references and the containment rule (§2). Under the corrected truth v3 loses two true frames and v3a gets them back: 84 true, 0 wrong on visible frames.
+It changed two. On walking f006 and f007 the local output is a box over the whole cat with the tail tip at its top edge, and the consensus is the tail tip alone. The truth had those whole-cat boxes as its references, taken from a detector in note 04, so the method had been scoring as correct on two frames where it was wrong. Revision 1.2 fixed the references and the containment rule (§2). Under the corrected truth v3 loses two true frames and v3a gets them back, and under scorer v2 the audit also repairs one collapsed curve (jumping f022): 82 true, 2 wrong on visible frames.
 
 ![Figure 2](figures/audit.jpg)
 
@@ -77,7 +88,7 @@ v3a is not the default. The reason is the one the reviewer model gave: the same 
 
 Everything above was tested on four clips, and every rule that was kept or dropped was decided on those four clips. The reviewer model's ruling at pass 11 was to stop, freeze v3 and v3a and the truth, and get new clips by a protocol that could not choose them for being interesting.
 
-The protocol is `review/holdout/sample_pool.py`, and the pool and the selection it produced are committed next to it. The pool is every file directly in the Wikimedia Commons category *Videos of cats*, 78 files, with metadata fetched through the API and no video opened. A file is eligible if it is a video, its licence is CC0, CC BY or public domain, it is at least four seconds long and at least 360 pixels high, it is not one of the four development clips, and its title, description and uploader contain none of a fixed list of words for animation, adverts and broadcast productions. Twenty-six files were eligible. Their titles were sorted, shuffled with seed 20260920, and the first four from distinct uploaders were taken. The window was fixed in advance: the first ten seconds at 4 fps, 40 frames a clip.
+The protocol is `review/holdout/sample_pool.py`, and the pool and the selection it produced are committed next to it. The pool is every file directly in the Wikimedia Commons category *Videos of cats*, 78 files, with metadata fetched through the API and no video opened. A file is eligible if it is a video, its licence is CC0, CC BY or public domain, it is at least four seconds long and at least 360 pixels high, it is not one of the four development clips, and its title, description and uploader contain none of a fixed list of words for animation, adverts and broadcast productions. Twenty-four files were eligible (the selection file records the reasons: 27 CC BY-SA, 19 whose MIME type the rule did not accept as video — several `.ogv` files that Commons reports as `application/ogg` — 6 by the keyword rule, 2 development clips). Their titles were sorted, shuffled with seed 20260920, and the first four from distinct uploaders were taken. The window was fixed in advance: the first ten seconds at 4 fps, 40 frames a clip.
 
 **Table 2.** The holdout, in selection order.
 
@@ -114,12 +125,12 @@ The result that matters is the other one. On unseen ordinary video, precision wa
 
 The next question was whether the recall gain would generalise on a holdout that had gaps for the bridge to fill. Eight more clips were taken from the same frozen order, continuing from the position after the fourth clip of §6, with uploaders distinct across both holdouts and the same licence rule (`review/holdout/selection2.json`). One file, a 4K AV1 upload, does not decode with the bundled ffmpeg; the Commons 1080p transcode of the same file is used and the manifest says so. One clip is a produced university-series video that the keyword list did not catch; the protocol keeps it. The 296 frames were annotated from raw frames before any method ran (tag `holdout2-2026-09-pre-inference`).
 
-**Table 4.** Holdout #2, in selection order, and what the first ten seconds contain.
+**Table 4.** Holdout #2, in selection order, and what the first ten seconds contain. Primary truth as frozen before inference.
 
 | clip | licence | frames | what is there | primary truth |
 |---|---|---|---|---|
 | *Ljubljana domača mačka 2* | CC BY 3.0 | 40 | a silver tabby's head fills the frame, then it walks away with the tail straight up | 7 positive, 33 negative |
-| *Andra and Billy* | CC BY 4.0 | 40 | a small tabby on the ground beside a person: lying, sitting with the tail out, walking with it up | 13 positive, 21 negative, 6 uncertain |
+| *Andra and Billy* | CC BY 4.0 | 40 | a small tabby on the ground beside a person: lying, sitting with the tail out, walking with it up | 13 positive, 21 negative, 6 uncertain as frozen; 18 negative, 9 uncertain after the amendment below |
 | *Koetjing gweh, Cito* | CC0 | 40 | an orange-and-white cat's face, close, dark | 40 negative |
 | *Sophy the Cat is Really High On A Ledge* | CC0 | 24 | a backlit cat on a ledge seen from below | 22 negative, 2 blur |
 | *Cat discovers it was being spied on* | CC0 | 32 | a street from a window; a cat about 80 px long on a balcony below | 32 uncertain |
@@ -129,17 +140,25 @@ The next question was whether the recall gain would generalise on a holdout that
 
 After the freeze the overlays were checked and the judgements recorded as overrides with reasons. Two things came out of that check. My reference boxes for the ginger cat's tail on the 4K clip were 200–400 px too far right (a blurred upright tail is hard to place on a grid by eye), so the automatic match failed on frames where the mask is plainly on the tail; those are overrides, not truth edits. And on three frames of *Andra and Billy* the method drew a mask at ground level behind the rump where my blind reading had said the tail was hidden; looking again, it could be the tail. Under the rule from §2, a disagreement found after inference goes to uncertain, not to visible, and that is what the file says.
 
-**Table 5.** Holdout #2, primary stratum (252 frames), truth 1.3, no method changed after seeing it.
+**Table 5.** Holdout #2, primary stratum (252 frames after the amendment), truth 1.3, scorer v2, adjudicated; no method changed after seeing it.
 
 | method | TP | wrong on a visible frame | missed | wrong on a hidden frame | correct refusal | precision | recall |
 |---|---|---|---|---|---|---|---|
-| v1 | 66 | 5 | 19 | 18 | 144 | 0.742 | 0.733 |
-| **v3** | 69 | 5 | 16 | 20 | 142 | 0.734 | 0.767 |
-| v3a | 69 | 5 | 16 | 20 | 142 | 0.734 | 0.767 |
+| v1 | 64 | 7 | 19 | 18 | 144 | 0.719 | 0.711 |
+| **v3** | **67** | 7 | 16 | 20 | 142 | **0.713** | **0.744** |
+| v3a | 66 | 8 | 16 | 20 | 142 | 0.702 | 0.733 |
 
-This time the criterion written down before the run is met: recall is up 3.4 points, precision down 0.8, and v3's three extra false assertions each extend an existing v1 false run by one frame rather than starting a new kind of error. The three frames it gains are real tails: the Ljubljana cat's upright tail on one more frame, the ginger cat's tail under the title overlay, the small tabby's tail as it turns away. So the bridge's gain generalises when a holdout contains gaps of the kind it fills, and does not when it does not; §6 and §6b together are the honest statement. v3a again corrects nothing and stays a candidate.
+**Table 5b.** The same, as frozen: the truth file before the post-inference amendment and automatic judgements only, no overrides. The displaced reference boxes on the 4K clip cost every method about twenty true frames here; the comparison between methods is the point.
 
-Precision is 0.73, and the 25 false assertions are of four kinds, none of which the development clips contain: a thin strip at the edge of a face that fills the frame (11 frames of *Cito*); the whole body of a small or distant cat (5 frames of the tabby sitting on a dog — and the 40 correct frames on *Katzengras* are the same kind of mask, on a cat whose tail happens to lie inside it); a leaf or forepaw on the ground in front of a lying cat's face (9 frames of *Andra and Billy*); and, once, a person's face, reached by propagation. Together with §6 that is 42 wrong assertions on 372 unseen primary frames against 4 on 134 development frames. The next thing to look at is whether the four mask features the grounded method already records — tail-to-cat area, the fraction of the mask inside the body, its contact with the body, its elongation — separate these kinds of error from true tails across all three sets, before any new rule is written.
+| method | TP | wrong on a visible frame | missed | wrong on a hidden frame | correct refusal | precision | recall |
+|---|---|---|---|---|---|---|---|
+| v1 | 45 | 26 | 19 | 18 | 144 | 0.506 | 0.5 |
+| **v3** | **46** | 28 | 16 | 20 | 142 | **0.489** | **0.511** |
+| v3a | 44 | 30 | 16 | 20 | 142 | 0.468 | 0.489 |
+
+This time the criterion written down before the run is met, under both scorings: adjudicated, recall is up 3.3 points and precision down 0.6; as frozen, recall is up 1.1 and precision down 1.7; and v3's extra false assertions each extend an existing v1 false run by one frame rather than starting a new kind of error (seven false runs for both methods, adjudicated). The three frames it gains are real tails: the Ljubljana cat's upright tail on one more frame, the ginger cat's tail under the title overlay, the small tabby's tail as it turns away. So the bridge's gain generalises when a holdout contains gaps of the kind it fills, and does not when it does not; §6 and §6b together are the honest statement. v3a again corrects nothing and stays a candidate.
+
+Precision is 0.71, and the 27 false assertions (seven runs) are of five kinds, none of which the development clips contain: a thin strip at the edge of a face that fills the frame (11 frames of *Cito*); the whole body of a small or distant cat (5 frames of the tabby sitting on a dog — and the 40 correct frames on *Katzengras* are the same kind of mask, on a cat whose tail happens to lie inside it); a leaf or forepaw on the ground in front of a lying cat's face (9 frames of *Andra and Billy*); once, a person's face, reached by propagation; and two collapsed centrelines (§0). Together with §6 that is 45 wrong assertions on 372 unseen primary frames against 7 on 134 development frames, from the aggregate. The next thing to look at is whether the four mask features the grounded method already records — tail-to-cat area, the fraction of the mask inside the body, its contact with the body, its elongation — separate these kinds of error from true tails across all three sets, before any new rule is written.
 
 ## 7. Where the programme is
 
@@ -171,6 +190,7 @@ python -m review.score_truth tail_grounded_v3 --holdout
 python -m review.holdout.sample_pool --continue-from review/holdout/selection.json --n 8
 python -m review.truth.build_frames_holdout2
 python -m review.score_truth tail_grounded_v3 --holdout2
+python -m review.aggregate
 python paper/05-frozen-truth/make_figures.py
 ```
 

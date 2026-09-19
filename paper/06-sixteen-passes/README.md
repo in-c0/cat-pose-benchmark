@@ -1,6 +1,6 @@
 # Sixteen passes: what was proposed, what was tested, and what survived
 
-**Ava Kim** — cat-pose-benchmark, technical note 06, v0.1, 20 September 2026
+**Ava Kim** — cat-pose-benchmark, technical note 06, v0.2, 20 September 2026 (v0.2: criteria in Table 1 corrected against the pass log after the reviewer's audit; passes 17–19 added)
 
 Repository: https://github.com/in-c0/cat-pose-benchmark · Follows note 05 · Licence of this note: CC-BY-4.0
 
@@ -14,16 +14,16 @@ Note 05 reports the outcome. It does not show how many things were tried and dro
 
 ## 2. The passes
 
-**Table 1.** Sixteen passes. Counts are TP / wrong on visible / missed / wrong on hidden on the four development clips under the truth version in force at the time, unless stated. "Rejected" means the method was not changed.
+**Table 1.** The passes. Counts are TP / wrong on visible / missed / wrong on hidden on the four development clips under the truth version and scorer in force at the time, unless stated; note 05 v0.3 re-reports the surviving methods under scorer v2. "Rejected" means the method was not changed. The criteria in rows 2, 3, 5, 6a and 13 were corrected in v0.2 against the pass log after the reviewer pointed out that v0.1 had paraphrased them.
 
 | pass | hypothesis | what was built | predeclared test | result | disposition |
 |---|---|---|---|---|---|
 | 1 | denser sampling helps the temporal pass | inference at 2–4× the review rate, scored at the review timestamps | +recall, ≤ 1 new FP | +3 recall points under the old proxy; 73/1/25/8 vs 77/0/22/2 once the truth was written down | rejected; the proxy was the error |
-| 2 | temporal terms should scale with frame interval | time-normalised Viterbi emissions and switch cost, reviewer's weights | no loss on any clip | *Cat Plays* collapses: 63/0/32/1 | rejected |
-| 3 | a wider candidate lattice recovers misses | oracle: correct box in top-5 but not top-2 | ≥ 3 such frames to justify building it | 1 frame | not built |
+| 2 | temporal terms should scale with frame interval | time-normalised Viterbi *emissions* (the switch cost stayed at 0.20), reviewer's weights | recall up with no new FP on either clip | *Cat Plays* collapses: 63/0/32/1 | rejected |
+| 3 | a wider candidate lattice recovers misses | oracle: correct box in top-5 but not top-2 | ≥ 4 new usable tails in K5∖K2, ≥ 3 of them surviving the crop check | 1 frame | not built |
 | 4 | — | truth v1 frozen; scorer; rescoring of every method | — | v1 77/0/22/2 (P 0.975, R 0.778) | baseline |
-| 5 | the detector threshold hides true tails | dump of every "tail" box down to 0.05 on missed and on hidden-tail frames | ≥ 3 usable boxes below 0.20 on missed frames, few on hidden ones | 2 usable; 2.9 junk boxes ≥ 0.20 per hidden frame | rejected |
-| 6a | the cat gate is too tight | 30 % containment instead of the centre rule | any gain | identical to v1 | rejected |
+| 5 | the detector threshold hides true tails | dump of every "tail" box down to 0.05 on missed and on hidden-tail frames | ≥ 4 usable boxes below 0.20 on missed frames, ≥ 3 of them at ≥ 0.10 | 2 usable; 2.9 junk boxes ≥ 0.20 per hidden frame | rejected |
+| 6a | the cat gate is too tight | 30 % containment instead of the centre rule | none predeclared — a diagnostic I had already started | identical to v1 | rejected |
 | 6b | a cheaper switch lets tails in | switch cost 0.20 → 0.15/0.10/0.05/0.00 | a plateau before the first FP | first FP arrives with the first TP | rejected |
 | 6c | two-sided propagation can fill a gap safely | left / right / union / intersection bridges, gaps ≤ 3 | ≥ 2 TP, 0 FP over v2 | intersection +4 TP, 0 FP; the others admit a 3× blob | **kept as v3** |
 | 7 | SAM2 can track a tail through a dark prefix | long one-sided propagation oracle with two negative controls | ≥ 3/4 dark frames tracked, no drift in the controls | 4/4; controls fail safe (mask empties) | evidence for pass 8 |
@@ -32,10 +32,13 @@ Note 05 reports the outcome. It does not show how many things were tried and dro
 | 10 | low-confidence partials are a truth problem | primary stratum = visible/partial with identity confidence high/medium; blinded re-review with ±1 s of video | licking strip resolves or is excluded | unresolved; excluded (revision 1.3) | truth rule |
 | 11 | v3 generalises | prospective holdout #1: four clips, metadata-only draw, truth before inference | ΔR > 0, ΔP ≥ −0.02, no new repeated failure | ΔR 0, ΔP −0.012, a rump read as a tail for 17 frames | **not met** |
 | 12 | — | note 05 v0.1 | — | — | published |
-| 13 | an existing SigLIP class already beats "tail" on the rump | offline margin audit of the six crop scores on every accepted frame | parameter-free `tail > max(others)` loses ≤ 5 dev TPs | −31 dev TP, −40 holdout TP (a hanging cream tail is "leg") | rejected |
+| 13 | an existing SigLIP class already beats "tail" on the rump | offline margin audit of the six crop scores on every accepted frame | engineering screen: remove most of the Taiwan run, no new repeated failure, ≤ 2 recall points lost | parameter-free `tail > max(others)`: −31 dev TP, −40 holdout TP (a hanging cream tail is "leg") | rejected |
 | 14 | the crop, not the model, is the problem | re-score on SAM2-mask-tight crops | Larry ≥ 30/40 improve; Taiwan ≥ 12/17 keep a negative margin; ≤ 5 dev flips | 1/40; 14/17; 9 flips; AUROC 0.38 → 0.18 | rejected; zero-shot verification dropped |
 | 15 | v3 generalises (second draw) | holdout #2: next eight clips in the frozen order, truth before inference | as pass 11 | ΔR +0.034, ΔP −0.008, no new repeated failure | **met**; precision 0.73 |
 | 16 | mask geometry separates the false assertions | six features on 191 TP / 46 FP across all three sets | direction replicates on all sets, pooled AUROC ≥ 0.80, ≥ 2 FP modes | max AUROC 0.67; direction reverses between sets | rejected; single-threshold geometry dropped |
+| 17 | — | note 06 v0.1 | — | — | published |
+| 18 | the frozen embedding contains tail-vs-not-tail signal the text heads miss | linear probe on SigLIP embeddings of the 237 accepted crops, clip- and run-weighted, leave-two-clips-out over the 11 clips that have accepted frames (55 folds), threshold at 98 % of weighted training TPs | held-out FP −25 % with TP loss ≤ 2 %, on ≥ 3 clips, no clip of ≥ 10 TPs losing > 1 | TP 191 → 44, FP 46 → 15; six clips lose more than one | rejected (exploratory: labels not human-checked) |
+| 19 | the record has holes a reviewer would find | reviewer audit of scorer, truth rules, notes and manifests | — | scorer judged the detector's box, not the curve; visible-without-reference scored any assertion correct; prose counts disagreed with the manifests | scorer v2; one generated aggregate; notes 05 v0.3 and 06 v0.2 |
 
 **Table 2.** Truth revisions.
 
@@ -45,15 +48,16 @@ Note 05 reports the outcome. It does not show how many things were tried and dro
 | 1.1 | 8 | second cat's tail recorded (`alt_*`); scorer instance-agnostic; the tuxedo tail on the scratcher, f007–f017 of the jumping clip, annotated for the first time | the oracle in pass 7 tracking the other cat |
 | 1.2 | 9 | walking f006/f007 references replaced (they were whole-cat detector boxes); containment rule made one-way | the audit in pass 9 |
 | 1.3 | 10 | primary stratum requires identity confidence high/medium; `identity` column; licking f027–f035 re-reviewed with temporal context and left unresolved | the reviewer model's rule |
+| scorer v2 | 19 | the reported curve is judged, not the detector's box; a collapsed centreline is `unusable_curve`; a visible tail without a reference box needs a hand judgement; holdouts scored as frozen and adjudicated | the reviewer's audit |
 | — | 15 | *Andra and Billy* f012–f014 moved to uncertain after v1 drew a mask where the blind reading said hidden | method output; resolved down, never up |
 
 ## 3. What the table says
 
-Three things. First, the only change that survived is the one that adds no threshold and no new model: it asks two propagations to agree and refuses when they do not. Second, the truth moved four times, three of them because a method found something the annotator had not, and each time the fix was to make the truth stricter or to exclude, never to accept the method's reading. Third, the failures cluster: every semantic and structural verifier tried was a per-frame test of a crop or a mask, and every one failed because true tails and false assertions overlap on whatever single axis was chosen — a hanging cream tail is what the zero-shot model calls a leg, a curled grey tail is as body-attached as a whole-cat mask. The reviewer model's own reading at the end of pass 16 was to stop tuning here, and that is what this note does.
+Three things. First, the only change that survived is the one that adds no threshold and no new model: it asks two propagations to agree and refuses when they do not. Second, the truth moved four times, three of them because a method found something the annotator had not, and each time the fix was to make the truth stricter or to exclude, never to accept the method's reading. Third, the failures cluster: every semantic and structural verifier tried was a per-frame test of a crop or a mask, and every one failed because true tails and false assertions overlap on whatever single axis was chosen — a hanging cream tail is what the zero-shot model calls a leg, a curled grey tail is as body-attached as a whole-cat mask. The reviewer model's own reading at the end of pass 16 was to stop tuning here, and that is what this note does. Its audit at pass 19 then found that the scorer had been judging the detector's box rather than the curve the method reports, which hid six collapsed centrelines; the corrected numbers are in note 05 v0.3 and do not change any disposition in Table 1. One limitation stands over every number: the 603 frames come from 16 clips and are not 603 independent observations — one clip supplies 40 near-identical easy tails, another a 17-frame repeated mistake — so the aggregate also reports per-clip counts, a macro average over clips and the number of distinct false runs (seven on holdout #2, not 27).
 
 ## 4. What comes next
 
-The reviewer model's proposal for the next phase, recorded so it is tested as written: a linear probe on the frozen SigLIP image embedding of the existing crop, trained on the 237 accepted predictions (191 true, 46 false) with each clip and each contiguous same-label run given equal weight, evaluated by exhaustive leave-two-clips-out over the 16 clips (120 folds), threshold chosen on training clips only as the highest that keeps 98 % of weighted training true positives, and promoted only if held-out false assertions fall by 25 % with true ones down no more than 2 %, on at least three different held-out clips, with no clip of ten or more true frames losing more than one. Before anything trained on those labels can be promoted, a human has to check them; that item is filed and open.
+The reviewer model's proposal for the next phase was a linear probe on the frozen SigLIP image embedding of the existing crop, trained on the 237 accepted predictions (191 true, 46 false) with each clip and each contiguous same-label run given equal weight, evaluated by exhaustive leave-two-clips-out, threshold chosen on training clips only as the highest that keeps 98 % of weighted training true positives, and promoted only if held-out false assertions fall by 25 % with true ones down no more than 2 %, on at least three different held-out clips, with no clip of ten or more true frames losing more than one. It was proposed for 16 clips and 120 folds; only 11 clips have an accepted frame, so the executed experiment was 55 folds. It was run as an exploratory probe, because the labels are model-annotated and a human has not checked them (that item is filed and open), and it failed every clause: held-out true frames fell from 191 to 44 while false ones fell from 46 to 15. With one cat per clip, a probe trained on ten cats' tails does not recognise the eleventh's, which is note 04's result again at a larger scale. The frozen embedding is not sufficient at this data size; the sequence stops there rather than escalating to fine-tuning.
 
 ## Acknowledgements
 
