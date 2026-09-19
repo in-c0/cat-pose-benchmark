@@ -34,8 +34,8 @@ commons-black-cat-walking,31,tail_grounded_v4,correct,,usable,target,
 commons-black-cat-walking,32,tail_grounded_v4,correct,other,partial,,override: same intersection mask as v2b_intersection
 commons-black-cat-walking,33,tail_grounded_v4,correct,,usable,target,
 commons-black-cat-walking,34,tail_grounded_v4,correct,,usable,target,
-commons-black-cat-walking,35,tail_grounded_v4,correct,,usable,target,
-commons-black-cat-walking,36,tail_grounded_v4,correct,,usable,target,no reference box; accepted on visibility alone — check by eye
+commons-black-cat-walking,35,tail_grounded_v4,unusable_curve,,unusable,,centreline collapsed to a point
+commons-black-cat-walking,36,tail_grounded_v4,needs_review,,,,visible tail without a reference box; manual judgement required
 commons-black-cat-walking,37,tail_grounded_v4,no_output,,,,no_cat
 commons-cat-jumping-backwards,0,tail_grounded_v4,no_output,,,,no_cat
 commons-cat-jumping-backwards,1,tail_grounded_v4,no_output,,,,no_cat
@@ -52,14 +52,14 @@ commons-cat-jumping-backwards,11,tail_grounded_v4,correct,,usable,target,
 commons-cat-jumping-backwards,12,tail_grounded_v4,correct,,usable,target,
 commons-cat-jumping-backwards,13,tail_grounded_v4,no_output,,,,no_tail_box
 commons-cat-jumping-backwards,14,tail_grounded_v4,correct,,usable,target,
-commons-cat-jumping-backwards,15,tail_grounded_v4,correct,,usable,target,no reference box; accepted on visibility alone — check by eye
-commons-cat-jumping-backwards,16,tail_grounded_v4,correct,,usable,target,
+commons-cat-jumping-backwards,15,tail_grounded_v4,needs_review,,,,visible tail without a reference box; manual judgement required
+commons-cat-jumping-backwards,16,tail_grounded_v4,unusable_curve,,unusable,,centreline collapsed to a point
 commons-cat-jumping-backwards,17,tail_grounded_v4,correct,,usable,target,
 commons-cat-jumping-backwards,18,tail_grounded_v4,no_output,,,,no_tail_box
 commons-cat-jumping-backwards,19,tail_grounded_v4,no_output,,,,no_tail_box
 commons-cat-jumping-backwards,20,tail_grounded_v4,correct,,usable,target,
 commons-cat-jumping-backwards,21,tail_grounded_v4,correct,,usable,target,
-commons-cat-jumping-backwards,22,tail_grounded_v4,correct,,usable,target,
+commons-cat-jumping-backwards,22,tail_grounded_v4,unusable_curve,,unusable,,centreline collapsed to a point
 commons-cat-jumping-backwards,23,tail_grounded_v4,correct,,usable,target,
 commons-cat-licking-tail,0,tail_grounded_v4,correct,,usable,target,
 commons-cat-licking-tail,1,tail_grounded_v4,correct,,usable,target,
@@ -88,8 +88,8 @@ commons-cat-licking-tail,23,tail_grounded_v4,correct,,usable,target,
 commons-cat-licking-tail,24,tail_grounded_v4,correct,,usable,target,
 commons-cat-licking-tail,25,tail_grounded_v4,correct,,usable,target,
 commons-cat-licking-tail,26,tail_grounded_v4,correct,,usable,target,
-commons-cat-licking-tail,27,tail_grounded_v4,correct,,usable,target,no reference box; accepted on visibility alone — check by eye
-commons-cat-licking-tail,28,tail_grounded_v4,correct,,usable,target,no reference box; accepted on visibility alone — check by eye
+commons-cat-licking-tail,27,tail_grounded_v4,needs_review,,,,visible tail without a reference box; manual judgement required
+commons-cat-licking-tail,28,tail_grounded_v4,needs_review,,,,visible tail without a reference box; manual judgement required
 commons-cat-licking-tail,29,tail_grounded_v4,no_output,,,,no_tail_box
 commons-cat-licking-tail,30,tail_grounded_v4,no_output,,,,no_tail_box
 commons-cat-licking-tail,31,tail_grounded_v4,no_output,,,,no_tail_box

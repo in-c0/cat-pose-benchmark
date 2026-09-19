@@ -33,6 +33,8 @@ from review.common import clip_workdir, load_clips
 
 TRUTH = Path(__file__).resolve().parent / "truth"
 IOU_MIN = 0.3
+CURVE_PAD_PX = 8
+DEGENERATE_PX = 4
 
 
 def load_truth(name: str = "frames.csv") -> dict[tuple[str, int], dict[str, Any]]:
@@ -57,14 +59,18 @@ def load_overrides() -> dict[tuple[str, int, str], dict[str, str]]:
 
 
 def _box_of(frame: dict[str, Any]) -> list[float] | None:
-    tail = frame.get("tail")
-    if tail and tail.get("box"):
-        return tail["box"]
+    """Scorer v2 (pass 19): judge the curve the method actually reports, not the detector's
+    proposal box. The box is only a fallback for outputs without a curve."""
     curve = frame.get("curve")
     if curve and curve.get("samples"):
         xs = [s["x_px"] for s in curve["samples"]]
         ys = [s["y_px"] for s in curve["samples"]]
-        return [min(xs), min(ys), max(xs), max(ys)]
+        # a short or straight centreline has a degenerate bounding box; pad it so the
+        # containment test has an area to work with
+        return [min(xs) - CURVE_PAD_PX, min(ys) - CURVE_PAD_PX, max(xs) + CURVE_PAD_PX, max(ys) + CURVE_PAD_PX]
+    tail = frame.get("tail")
+    if tail and tail.get("box"):
+        return tail["box"]
     return None
 
 
@@ -96,8 +102,10 @@ def frame_class(t: dict[str, Any]) -> str:
     return "not_visible"
 
 
-def judge(method: str, run_clip: str, review_clip: str, factor: int, truth: dict, overrides: dict, tag: str | None = None) -> list[dict[str, Any]]:
+def judge(method: str, run_clip: str, review_clip: str, factor: int, truth: dict, overrides: dict, tag: str | None = None, use_overrides: bool = True) -> list[dict[str, Any]]:
     tag = tag or method
+    if not use_overrides:
+        overrides = {}
     path = clip_workdir(run_clip) / method / "result.json"
     if not path.exists():
         return []
@@ -117,13 +125,26 @@ def judge(method: str, run_clip: str, review_clip: str, factor: int, truth: dict
             row["note"] = f["status"]
         else:
             box = _box_of(f)
+            curve = f.get("curve")
+            if curve and curve.get("samples"):
+                xs = [s["x_px"] for s in curve["samples"]]
+                ys = [s["y_px"] for s in curve["samples"]]
+                if max(xs) - min(xs) < DEGENERATE_PX and max(ys) - min(ys) < DEGENERATE_PX:
+                    # the reported centreline collapsed to a point: the output is unusable
+                    # whatever the mask looked like (scorer v2)
+                    row["output_status"] = "unusable_curve"; row["box_quality"] = "unusable"; row["note"] = "centreline collapsed to a point"
+                    box = None
             tv, av = t["tail_visibility"] in ("visible", "partial"), t.get("alt_vis", "") in ("visible", "partial")
-            if tv and t["ref"] and box and _same(box, t["ref"]):
+            if row["output_status"] == "unusable_curve":
+                pass
+            elif tv and t["ref"] and box and _same(box, t["ref"]):
                 row["output_status"] = "correct"; row["box_quality"] = "usable"; row["instance"] = "target"
             elif av and t["alt"] and box and _same(box, t["alt"]):
                 row["output_status"] = "correct"; row["box_quality"] = "usable"; row["instance"] = "alt"; row["note"] = f"on the other cat's tail ({t.get('alt_cat', '')})"
             elif tv and not t["ref"]:
-                row["output_status"] = "correct"; row["box_quality"] = "usable"; row["instance"] = "target"; row["note"] = "no reference box; accepted on visibility alone — check by eye"
+                # scorer v2: a visible tail with no reference box cannot be judged
+                # automatically; excluded unless a hand override says correct / wrong_part
+                row["output_status"] = "needs_review"; row["note"] = "visible tail without a reference box; manual judgement required"
             else:
                 row["output_status"] = "wrong_part"; row["wrong_part"] = "other"; row["note"] = "auto: box does not match any reference (or no tail visible)"
         ov = overrides.get((clip, i, tag))
@@ -143,6 +164,9 @@ def tally(rows: list[dict[str, Any]], truth: dict) -> dict[str, Any]:
         vis = t["tail_visibility"]
         s = r["output_status"]
         fc = frame_class(t)
+        if s == "needs_review":
+            c["needs_review"] = c.get("needs_review", 0) + 1
+            continue
         if fc == "ambiguous":
             c["excluded"] += 1
             c["ambiguous_" + ("asserted" if s not in ("no_output",) else "no_output")] = c.get("ambiguous_" + ("asserted" if s not in ("no_output",) else "no_output"), 0) + 1
@@ -180,6 +204,7 @@ def main() -> None:
     parser.add_argument("--tag", help="name for the methods/<tag>.csv output (default: method[+dense])")
     parser.add_argument("--holdout", action="store_true", help="score against holdout_frames.csv instead of frames.csv")
     parser.add_argument("--holdout2", action="store_true", help="score against holdout2_frames.csv")
+    parser.add_argument("--no-overrides", action="store_true", help="as-frozen scoring: automatic judgements only, no hand overrides")
     args = parser.parse_args()
     truth = load_truth("holdout2_frames.csv" if args.holdout2 else ("holdout_frames.csv" if args.holdout else "frames.csv"))
     overrides = load_overrides()
@@ -193,9 +218,9 @@ def main() -> None:
             d = dense_for.get(review_clip)
             if not d:
                 continue
-            rows = judge(args.method, d["clip_id"], review_clip, int(d["dense_factor"]), truth, overrides, tag)
+            rows = judge(args.method, d["clip_id"], review_clip, int(d["dense_factor"]), truth, overrides, tag, use_overrides=not args.no_overrides)
         else:
-            rows = judge(args.method, review_clip, review_clip, 1, truth, overrides, tag)
+            rows = judge(args.method, review_clip, review_clip, 1, truth, overrides, tag, use_overrides=not args.no_overrides)
         if not rows:
             continue
         all_rows += rows
@@ -208,8 +233,9 @@ def main() -> None:
     total = tally(all_rows, truth)
     for clip, c in per_clip.items():
         print(f"{clip}: TP {c['TP']} FPv {c['FPv']} FN {c['FN']} FPn {c['FPn']} TN {c['TN']} excl {c['excluded']}  P {c['precision']} R {c['recall']}")
-    print(f"TOTAL {tag}: TP {total['TP']} FPv {total['FPv']} FN {total['FN']} FPn {total['FPn']} TN {total['TN']} excl {total['excluded']}  P {total['precision']} R {total['recall']}  (partial: TP {total['TP_partial']} FN {total['FN_partial']}; assoc_mismatch {total['assoc_mismatch']}; ambiguous stratum: asserted {total.get('ambiguous_asserted', 0)} correct {total.get('ambiguous_correct', 0)} no_output {total.get('ambiguous_no_output', 0)})")
-    wrongs = [r for r in all_rows if r["output_status"] not in ("correct", "no_output", "partial")]
+    print(f"TOTAL {tag}: TP {total['TP']} FPv {total['FPv']} FN {total['FN']} FPn {total['FPn']} TN {total['TN']} excl {total['excluded']} needs_review {total.get('needs_review', 0)}  P {total['precision']} R {total['recall']}  (partial: TP {total['TP_partial']} FN {total['FN_partial']}; assoc_mismatch {total['assoc_mismatch']}; ambiguous stratum: asserted {total.get('ambiguous_asserted', 0)} correct {total.get('ambiguous_correct', 0)} no_output {total.get('ambiguous_no_output', 0)})")
+    wrongs = [r for r in all_rows if r["output_status"] not in ("correct", "no_output", "partial", "needs_review")]
+    print("  needs_review:", [f"{r['clip_id'][8:14]} f{r['frame_index']:03d}" for r in all_rows if r["output_status"] == "needs_review"])
     fns = [r for r in all_rows if r["output_status"] == "no_output" and frame_class(truth[(r["clip_id"], r["frame_index"])]) == "visible"]
     print("  asserted-wrong:", [f"{r['clip_id'][8:14]} f{r['frame_index']:03d}" for r in wrongs])
     print("  missed:", [f"{r['clip_id'][8:14]} f{r['frame_index']:03d}" for r in fns])
