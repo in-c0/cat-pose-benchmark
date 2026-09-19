@@ -18,3 +18,23 @@ commons-cat-plays,6,tail_grounded_v2,wrong_part,paw,unusable,white hind paw
 commons-black-cat-walking,0,tail_grounded_v1,wrong_part,torso,unusable,tail hidden behind the frontal body; box on the back
 commons-black-cat-walking,0,tail_grounded_v2,wrong_part,torso,unusable,as v1
 commons-black-cat-walking,0,tail_grounded,wrong_part,ear,unusable,v0 grounded the ear (found 2026-09-20)
+commons-cat-plays,4,v2b_left,correct,,partial,as tail_grounded_v2 (reach-1 propagated mask on the tail)
+commons-cat-jumping-backwards,6,v2b_left,correct,,partial,as tail_grounded_v2
+commons-black-cat-walking,32,v2b_left,correct,,partial,bidirectional mask on the tail tip above the back (checked 2026-09-20)
+commons-black-cat-walking,0,v2b_left,wrong_part,torso,unusable,as v1
+commons-cat-plays,6,v2b_left,wrong_part,paw,unusable,white hind paw
+commons-cat-plays,4,v2b_right,correct,,partial,as tail_grounded_v2 (reach-1 propagated mask on the tail)
+commons-cat-jumping-backwards,6,v2b_right,correct,,partial,as tail_grounded_v2
+commons-black-cat-walking,32,v2b_right,correct,,partial,bidirectional mask on the tail tip above the back (checked 2026-09-20)
+commons-black-cat-walking,0,v2b_right,wrong_part,torso,unusable,as v1
+commons-cat-plays,6,v2b_right,wrong_part,paw,unusable,white hind paw
+commons-cat-plays,4,v2b_intersection,correct,,partial,as tail_grounded_v2 (reach-1 propagated mask on the tail)
+commons-cat-jumping-backwards,6,v2b_intersection,correct,,partial,as tail_grounded_v2
+commons-black-cat-walking,32,v2b_intersection,correct,,partial,bidirectional mask on the tail tip above the back (checked 2026-09-20)
+commons-black-cat-walking,0,v2b_intersection,wrong_part,torso,unusable,as v1
+commons-cat-plays,6,v2b_intersection,wrong_part,paw,unusable,white hind paw
+commons-cat-plays,4,v2b_union,correct,,partial,as tail_grounded_v2 (reach-1 propagated mask on the tail)
+commons-cat-jumping-backwards,6,v2b_union,correct,,partial,as tail_grounded_v2
+commons-black-cat-walking,32,v2b_union,correct,,partial,bidirectional mask on the tail tip above the back (checked 2026-09-20)
+commons-black-cat-walking,0,v2b_union,wrong_part,torso,unusable,as v1
+commons-cat-plays,6,v2b_union,wrong_part,paw,unusable,white hind paw
