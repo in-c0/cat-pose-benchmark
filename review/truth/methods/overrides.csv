@@ -56,3 +56,12 @@ commons-cat-plays,15,tail_grounded_v4,wrong_part,hind_leg,unusable,tracked mask 
 commons-cat-plays,16,tail_grounded_v4,wrong_part,hind_leg,unusable,as f015
 commons-cat-plays,17,tail_grounded_v4,wrong_part,hind_leg,unusable,as f015
 commons-cat-plays,18,tail_grounded_v4,wrong_part,hind_leg,unusable,as f015
+commons-cat-plays,4,tail_grounded_v3a,correct,,partial,as tail_grounded_v3 (frame untouched by the audit)
+commons-black-cat-walking,32,tail_grounded_v3a,correct,,partial,as tail_grounded_v3 (frame untouched by the audit)
+commons-black-cat-walking,0,tail_grounded_v3a,wrong_part,torso,unusable,as v1 (no left anchor; audit cannot form)
+commons-cat-plays,6,tail_grounded_v3a,wrong_part,other,unusable,consensus replaced the paw mask with a small blob near the raised hind leg; tail is under the body (checked 2026-09-20)
+commons-black-cat-walking,6,tail_grounded_v1,wrong_part,torso,unusable,box is the whole cat with the tail tip at its top edge (found by the pass-9 audit)
+commons-black-cat-walking,7,tail_grounded_v1,wrong_part,torso,unusable,as f006
+commons-black-cat-walking,6,tail_grounded_v3,wrong_part,torso,unusable,as v1
+commons-black-cat-walking,7,tail_grounded_v3,wrong_part,torso,unusable,as v1
+commons-black-cat-walking,7,tail_grounded,wrong_part,torso,unusable,as v1

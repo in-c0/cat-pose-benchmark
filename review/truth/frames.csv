@@ -1,4 +1,4 @@
-# annotation_protocol_version: 1.1; reviewer_id: claude-809c44f2 (model); frozen_at_commit: b4ee959; date: 2026-09-20
+# annotation_protocol_version: 1.2; reviewer_id: claude-809c44f2 (model); frozen_at_commit: b78d5f4; date: 2026-09-20
 clip_id,frame_index,timestamp_s,target_cat,tail_visibility,tail_identity_confidence,condition,note,reference_box,alt_cat,alt_tail_visibility,alt_identity_confidence,alt_note,alt_reference_box
 commons-cat-plays,0,0.0000,cat_0 tuxedo,not_visible,high,appearance_ambiguous,raised hind leg with white paw; tail under body,,,,,,
 commons-cat-plays,1,0.2500,cat_0 tuxedo,not_visible,high,appearance_ambiguous,raised hind leg with white paw; tail under body,,,,,,
@@ -63,8 +63,8 @@ commons-black-cat-walking,2,1.0000,cat_0 black,visible,high,none,tail up,1163 21
 commons-black-cat-walking,3,1.5000,cat_0 black,visible,high,none,tail up,1055 80 1208 365,,,,,
 commons-black-cat-walking,4,2.0000,cat_0 black,visible,high,none,tail up,912 0 1128 330,,,,,
 commons-black-cat-walking,5,2.5000,cat_0 black,visible,high,none,tail up,687 0 865 222,,,,,
-commons-black-cat-walking,6,3.0000,cat_0 black,visible,high,none,tail up,577 1 1048 708,,,,,
-commons-black-cat-walking,7,3.5000,cat_0 black,visible,high,none,tail up,267 1 534 863,,,,,
+commons-black-cat-walking,6,3.0000,cat_0 black,visible,high,none,tail up,625 0 805 142,,,,,
+commons-black-cat-walking,7,3.5000,cat_0 black,visible,high,none,tail up,312 0 525 189,,,,,
 commons-black-cat-walking,8,4.0000,cat_0 black,visible,high,none,tail up,157 0 397 248,,,,,
 commons-black-cat-walking,9,4.5000,cat_0 black,visible,high,none,tail up,146 0 334 117,,,,,
 commons-black-cat-walking,10,5.0000,cat_0 black,visible,high,none,tail up,103 0 368 261,,,,,

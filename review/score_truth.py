@@ -68,13 +68,18 @@ def _box_of(frame: dict[str, Any]) -> list[float] | None:
 
 
 def _same(box: list[float], ref: list[float]) -> bool:
+    """IoU >= 0.3, or the method box is no larger than the reference and 80 % of it lies
+    inside the reference (a tight curve box inside a looser detector box). Containment is
+    one-way on purpose: a whole-cat box that merely contains the tail is not a tail box
+    (found on walking f006/f007 in pass 9)."""
     if _iou(box, ref) >= IOU_MIN:
         return True
     x0, y0 = max(box[0], ref[0]), max(box[1], ref[1])
     x1, y1 = min(box[2], ref[2]), min(box[3], ref[3])
     inter = max(0.0, x1 - x0) * max(0.0, y1 - y0)
-    smaller = min((box[2] - box[0]) * (box[3] - box[1]), (ref[2] - ref[0]) * (ref[3] - ref[1]))
-    return smaller > 0 and inter / smaller >= 0.8
+    area_box = (box[2] - box[0]) * (box[3] - box[1])
+    area_ref = (ref[2] - ref[0]) * (ref[3] - ref[1])
+    return 0 < area_box <= area_ref and inter / area_box >= 0.8
 
 
 def frame_class(t: dict[str, Any]) -> str:

@@ -76,7 +76,10 @@ DECISIONS: dict[str, dict[int, tuple[str, str, str, str]]] = {
 REFERENCE_SOURCE: dict[str, dict[int, tuple[str, int]]] = {
     "commons-cat-plays": {i: ("tail_grounded", i) for i in (4, 5, 7, 8, 19, 20)},
     "commons-cat-jumping-backwards": {i: ("tail_grounded", i) for i in rng(2, 17) + rng(20, 23)},
-    "commons-black-cat-walking": {**{i: ("tail_grounded", i) for i in rng(1, 35) if i != 6}, 6: ("tail_grounded_v1", 6)},
+    # f006/f007: every detector box is the whole cat with the tail tip at its top edge; the
+    # reference is the tail tip itself, boxed from the bidirectional-consensus mask after
+    # checking it by eye on the overlay (pass 9, 2026-09-20).
+    "commons-black-cat-walking": {**{i: ("tail_grounded", i) for i in rng(1, 35) if i not in (6, 7)}, 6: ("box", "625 0 805 142"), 7: ("box", "312 0 525 189")},
     "commons-cat-licking-tail": {i: ("tail_grounded", i) for i in rng(0, 26)},
 }
 
@@ -129,6 +132,14 @@ def main() -> None:
             src = REFERENCE_SOURCE.get(clip, {}).get(i)
             if src and vis in (V, P):
                 method, idx = src
+                if method == "box":
+                    ref = idx
+                    rows.append({
+                        "clip_id": clip, "frame_index": i, "timestamp_s": f"{f['timestamp_s']:.4f}", "target_cat": TARGET[clip],
+                        "tail_visibility": vis, "tail_identity_confidence": conf, "condition": cond, "note": note, "reference_box": ref,
+                        "alt_cat": "", "alt_tail_visibility": "", "alt_identity_confidence": "", "alt_note": "", "alt_reference_box": "",
+                    })
+                    continue
                 if method not in results:
                     results[method] = {x["frame_index"]: x for x in json.loads((clip_workdir(clip) / method / "result.json").read_text(encoding="utf-8"))["frames"]}
                 fr = results[method].get(idx)
@@ -142,7 +153,7 @@ def main() -> None:
             })
     out = HERE / "frames.csv"
     with out.open("w", newline="", encoding="utf-8") as h:
-        h.write(f"# annotation_protocol_version: 1.1; reviewer_id: claude-809c44f2 (model); frozen_at_commit: {commit}; date: 2026-09-20\n")
+        h.write(f"# annotation_protocol_version: 1.2; reviewer_id: claude-809c44f2 (model); frozen_at_commit: {commit}; date: 2026-09-20\n")
         w = csv.DictWriter(h, fieldnames=list(rows[0].keys()))
         w.writeheader()
         w.writerows(rows)

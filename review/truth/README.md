@@ -31,6 +31,11 @@ Columns: `clip_id, frame_index, method, output_status, wrong_part, box_quality, 
 - uncertain → excluded
 - `partial` frames are reported separately as well as inside the visible denominator.
 
+## Revisions
+
+- **1.1** (pass 8, 2026-09-20): instance-complete. `alt_cat`, `alt_tail_visibility`, `alt_identity_confidence`, `alt_note`, `alt_reference_box` carry a second cat's tail where one is discernible (only the jumping clip). The primary metric is instance-agnostic — an output on any annotated tail is correct; `assoc_mismatch` in the scorer counts TPs that sit on the other cat's tail while the method's cat box is on the target.
+- **1.2** (pass 9): walking f006/f007 reference boxes replaced. Both had been taken from detector boxes that cover the whole cat with the tail tip at the top edge, so a whole-body box scored as a tail. The references are now the tail tip itself. The scorer's containment rule became one-way at the same time (a box no larger than the reference with 80 % of itself inside it), so a box that merely contains the tail no longer matches.
+
 ## Provenance
 
 - `annotation_protocol_version: 1`

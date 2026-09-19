@@ -6,7 +6,7 @@ commons-black-cat-walking,3,tail_grounded,correct,,usable,target,
 commons-black-cat-walking,4,tail_grounded,correct,,usable,target,
 commons-black-cat-walking,5,tail_grounded,correct,,usable,target,
 commons-black-cat-walking,6,tail_grounded,wrong_part,other,,,auto: box does not match any reference (or no tail visible)
-commons-black-cat-walking,7,tail_grounded,correct,,usable,target,
+commons-black-cat-walking,7,tail_grounded,wrong_part,other,,,auto: box does not match any reference (or no tail visible)
 commons-black-cat-walking,8,tail_grounded,correct,,usable,target,
 commons-black-cat-walking,9,tail_grounded,correct,,usable,target,
 commons-black-cat-walking,10,tail_grounded,correct,,usable,target,
