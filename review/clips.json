@@ -92,6 +92,42 @@
       "review": false,
       "dense_of": "commons-cat-licking-tail",
       "dense_factor": 4
+    },
+    {
+      "clip_id": "holdout-larry-nails",
+      "manifest": "bakeoff/clips/holdout-larry-nails.json",
+      "sample_fps": 4.0,
+      "max_seconds": 10.0,
+      "subject": "Prospective holdout (protocol: first 10 s at 4 fps, fixed before anything was watched).",
+      "held_out": true,
+      "review": true
+    },
+    {
+      "clip_id": "holdout-boxing-cats-1894",
+      "manifest": "bakeoff/clips/holdout-boxing-cats-1894.json",
+      "sample_fps": 4.0,
+      "max_seconds": 10.0,
+      "subject": "Prospective holdout (protocol: first 10 s at 4 fps, fixed before anything was watched).",
+      "held_out": true,
+      "review": true
+    },
+    {
+      "clip_id": "holdout-cat-playing-taiwan",
+      "manifest": "bakeoff/clips/holdout-cat-playing-taiwan.json",
+      "sample_fps": 4.0,
+      "max_seconds": 10.0,
+      "subject": "Prospective holdout (protocol: first 10 s at 4 fps, fixed before anything was watched).",
+      "held_out": true,
+      "review": true
+    },
+    {
+      "clip_id": "holdout-dejeuner-des-minet-1906",
+      "manifest": "bakeoff/clips/holdout-dejeuner-des-minet-1906.json",
+      "sample_fps": 4.0,
+      "max_seconds": 10.0,
+      "subject": "Prospective holdout (protocol: first 10 s at 4 fps, fixed before anything was watched).",
+      "held_out": true,
+      "review": true
     }
   ]
 }

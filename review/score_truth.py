@@ -35,9 +35,9 @@ TRUTH = Path(__file__).resolve().parent / "truth"
 IOU_MIN = 0.3
 
 
-def load_truth() -> dict[tuple[str, int], dict[str, Any]]:
+def load_truth(name: str = "frames.csv") -> dict[tuple[str, int], dict[str, Any]]:
     rows = {}
-    with (TRUTH / "frames.csv").open(encoding="utf-8") as h:
+    with (TRUTH / name).open(encoding="utf-8") as h:
         lines = [l for l in h if not l.startswith("#")]
     for r in csv.DictReader(lines):
         ref = [float(v) for v in r["reference_box"].split()] if r["reference_box"] else None
@@ -98,7 +98,10 @@ def frame_class(t: dict[str, Any]) -> str:
 
 def judge(method: str, run_clip: str, review_clip: str, factor: int, truth: dict, overrides: dict, tag: str | None = None) -> list[dict[str, Any]]:
     tag = tag or method
-    result = json.loads((clip_workdir(run_clip) / method / "result.json").read_text(encoding="utf-8"))
+    path = clip_workdir(run_clip) / method / "result.json"
+    if not path.exists():
+        return []
+    result = json.loads(path.read_text(encoding="utf-8"))
     frames = {f["frame_index"]: f for f in result["frames"]}
     rows = []
     for (clip, i), t in truth.items():
@@ -175,12 +178,13 @@ def main() -> None:
     parser.add_argument("method")
     parser.add_argument("--dense", action="store_true")
     parser.add_argument("--tag", help="name for the methods/<tag>.csv output (default: method[+dense])")
+    parser.add_argument("--holdout", action="store_true", help="score against holdout_frames.csv instead of frames.csv")
     args = parser.parse_args()
-    truth = load_truth()
+    truth = load_truth("holdout_frames.csv" if args.holdout else "frames.csv")
     overrides = load_overrides()
     clips = load_clips()
     dense_for = {c["dense_of"]: c for c in clips if c.get("dense_of") and c.get("dense_factor")}
-    tag = args.tag or (args.method + ("+dense" if args.dense else ""))
+    tag = args.tag or (args.method + ("+dense" if args.dense else "") + ("+holdout" if args.holdout else ""))
     all_rows: list[dict[str, Any]] = []
     per_clip = {}
     for review_clip in sorted({k[0] for k in truth}):
@@ -191,6 +195,8 @@ def main() -> None:
             rows = judge(args.method, d["clip_id"], review_clip, int(d["dense_factor"]), truth, overrides, tag)
         else:
             rows = judge(args.method, review_clip, review_clip, 1, truth, overrides, tag)
+        if not rows:
+            continue
         all_rows += rows
         per_clip[review_clip] = tally(rows, truth)
     out = TRUTH / "methods" / f"{tag}.csv"

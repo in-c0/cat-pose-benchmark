@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "clip_id": "holdout-cat-playing-taiwan",
+  "source": {
+    "kind": "redistributable",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/72/Cat_playing_in_Taiwan.webm",
+    "local_path": "bakeoff/media/holdout-cat-playing-taiwan.webm"
+  },
+  "licence": {
+    "status": "verified",
+    "identifier": "CC-BY-2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Cat_playing_in_Taiwan.webm",
+    "redistribution": "allowed",
+    "notes": "Commons metadata: licence CC BY 2.0, uploader The Nature Box, artist MiNe. Selected by the precommitted metadata-only protocol in review/holdout/sample_pool.py (seed 20260920, rank 3); nothing about the content was seen before selection."
+  },
+  "slices": [
+    "holdout"
+  ],
+  "notes": "Prospective holdout clip 3/4. Commons description: Cat playing in Taipei, Taiwan."
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "clip_id": "holdout-larry-nails",
+  "source": {
+    "kind": "redistributable",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/53/Larry_the_cat_getting_his_nails_trimmed_%28VID_20210408_123153%29.webm",
+    "local_path": "bakeoff/media/holdout-larry-nails.webm"
+  },
+  "licence": {
+    "status": "verified",
+    "identifier": "CC-BY-4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Larry_the_cat_getting_his_nails_trimmed_(VID_20210408_123153).webm",
+    "redistribution": "allowed",
+    "notes": "Commons metadata: licence CC BY 4.0, uploader Trougnouf, artist Trougnouf. Selected by the precommitted metadata-only protocol in review/holdout/sample_pool.py (seed 20260920, rank 1); nothing about the content was seen before selection."
+  },
+  "slices": [
+    "holdout"
+  ],
+  "notes": "Prospective holdout clip 1/4. Commons description: Larry the cat getting his nails trimmed"
+}
