@@ -3,20 +3,26 @@
 Stage A (blind): contact sheets of raw frames, no model output anywhere on them, and an
 empty CSV with one row per frame. Reviewers say whether a cat's tail can be seen.
 
-Stage B (after Stage A is locked): one image per distinct tail curve that v1 or v3 reported,
-shuffled across clips with a fixed seed, method identity hidden, drawn in one colour. The
+Stage B (images released after Stage A is locked): one image per distinct tail curve that
+v1 or v3 reported, shuffled across clips, method identity hidden, drawn in one colour. The
 reviewer says whether the line lies on a cat's tail. A few items are shown twice to measure
 how consistent each reviewer is with themself.
 
-Stage B images are written to ``review/work/hr1/stage_b`` (git-ignored) and only their
-SHA-256 digests are committed (``package/stage_b_commitment.json``), so the set is fixed
-before any Stage A label exists but nobody sees a model output before finishing Stage A.
+The shuffle is driven by a secret salt (``review/work/hr1/SECRET-salt.txt``, git-ignored), not
+by a public seed: with a public seed, anyone holding the method outputs could rebuild the key
+from this file. Everything that maps an item to its clip, frame or method stays private
+until every reviewer has locked Stage B: the key, the per-method outputs, and the manifest
+of digests (which contains the salt). The repository gets one number now,
+``root_sha256`` in ``package/stage_b_commitment.json``: the SHA-256 of the canonical
+manifest. Because the manifest includes a 256-bit salt, the root reveals nothing about the
+items, yet once the manifest is published anyone can check that no item, key entry or output
+changed after the commitment (``python -m review.hr1.withholding --verify-release``).
 
 Also exports the compact method outputs the package was built from
 (``outputs/<clip>--<method>.json``: status, box and reported curve per frame), because the
 full ``result.json`` files were never committed and the numbers in notes 05/06 could not be
-re-derived from the repository alone. They contain the curve coordinates, so they are
-withheld with Stage B (``review/work/hr1/outputs``) and only their digests are committed now.
+re-derived from the repository alone. They name the method, so they are private until
+Stage B is locked by everyone (``review/work/hr1/outputs``).
 
     python -m review.hr1.build             # after the v1/v3 runs exist under review/work
 """
@@ -27,23 +33,22 @@ import argparse
 import csv
 import hashlib
 import json
-import random
+import secrets
 from pathlib import Path
 from typing import Any
 
 from PIL import Image, ImageDraw, ImageFont
 
 from review.common import REPO_ROOT, clip_workdir, frames_dir, load_frames_manifest, write_json
+from review.hr1.withholding import MANIFEST_PATH, SALT_PATH, STAGE_B_WORK, manifest_root, shuffle_rng
 from review.score_truth import load_truth
 
 HERE = Path(__file__).resolve().parent
 PACKAGE = HERE / "package"
-STAGE_B_WORK = REPO_ROOT / "review" / "work" / "hr1" / "stage_b"
 OUTPUTS = STAGE_B_WORK.parent / "outputs"
 
 SETS = {"holdout1": "holdout_frames.csv", "holdout2": "holdout2_frames.csv"}
 METHODS = ("tail_grounded_v1", "tail_grounded_v3")
-SEED = 20261011
 N_REPEATS = 15
 SHEET_COLUMNS = 4
 SHEET_ROWS = 5
@@ -69,6 +74,19 @@ def _font(size: int) -> ImageFont.ImageFont:
         except OSError:
             continue
     return ImageFont.load_default()
+
+
+def load_or_create_salt(path: Path = SALT_PATH) -> str:
+    """The private shuffle salt. Created once; reused on rebuild so the item order is stable."""
+    if path.exists():
+        salt = path.read_text(encoding="utf-8").strip()
+    else:
+        salt = secrets.token_hex(32)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(salt + "\n", encoding="utf-8")
+    if len(salt) != 64 or any(c not in "0123456789abcdef" for c in salt):
+        raise SystemExit(f"{path}: expected 64 hex characters")
+    return salt
 
 
 # ---------------------------------------------------------------- method outputs
@@ -190,7 +208,7 @@ def _render_item(clip: str, frame_file: str, curve: list[list[float]], item_id: 
     canvas.save(path, quality=90)
 
 
-def build_stage_b(clips_by_set: dict[str, list[str]], outputs: dict[str, dict[str, Any]]) -> dict[str, Any]:
+def build_stage_b(clips_by_set: dict[str, list[str]], outputs: dict[str, dict[str, Any]], salt: str) -> dict[str, Any]:
     distinct: dict[tuple[str, int, str], dict[str, Any]] = {}
     frames_key: list[dict[str, Any]] = []
     for set_name, clips in clips_by_set.items():
@@ -209,7 +227,7 @@ def build_stage_b(clips_by_set: dict[str, list[str]], outputs: dict[str, dict[st
                         d["methods"].append(m)
                     entry["methods"][m] = {"asserted": asserted, "status": f["status"] if f else None, "curve_key": ck}
                 frames_key.append(entry)
-    rng = random.Random(SEED)
+    rng = shuffle_rng(salt)
     order = list(distinct.values())
     rng.shuffle(order)
     repeats = rng.sample(range(len(order)), min(N_REPEATS, len(order)))
@@ -220,6 +238,8 @@ def build_stage_b(clips_by_set: dict[str, list[str]], outputs: dict[str, dict[st
     first_id: dict[int, str] = {}
     # assign ids in presentation order; a repeat points at the id of its original
     pending_repeats = []
+    for old in (STAGE_B_WORK / "items").glob("*.jpg"):
+        old.unlink()
     for n, (kind, i) in enumerate(sequence, start=1):
         item_id = f"B{n:03d}"
         if kind == "item":
@@ -241,17 +261,26 @@ def build_stage_b(clips_by_set: dict[str, list[str]], outputs: dict[str, dict[st
         w.writeheader()
         for n in range(1, len(sequence) + 1):
             w.writerow({"item_id": f"B{n:03d}", "on_tail": "", "note": ""})
-    key = {"seed": SEED, "methods": list(METHODS), "items": items, "repeat_of": repeat_of, "frames": frames_key}
+    key = {"methods": list(METHODS), "items": items, "repeat_of": repeat_of, "frames": frames_key}
     write_json(STAGE_B_WORK / "key.json", key)
-    commitment = {
-        "note": "Stage B is withheld until every reviewer has locked Stage A. These digests fix the item set now.",
-        "seed": SEED,
+    manifest = {
+        "salt": salt,
         "n_items": len(items),
         "n_repeats": len(repeat_of),
         "key_sha256": _sha(STAGE_B_WORK / "key.json"),
         "template_sha256": _sha(STAGE_B_WORK / "stage-b-TEMPLATE.csv"),
         "images": {p.name: _sha(p) for p in sorted((STAGE_B_WORK / "items").glob("*.jpg"))},
         "outputs": {p.name: _sha(p) for p in sorted(OUTPUTS.glob("*.json"))},
+    }
+    write_json(MANIFEST_PATH, manifest)
+    commitment = {
+        "note": ("Stage B images are released after every reviewer has locked Stage A. The key, the method outputs "
+                 "and the manifest (which holds the shuffle salt) stay private until every reviewer has locked Stage B. "
+                 "root_sha256 is the SHA-256 of the canonical manifest; see review/hr1/README.md."),
+        "scheme": "sha256(json.dumps(manifest, sort_keys=True, separators=(',', ':')))",
+        "n_items": len(items),
+        "n_repeats": len(repeat_of),
+        "root_sha256": manifest_root(manifest),
     }
     write_json(PACKAGE / "stage_b_commitment.json", commitment)
     return commitment
@@ -269,8 +298,8 @@ def main() -> None:
     if not args.skip_stage_a:
         rows = build_stage_a(clips_by_set, PACKAGE)
         print(f"stage A: {len(rows)} frames")
-    c = build_stage_b(clips_by_set, outputs)
-    print(f"stage B: {c['n_items']} items + {c['n_repeats']} repeats (withheld; digests committed)")
+    c = build_stage_b(clips_by_set, outputs, load_or_create_salt())
+    print(f"stage B: {c['n_items']} items + {c['n_repeats']} repeats (private; root {c['root_sha256'][:12]}... committed)")
 
 
 if __name__ == "__main__":

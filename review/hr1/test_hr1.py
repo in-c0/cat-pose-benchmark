@@ -10,6 +10,7 @@ from review.hr1.agreement import cohen_kappa, krippendorff_alpha_nominal, pairwi
 import hashlib
 
 from review.hr1.score import check_locks, load_stage_a, load_stage_b, score, unanimous
+from review.hr1 import withholding as wh
 
 
 def _two_raters(yy: int, yn: int, ny: int, nn: int) -> tuple[dict, dict]:
@@ -119,6 +120,75 @@ class ScoreTests(unittest.TestCase):
         _write(p, ["item_id", "on_tail"], [{"item_id": "B001", "on_tail": "maybe"}])
         with self.assertRaises(ValueError):
             load_stage_b(p)
+
+
+class WithholdingTests(unittest.TestCase):
+    """The public tree must not let a reviewer rebuild the Stage B key, outputs or mapping early.
+
+    Each rule has a negative control: a tree that breaks it on purpose must be reported.
+    """
+
+    COMMIT = {"note": "", "scheme": "", "n_items": 3, "n_repeats": 1, "root_sha256": "0" * 64}
+    SALT = "ab" * 32
+
+    def _check(self, files: dict[str, object], private=None) -> list[str]:
+        blobs = {k: v if isinstance(v, bytes) else json.dumps(v).encode() for k, v in files.items()}
+        blobs.setdefault(wh.COMMITMENT, json.dumps(self.COMMIT).encode())
+        return wh.check(sorted(blobs), blobs.__getitem__, private)
+
+    def _locks(self, a: list[str], b: list[str]) -> dict:
+        return {**{f"stage_a/stage-a-{h}.csv": "1" * 64 for h in a}, **{f"stage_b/stage-b-{h}.csv": "2" * 64 for h in b}}
+
+    def test_repository_withholds_now(self):
+        # the real tracked tree; also scans for the salt and curve keys when the private build is present
+        self.assertEqual(wh.check_repo(), [])
+
+    def test_key_outputs_manifest_before_stage_b_lock_are_reported(self):
+        for path in ("review/hr1/key.json", "review/hr1/outputs/x--tail_grounded_v3.json",
+                     "review/hr1/stage_b_manifest.json", "review/hr1/SECRET-salt.txt", "review/hr1/results.md"):
+            for locks in ({}, self._locks(["r1", "r2"], []), self._locks(["r1", "r2"], ["r1"])):
+                with self.subTest(path=path, locks=sorted(locks)):
+                    self.assertTrue(self._check({path: b"{}", wh.LOCKS: locks}))
+        self.assertEqual(self._check({"review/hr1/key.json": b"{}", wh.LOCKS: self._locks(["r1", "r2"], ["r1", "r2-r2"])}), [])
+
+    def test_stage_b_images_need_two_stage_a_locks(self):
+        img = wh.STAGE_B_PUBLIC + "items/B001.jpg"
+        self.assertTrue(self._check({img: b"x", wh.LOCKS: self._locks(["r1"], [])}))
+        self.assertEqual(self._check({img: b"x", wh.LOCKS: self._locks(["r1", "r2"], [])}), [])
+
+    def test_commitment_may_not_carry_per_item_or_seed_fields(self):
+        for extra in ({"seed": 20261011}, {"images": {"B001.jpg": "0" * 64}}, {"key_sha256": "0" * 64}):
+            with self.subTest(extra=extra):
+                self.assertTrue(self._check({wh.COMMITMENT: {**self.COMMIT, **extra}}))
+
+    def test_salt_or_curve_key_in_any_tracked_text_is_reported(self):
+        private = {"salt": self.SALT, "curve_keys": {"B001": "0123456789abcdef"}}
+        self.assertEqual(self._check({"notes.md": b"nothing here"}, private), [])
+        self.assertTrue(self._check({"notes.md": f"salt {self.SALT}".encode()}, private))
+        self.assertTrue(self._check({"x.csv": b"B001,0123456789abcdef"}, private))
+
+    def test_private_working_set_must_not_be_tracked(self):
+        self.assertTrue(self._check({"review/work/hr1/stage_b/key.json": b"{}"}))
+
+    def test_order_depends_on_the_secret_salt(self):
+        order = lambda salt: [wh.shuffle_rng(salt).random() for _ in range(3)]
+        self.assertEqual(order(self.SALT), order(self.SALT))
+        self.assertNotEqual(order(self.SALT), order("cd" * 32))
+
+    def test_release_verification_detects_tampering(self):
+        tmp = Path(tempfile.mkdtemp())
+        (tmp / "key.json").write_text("{}", encoding="utf-8")
+        (tmp / "t.csv").write_text("item_id,on_tail,note\n", encoding="utf-8")
+        (tmp / "B001.jpg").write_bytes(b"img")
+        sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+        manifest = {"salt": self.SALT, "n_items": 1, "n_repeats": 0, "key_sha256": sha(tmp / "key.json"),
+                    "template_sha256": sha(tmp / "t.csv"), "images": {"B001.jpg": sha(tmp / "B001.jpg")}, "outputs": {}}
+        commitment = {**self.COMMIT, "root_sha256": wh.manifest_root(manifest)}
+        files = {"key": tmp / "key.json", "template": tmp / "t.csv", "images/B001.jpg": tmp / "B001.jpg"}
+        self.assertEqual(wh.verify_release(manifest, commitment, files), [])
+        (tmp / "key.json").write_text('{"changed": 1}', encoding="utf-8")
+        self.assertTrue(wh.verify_release(manifest, commitment, files))
+        self.assertTrue(wh.verify_release({**manifest, "salt": "cd" * 32}, commitment, files))
 
 
 if __name__ == "__main__":

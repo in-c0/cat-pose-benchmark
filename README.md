@@ -42,8 +42,8 @@ are released.
 
 The most useful thing anyone can do right now is look at real cat video and say whether a
 tail can be seen. Every number in the technical notes was checked against labels written by
-an AI model; none has been checked by a person. The review takes about an hour and a half in
-two sittings and needs no code.
+an AI model; none has been checked by a person. We estimate the review at one and a half to
+two and a half hours in two sittings (nobody has timed it yet), and it needs no code.
 
 The current review is **[HR1](review/hr1/README.md)**: twelve short Commons clips that no
 method was tuned on, 456 frames.
@@ -51,8 +51,8 @@ method was tuned on, 456 frames.
 1. **Stage A.** Look at contact sheets of raw frames (nothing drawn on them) and say, per
    frame, whether a cat's tail is `visible`, `partial`, `not_visible`, or that you
    `cannot_tell`.
-2. **Stage B.** After every reviewer has finished Stage A, judge a few hundred shuffled
-   images, each with one line drawn by the method, as `on_tail`, `not_on_tail` or
+2. **Stage B.** After every reviewer has finished Stage A, judge 175 shuffled images,
+   each with one line drawn by the method, as `on_tail`, `not_on_tail` or
    `cannot_tell`. You will not know which method drew which line.
 3. **Submit** by posting a fingerprint of your file first and the file itself later, so that
    nobody's answers can influence anyone else's.

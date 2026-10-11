@@ -1,6 +1,6 @@
 # Reviewer guide: is there a cat's tail in this frame?
 
-Thank you for helping. This review checks whether a tail-finding method works on cat videos it has never seen. So far every label in this project was written by an AI model, so your answers would be the first human check of those numbers. It takes about an hour and a half in two sittings, and you need nothing beyond a browser, a spreadsheet program and some familiarity with cats.
+Thank you for helping. This review checks whether a tail-finding method works on cat videos it has never seen. So far every label in this project was written by an AI model, so your answers would be the first human check of those numbers. There are 456 frames to label in Stage A and 175 images in Stage B. We estimate one and a half to two and a half hours in total, in two sittings, but nobody has timed it yet. You need nothing beyond a browser, a spreadsheet program and some familiarity with cats, and you can stop and come back to a stage as often as you like before you lock it.
 
 There are two stages. Please finish Stage A before you look at anything in Stage B, and please do not compare answers with anyone else until everyone has submitted. The value of having two reviewers comes from your answers being independent.
 
@@ -9,14 +9,14 @@ There are two stages. Please finish Stage A before you look at anything in Stage
 Please do **not** open these, because they show what the model or the AI annotator thought about the same frames:
 
 - `review/truth/` (the AI-written labels)
-- `review/hr1/outputs/` and `review/hr1/key.json`, once they appear (the method's output and the Stage B answer key)
+- `review/hr1/outputs/` and `review/hr1/key.json` (the method's output and the Stage B answer key). They are not in the repository yet and are added only after everyone has locked Stage B, but if you come back to the project later, please do not open them before you finish
 - `review/results/` and the technical notes under `paper/` (pictures with model output drawn on them)
 
 If you have already seen some of them, that is fine. Just say so when you submit (see the end of this guide), and we will record it next to your answers.
 
 The easiest way to get everything is to download the repository as a ZIP: the green **Code** button on the [repository page](https://github.com/in-c0/cat-pose-benchmark), then **Download ZIP**. The files you need are under `review/hr1/package/`.
 
-## Stage A: tail or no tail (about 45 minutes)
+## Stage A: tail or no tail (about 45–90 minutes)
 
 You will look at **456 frames from 12 short videos**, laid out as contact sheets in `review/hr1/package/stage_a/sheets/`. Each sheet holds up to 20 frames, in order, with the video name, frame number and time printed above each frame. No model output is drawn on them.
 
@@ -43,7 +43,7 @@ Some practical points:
 
 When you finish, save the file and **lock** it as described under "Submitting". Do not change it after locking.
 
-## Stage B: is the line on the tail? (about 30 minutes)
+## Stage B: is the line on the tail? (about 30–45 minutes)
 
 Stage B is released after every reviewer has locked Stage A. It contains 175 images, one per item, named `B001.jpg`, `B002.jpg` and so on, in a shuffled order that mixes the videos. Each image has three panels: the full frame with a **magenta line** drawn on it, a zoomed view with the same line, and the same zoomed view without the line so you can see what is underneath.
 

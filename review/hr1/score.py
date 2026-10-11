@@ -4,7 +4,7 @@ Inputs (one file per reviewer; the file stem is the reviewer id):
 
     review/hr1/submissions/stage_a/<reviewer>.csv
     review/hr1/submissions/stage_b/<reviewer>.csv
-    review/hr1/key.json        (published with Stage B, after every Stage A is locked)
+    review/hr1/key.json        (published only after every reviewer has locked Stage B)
 
 Everything the analysis does was written down in review/hr1/README.md before any label
 existed. In short:
