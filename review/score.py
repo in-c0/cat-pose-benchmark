@@ -1,7 +1,8 @@
 """Score one or more filled review CSVs.
 
 Per clip, method and part: how often a visible part was judged ok. With two reviewers,
-also reports raw agreement so disagreement is kept, not averaged away.
+also reports raw agreement so disagreement is kept, not averaged away. With two or more
+reviewers, every pair gets raw agreement and Cohen's kappa, plus Krippendorff's alpha overall.
 """
 
 from __future__ import annotations
@@ -129,6 +130,20 @@ def score(paths: list[Path]) -> dict[str, Any]:
     names = list(reviewers)
     if len(names) == 2:
         result["agreement"] = _agreement(reviewers[names[0]], reviewers[names[1]])
+    if len(names) >= 2:
+        # every pair, with chance-corrected kappa; with three or more reviewers this is the
+        # only agreement output (the two-reviewer ``agreement`` block above is kept as is)
+        from review.hr1.agreement import cohen_kappa, krippendorff_alpha_nominal
+
+        verdicts = {n: {k: v["verdict"] for k, v in reviewers[n].items()} for n in names}
+        result["pairwise"] = []
+        for i, x in enumerate(names):
+            for y in names[i + 1:]:
+                pair = _agreement(reviewers[x], reviewers[y])
+                k = cohen_kappa(verdicts[x], verdicts[y])
+                result["pairwise"].append({"a": x, "b": y, **pair, "cohen_kappa": None if k is None else round(k, 3)})
+        alpha = krippendorff_alpha_nominal(verdicts)
+        result["krippendorff_alpha"] = None if alpha is None else round(alpha, 3)
     return result
 
 
@@ -151,6 +166,11 @@ def render_markdown(result: dict[str, Any]) -> str:
             for f in tally["failures"]:
                 note = f" — {f['note']}" if f["note"] else ""
                 lines.append(f"- {f['clip_id']} f{f['frame_index']:03d} {f['part']} ({f['condition']}){note}")
+        lines.append("")
+    if "pairwise" in result:
+        lines += ["## Pairwise agreement", "", f"Krippendorff's alpha (nominal, all reviewers): {result['krippendorff_alpha']}", ""]
+        for pr in result["pairwise"]:
+            lines.append(f"- {pr['a']} vs {pr['b']}: {pr['n_agree']}/{pr['n_shared']} agree ({pr['pct_agree']}%), kappa {pr['cohen_kappa']}")
         lines.append("")
     if "agreement" in result:
         a = result["agreement"]

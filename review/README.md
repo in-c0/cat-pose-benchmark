@@ -2,6 +2,8 @@
 
 Status: first review set built 2026-09-13 on the two Wikimedia Commons clips; anchored tail method added the same day, grounded tail method 2026-09-14. No human verdicts yet.
 
+> **The current human review is [HR1](hr1/README.md)** (2026-10-11): blind tail-visibility labels and method-blind curve verdicts on the twelve prospective holdout clips, for the v1 and v3 methods the technical notes report. The sets below judge earlier methods (body, tail, anchored, grounded v0–v2; not v3) on clips that were used for tuning. They stay open, but a reviewer with limited time should do HR1 first.
+
 This directory turns "the overlay looks right" into a number. A person looks at what the models drew on real cat frames and says, part by part, whether it is on the cat or not. That is coarse, but it is the first evidence in this repository that comes from someone checking real animals rather than from a model checking another model.
 
 It does not measure pixel error. A verdict of `ok` means "the tail curve is on the tail", not "the tail curve is within 5 px". Numerical accuracy still needs Stage 0 or hand-placed labels. Verdicts collected here are G3-tier in the sense of `docs/GROUND-TRUTH-PROVENANCE.md` (human-verified under a written protocol), but they verify the model output, not a landmark position, so the scorer labels them `G3-verdict` rather than plain G3.
@@ -39,7 +41,7 @@ Three verdicts:
 
 - `ok` — the drawn thing is on the right part. Small offsets are fine.
 - `wrong` — it is on the wrong part, on a different object, on the wrong cat, or missing while the part is clearly visible. A red `NO OUTPUT` banner with a visible cat is `wrong`.
-- `not_visible` — the part is hidden, out of frame, or the frame is too blurred to say. If in doubt, use this rather than guessing.
+- `not_visible` — the part is hidden, out of frame, or the frame is too blurred to see it. If you can see the part but cannot decide whether the model got it right, leave the row blank instead; blank rows are not counted.
 
 Only judge solid points. Hollow points are below threshold and the model is not claiming them.
 
@@ -81,7 +83,8 @@ Requires `rtmlib`, `imageio-ffmpeg`, `transformers` (Grounding DINO), `sam2` (in
 ## Sets
 
 - `results/2026-09-13-commons-v0/` — the two clips every threshold was tuned on (513 rows).
-- `results/2026-09-14-heldout-v0/` — two clips added afterwards and never tuned on (720 rows). Verdicts here carry more weight.
+- `results/2026-09-14-heldout-v0/` — two clips added afterwards and never tuned on when this set was built (720 rows). Since note 05 these two clips are development clips too: v3 and its truth rules were decided on them.
+- [`hr1/`](hr1/README.md) — the twelve prospective holdout clips (456 frames), v1 and v3. Current priority.
 
 Entries in `clips.json` with `"review": false` are dense resamples used for training experiments and are excluded from templates and sheets.
 
