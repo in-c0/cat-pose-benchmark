@@ -13,6 +13,8 @@ A few things that make a review more useful:
 
 - Judge only solid points. Hollow points are below the confidence threshold and the model is not
   claiming them.
+- If you have time for one review, do [HR1](review/hr1/REVIEWER-GUIDE.md) first. It covers the clips no
+  method was tuned on and the method the technical notes report.
 - `not_visible` is a real answer. If the part is hidden, blurred or out of frame, say so instead
   of guessing which way the model went.
 - Use `wrong` when the model drew nothing but the part is clearly there. A red `NO OUTPUT`

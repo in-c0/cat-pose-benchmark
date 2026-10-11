@@ -1,0 +1,337 @@
+{
+  "clip_id": "holdout2-andra-and-billy",
+  "frame_count": 40,
+  "frames": [
+    {
+      "file": "00000.jpg",
+      "frame_index": 0,
+      "height_px": 1080,
+      "sha256": "d1fc2ef508cafa9b846192caae8d623e128729701251afa8e5b938c76a38d585",
+      "timestamp_s": 0.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00001.jpg",
+      "frame_index": 1,
+      "height_px": 1080,
+      "sha256": "acb23e7dddf93346822cce336dbca07091d607ca2362a8ab3738effc89fc8e40",
+      "timestamp_s": 0.25,
+      "width_px": 1920
+    },
+    {
+      "file": "00002.jpg",
+      "frame_index": 2,
+      "height_px": 1080,
+      "sha256": "71afeb6be40743d52f2b0f87518658f4f88ca19c3a7c8d0778929f9ced78c687",
+      "timestamp_s": 0.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00003.jpg",
+      "frame_index": 3,
+      "height_px": 1080,
+      "sha256": "d2273b8646138870dca04680b3134fada3ed224c97b3a507572a9a30045e5bcf",
+      "timestamp_s": 0.75,
+      "width_px": 1920
+    },
+    {
+      "file": "00004.jpg",
+      "frame_index": 4,
+      "height_px": 1080,
+      "sha256": "a14eb78de88fb38a8b78a22ad4242ac68ee43675f22c5bf316f79c3939273ee6",
+      "timestamp_s": 1.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00005.jpg",
+      "frame_index": 5,
+      "height_px": 1080,
+      "sha256": "98e012b4fe8d7aa8b607e609d8f02260e3e09e9da206aa5bc74ed7f1a00882d1",
+      "timestamp_s": 1.25,
+      "width_px": 1920
+    },
+    {
+      "file": "00006.jpg",
+      "frame_index": 6,
+      "height_px": 1080,
+      "sha256": "10c7ce373bb2ff1cc9319850e40100da2cbe185f1bfc8c15b042078574ac1e44",
+      "timestamp_s": 1.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00007.jpg",
+      "frame_index": 7,
+      "height_px": 1080,
+      "sha256": "f4183045a4546c8f3ad83ff38d154252a639fe3455edb45b909a765556d54830",
+      "timestamp_s": 1.75,
+      "width_px": 1920
+    },
+    {
+      "file": "00008.jpg",
+      "frame_index": 8,
+      "height_px": 1080,
+      "sha256": "0fe9567733bfc354177fb79c8943e8d12c1f85ab3ef8456433ea607ba209908f",
+      "timestamp_s": 2.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00009.jpg",
+      "frame_index": 9,
+      "height_px": 1080,
+      "sha256": "d86000810fe2e9ea44c0287c68a710be32f01cb91669f7cfea797b9c76979477",
+      "timestamp_s": 2.25,
+      "width_px": 1920
+    },
+    {
+      "file": "00010.jpg",
+      "frame_index": 10,
+      "height_px": 1080,
+      "sha256": "954a1c0b91746de3562b5809aa264120b4d35dc0e6a6585b7613adf0baf32c5f",
+      "timestamp_s": 2.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00011.jpg",
+      "frame_index": 11,
+      "height_px": 1080,
+      "sha256": "edbc2028a68007515d7f3e4640d3dc5f6a2a6785cc55ec6edea3d9197a780250",
+      "timestamp_s": 2.75,
+      "width_px": 1920
+    },
+    {
+      "file": "00012.jpg",
+      "frame_index": 12,
+      "height_px": 1080,
+      "sha256": "58991c0597f291718a0ed051b2a4a7694ca22ef71e910d1d5f3d34964f9e4935",
+      "timestamp_s": 3.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00013.jpg",
+      "frame_index": 13,
+      "height_px": 1080,
+      "sha256": "98910699f72ab66cb528067f7a9529536584d6d457172c1989ba91c6edd4578a",
+      "timestamp_s": 3.25,
+      "width_px": 1920
+    },
+    {
+      "file": "00014.jpg",
+      "frame_index": 14,
+      "height_px": 1080,
+      "sha256": "4b3328d983b58fdb74426b912611b8c8340918d6186cccf723dbcaa968fb5521",
+      "timestamp_s": 3.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00015.jpg",
+      "frame_index": 15,
+      "height_px": 1080,
+      "sha256": "e67faffa6dce096a817c9cc3266a1d714e804d0ea4d56c090e1b90803c2f9097",
+      "timestamp_s": 3.75,
+      "width_px": 1920
+    },
+    {
+      "file": "00016.jpg",
+      "frame_index": 16,
+      "height_px": 1080,
+      "sha256": "50c54903aa759a1fd43ae751c90c52b13cc7e996c61b7a03eb0bbcf77d8a28b8",
+      "timestamp_s": 4.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00017.jpg",
+      "frame_index": 17,
+      "height_px": 1080,
+      "sha256": "ec4c67e9a169de0d334b0c75136ed54337b66b4a5447711d0c5bb1588adb1000",
+      "timestamp_s": 4.25,
+      "width_px": 1920
+    },
+    {
+      "file": "00018.jpg",
+      "frame_index": 18,
+      "height_px": 1080,
+      "sha256": "f8f5f0c74974472a2581fb8c866364a413656b258172396ec9ecac3a0172b088",
+      "timestamp_s": 4.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00019.jpg",
+      "frame_index": 19,
+      "height_px": 1080,
+      "sha256": "f6c04027abd56a53a6ee75ffc4a910ad43326ce2bb9935823ec757843e521e61",
+      "timestamp_s": 4.75,
+      "width_px": 1920
+    },
+    {
+      "file": "00020.jpg",
+      "frame_index": 20,
+      "height_px": 1080,
+      "sha256": "572ed2df1c93d3b11eb77c77f87a2b89b3d44744b13f81d83437eb4506f20fba",
+      "timestamp_s": 5.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00021.jpg",
+      "frame_index": 21,
+      "height_px": 1080,
+      "sha256": "42ad277632fdc51df6dd22798d3d6ae6937b69880bce8e4162344a5ad0907f7e",
+      "timestamp_s": 5.25,
+      "width_px": 1920
+    },
+    {
+      "file": "00022.jpg",
+      "frame_index": 22,
+      "height_px": 1080,
+      "sha256": "bc3e39ee4ffd864ea2f9627f5870d783dc278588f750434ee9a189c522d8ae4d",
+      "timestamp_s": 5.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00023.jpg",
+      "frame_index": 23,
+      "height_px": 1080,
+      "sha256": "ae8eb19a2bdf89f5186c189ceb36f68673087fadeb5e52b137011357d3e71e43",
+      "timestamp_s": 5.75,
+      "width_px": 1920
+    },
+    {
+      "file": "00024.jpg",
+      "frame_index": 24,
+      "height_px": 1080,
+      "sha256": "9f36b6649c2d2e427be4edf04c6ac5e97a35b88c01b1343793b192b858a66467",
+      "timestamp_s": 6.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00025.jpg",
+      "frame_index": 25,
+      "height_px": 1080,
+      "sha256": "4347592e7f2093bc518f2400c26ecf8fa14a9d25f9e9515e09fa3f19e3ebf07d",
+      "timestamp_s": 6.25,
+      "width_px": 1920
+    },
+    {
+      "file": "00026.jpg",
+      "frame_index": 26,
+      "height_px": 1080,
+      "sha256": "c7162870f5085da8278593c7beb2cba5ca20d23d0748f94a28170cedd664424e",
+      "timestamp_s": 6.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00027.jpg",
+      "frame_index": 27,
+      "height_px": 1080,
+      "sha256": "c4337300f128bec88094166fd2cb0e00cbc7f2b757bab936472aca7ec68f8786",
+      "timestamp_s": 6.75,
+      "width_px": 1920
+    },
+    {
+      "file": "00028.jpg",
+      "frame_index": 28,
+      "height_px": 1080,
+      "sha256": "a1b172c2161e82c77ec5b5af39e3318cdfbf175a18754c0ca23b25f33bb5e958",
+      "timestamp_s": 7.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00029.jpg",
+      "frame_index": 29,
+      "height_px": 1080,
+      "sha256": "523e329995bfb8f6cb6334f15beb2380437c2f5d31e3d888b34f5714da0a3555",
+      "timestamp_s": 7.25,
+      "width_px": 1920
+    },
+    {
+      "file": "00030.jpg",
+      "frame_index": 30,
+      "height_px": 1080,
+      "sha256": "5557fd6fc48bc2e2937beaa8f85797f65b23e599dff6df0351cbce4d2aa0d95b",
+      "timestamp_s": 7.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00031.jpg",
+      "frame_index": 31,
+      "height_px": 1080,
+      "sha256": "11a89dcced6236fed8d94f9741631baf5b2b2d153bbcc72190b8b62c921618a2",
+      "timestamp_s": 7.75,
+      "width_px": 1920
+    },
+    {
+      "file": "00032.jpg",
+      "frame_index": 32,
+      "height_px": 1080,
+      "sha256": "e2473c76b7f08cc7b882ce3099965a635dc3654b66142ad769460847344f4cf9",
+      "timestamp_s": 8.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00033.jpg",
+      "frame_index": 33,
+      "height_px": 1080,
+      "sha256": "94f0f621a345a49e9c647fe8e9b6e8c3f17770548ebf1e8539b3ae65fd0b1468",
+      "timestamp_s": 8.25,
+      "width_px": 1920
+    },
+    {
+      "file": "00034.jpg",
+      "frame_index": 34,
+      "height_px": 1080,
+      "sha256": "587b1389b4e49dc3cc63a1b44f38f2822e632084c1c32b9fe3940ac855735883",
+      "timestamp_s": 8.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00035.jpg",
+      "frame_index": 35,
+      "height_px": 1080,
+      "sha256": "587ac932c7ca4c1788332722da212290efb84d7815fbe2bf4830dbee83c85c9e",
+      "timestamp_s": 8.75,
+      "width_px": 1920
+    },
+    {
+      "file": "00036.jpg",
+      "frame_index": 36,
+      "height_px": 1080,
+      "sha256": "41a11f9474fa43da94a381969008f91e4157082f4676a43e75f4432a7409f07a",
+      "timestamp_s": 9.0,
+      "width_px": 1920
+    },
+    {
+      "file": "00037.jpg",
+      "frame_index": 37,
+      "height_px": 1080,
+      "sha256": "9e06e06be418b119a87522022efc81d39823b4c1db9c03014bea6256b76c86d4",
+      "timestamp_s": 9.25,
+      "width_px": 1920
+    },
+    {
+      "file": "00038.jpg",
+      "frame_index": 38,
+      "height_px": 1080,
+      "sha256": "8d3129a6339382a8f8d4e88e6583957937b4ab79388c325fb6228e775719e20c",
+      "timestamp_s": 9.5,
+      "width_px": 1920
+    },
+    {
+      "file": "00039.jpg",
+      "frame_index": 39,
+      "height_px": 1080,
+      "sha256": "b594263f6d06d5d5d02cac1debc39276b6f82c06cc74898b419c4e92c636b69b",
+      "timestamp_s": 9.75,
+      "width_px": 1920
+    }
+  ],
+  "sampling": {
+    "fps": 4.0,
+    "max_seconds": 10.0
+  },
+  "schema_version": "0.1.0",
+  "source": {
+    "licence": "CC-BY-4.0",
+    "manifest": "bakeoff/clips/holdout2-andra-and-billy.json",
+    "media_path": "bakeoff\\media\\holdout2-andra-and-billy.webm",
+    "media_sha256": "d4c488cc9f6ca7ccc9379a65b3651fcf5739e3691a9ba00e268081fbb31d613d"
+  }
+}

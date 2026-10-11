@@ -1,0 +1,337 @@
+{
+  "clip_id": "holdout-dejeuner-des-minet-1906",
+  "frame_count": 40,
+  "frames": [
+    {
+      "file": "00000.jpg",
+      "frame_index": 0,
+      "height_px": 2160,
+      "sha256": "1bc9a761d1be7a70826f0784726bb0f7781fa4c132091c94f5be224100cd5988",
+      "timestamp_s": 0.0,
+      "width_px": 3840
+    },
+    {
+      "file": "00001.jpg",
+      "frame_index": 1,
+      "height_px": 2160,
+      "sha256": "1de2262174d60e252eafc1664b44c643c774cffce854e4c05e192b4a522bab23",
+      "timestamp_s": 0.25,
+      "width_px": 3840
+    },
+    {
+      "file": "00002.jpg",
+      "frame_index": 2,
+      "height_px": 2160,
+      "sha256": "a60d3091b77bb1df7c46d1451879e1688c904eeb9cd2b79788dc9c77784c6f78",
+      "timestamp_s": 0.5,
+      "width_px": 3840
+    },
+    {
+      "file": "00003.jpg",
+      "frame_index": 3,
+      "height_px": 2160,
+      "sha256": "93cacb5c87a2cdf4ab9e769045c87fa8bbb0da5ae0a34bd2ffd35e24d36c5189",
+      "timestamp_s": 0.75,
+      "width_px": 3840
+    },
+    {
+      "file": "00004.jpg",
+      "frame_index": 4,
+      "height_px": 2160,
+      "sha256": "25bbc5174b0e0819ceb94dfb99691e67055026c31e4eb22af92dc01ab7a46c25",
+      "timestamp_s": 1.0,
+      "width_px": 3840
+    },
+    {
+      "file": "00005.jpg",
+      "frame_index": 5,
+      "height_px": 2160,
+      "sha256": "5fb588ac906ba90751ea0123ff42245be62a306ea9d36d79d9b26a2d32f2c521",
+      "timestamp_s": 1.25,
+      "width_px": 3840
+    },
+    {
+      "file": "00006.jpg",
+      "frame_index": 6,
+      "height_px": 2160,
+      "sha256": "b2401a98b0d2477c58fca475c7e731230ceeaf81a6ae18b79da3f84a095960b0",
+      "timestamp_s": 1.5,
+      "width_px": 3840
+    },
+    {
+      "file": "00007.jpg",
+      "frame_index": 7,
+      "height_px": 2160,
+      "sha256": "2bab53bdbd2c7e8831e6f335db14f02fdeb4e939c979da99e1e8b5693c000e8e",
+      "timestamp_s": 1.75,
+      "width_px": 3840
+    },
+    {
+      "file": "00008.jpg",
+      "frame_index": 8,
+      "height_px": 2160,
+      "sha256": "7634944f931f7b87f27389cad351917fea7be99c81be0af6a1a7ec59642e5e4e",
+      "timestamp_s": 2.0,
+      "width_px": 3840
+    },
+    {
+      "file": "00009.jpg",
+      "frame_index": 9,
+      "height_px": 2160,
+      "sha256": "e2f04de1035a5802469310c46550c616d3350a6559686db5de54e033d65cfe09",
+      "timestamp_s": 2.25,
+      "width_px": 3840
+    },
+    {
+      "file": "00010.jpg",
+      "frame_index": 10,
+      "height_px": 2160,
+      "sha256": "265f42073c572668a25c4bb7562f3873149ea659ab224c586339f73382069d81",
+      "timestamp_s": 2.5,
+      "width_px": 3840
+    },
+    {
+      "file": "00011.jpg",
+      "frame_index": 11,
+      "height_px": 2160,
+      "sha256": "536087b4feb71fa182060f3bc8f71ede0d06127fa106aa92b1b1c9ed28daa9a9",
+      "timestamp_s": 2.75,
+      "width_px": 3840
+    },
+    {
+      "file": "00012.jpg",
+      "frame_index": 12,
+      "height_px": 2160,
+      "sha256": "fef7cd7707fcffaf2a650a64862a650e7a006920bd73e04b70d6704cb1502d84",
+      "timestamp_s": 3.0,
+      "width_px": 3840
+    },
+    {
+      "file": "00013.jpg",
+      "frame_index": 13,
+      "height_px": 2160,
+      "sha256": "2157a93b88cc9b6ef25133069d064e30c9780ab2130866e1057c54677a160f51",
+      "timestamp_s": 3.25,
+      "width_px": 3840
+    },
+    {
+      "file": "00014.jpg",
+      "frame_index": 14,
+      "height_px": 2160,
+      "sha256": "f53dc79e6595100f1bb8dad579aef215a6df76e7253a11b9f0012818c19570ce",
+      "timestamp_s": 3.5,
+      "width_px": 3840
+    },
+    {
+      "file": "00015.jpg",
+      "frame_index": 15,
+      "height_px": 2160,
+      "sha256": "f3bf4823d6e89bb778569ca9d30b0c80bc298843f79f00b2725b97ebdf05e2a6",
+      "timestamp_s": 3.75,
+      "width_px": 3840
+    },
+    {
+      "file": "00016.jpg",
+      "frame_index": 16,
+      "height_px": 2160,
+      "sha256": "f4874e456eb0af32df3b7afca2c81f6d0c70365b2bf707afdb07c0824271fb7a",
+      "timestamp_s": 4.0,
+      "width_px": 3840
+    },
+    {
+      "file": "00017.jpg",
+      "frame_index": 17,
+      "height_px": 2160,
+      "sha256": "32dfcb59e155a554072e215dc50df2b1c13082e55a08cd6fc8a641889d30ad95",
+      "timestamp_s": 4.25,
+      "width_px": 3840
+    },
+    {
+      "file": "00018.jpg",
+      "frame_index": 18,
+      "height_px": 2160,
+      "sha256": "d18d5e7669e94bc1bea44b13ff01a916eebf48bffb97e1171a458d6955cab9b8",
+      "timestamp_s": 4.5,
+      "width_px": 3840
+    },
+    {
+      "file": "00019.jpg",
+      "frame_index": 19,
+      "height_px": 2160,
+      "sha256": "1f37ec959222784dec15be71624ad44662b09d978b4543f48f3154dd74b32d7e",
+      "timestamp_s": 4.75,
+      "width_px": 3840
+    },
+    {
+      "file": "00020.jpg",
+      "frame_index": 20,
+      "height_px": 2160,
+      "sha256": "1bf9473271ca6b6782efe88bfdf7727ce5cb9706d87e5dc7c51ae695e6e7605e",
+      "timestamp_s": 5.0,
+      "width_px": 3840
+    },
+    {
+      "file": "00021.jpg",
+      "frame_index": 21,
+      "height_px": 2160,
+      "sha256": "18d7359b704d880eb7ad0ae67cd74b95287d210c043b2527f6094267dd374a50",
+      "timestamp_s": 5.25,
+      "width_px": 3840
+    },
+    {
+      "file": "00022.jpg",
+      "frame_index": 22,
+      "height_px": 2160,
+      "sha256": "a33193aa9420df0a60dffb433f4c6c02403b3f1040e4c88d123d20b96f291edc",
+      "timestamp_s": 5.5,
+      "width_px": 3840
+    },
+    {
+      "file": "00023.jpg",
+      "frame_index": 23,
+      "height_px": 2160,
+      "sha256": "93f2ca1d3ccb0038e5a4bbc03f816f6c5078d8a675daa1b1feb32ad1e05f82dd",
+      "timestamp_s": 5.75,
+      "width_px": 3840
+    },
+    {
+      "file": "00024.jpg",
+      "frame_index": 24,
+      "height_px": 2160,
+      "sha256": "494c52c656e0209d0b2969e53c6d3c7ebd5a42e25b7c3255d4c59ade6478eb8e",
+      "timestamp_s": 6.0,
+      "width_px": 3840
+    },
+    {
+      "file": "00025.jpg",
+      "frame_index": 25,
+      "height_px": 2160,
+      "sha256": "014b7e7de0bc35472e58f8e65e3085732dba970b8150ef3373aa2173350f3e26",
+      "timestamp_s": 6.25,
+      "width_px": 3840
+    },
+    {
+      "file": "00026.jpg",
+      "frame_index": 26,
+      "height_px": 2160,
+      "sha256": "3991ac543e396b53ee541d6c2f4634a34bba5beb421bd41817a8a945336eb186",
+      "timestamp_s": 6.5,
+      "width_px": 3840
+    },
+    {
+      "file": "00027.jpg",
+      "frame_index": 27,
+      "height_px": 2160,
+      "sha256": "f6ac2ae535873c62e592cc038e92b3bcbc7b11aaadf55181fcca5be6d2f74dd9",
+      "timestamp_s": 6.75,
+      "width_px": 3840
+    },
+    {
+      "file": "00028.jpg",
+      "frame_index": 28,
+      "height_px": 2160,
+      "sha256": "2c6a295fa704dbd852ef0eed3ce6ed624f3ee3273f263075b54e7d899e1b7b5e",
+      "timestamp_s": 7.0,
+      "width_px": 3840
+    },
+    {
+      "file": "00029.jpg",
+      "frame_index": 29,
+      "height_px": 2160,
+      "sha256": "64d6fb4c380abf33dbfd8586026bac6f3d3d0c706cdb286fa92fd5072ec77902",
+      "timestamp_s": 7.25,
+      "width_px": 3840
+    },
+    {
+      "file": "00030.jpg",
+      "frame_index": 30,
+      "height_px": 2160,
+      "sha256": "338882ee3e5bde29004e3ca3c1366d99a1d36a6b0e94469d756f844bb17373dd",
+      "timestamp_s": 7.5,
+      "width_px": 3840
+    },
+    {
+      "file": "00031.jpg",
+      "frame_index": 31,
+      "height_px": 2160,
+      "sha256": "cb221890598c8dcd8bb552e62b7e0c53ad10a905796b488e819fe3f8887bdc82",
+      "timestamp_s": 7.75,
+      "width_px": 3840
+    },
+    {
+      "file": "00032.jpg",
+      "frame_index": 32,
+      "height_px": 2160,
+      "sha256": "37b9d15bae496027490bd9bfa6372034954edee482064abc32fd45a388d1a589",
+      "timestamp_s": 8.0,
+      "width_px": 3840
+    },
+    {
+      "file": "00033.jpg",
+      "frame_index": 33,
+      "height_px": 2160,
+      "sha256": "3e16857f0bb0ad1e8cfacafe0253b1ee1c121152388eab928e6d6a4da6b9f704",
+      "timestamp_s": 8.25,
+      "width_px": 3840
+    },
+    {
+      "file": "00034.jpg",
+      "frame_index": 34,
+      "height_px": 2160,
+      "sha256": "4992bfaf825f71130740645ccf9354aa6ceae6133eaecdc49130aa39e8adcd5e",
+      "timestamp_s": 8.5,
+      "width_px": 3840
+    },
+    {
+      "file": "00035.jpg",
+      "frame_index": 35,
+      "height_px": 2160,
+      "sha256": "f8eb575a0e518c71daed82ba4b792059ff0a4aabc88b0256cc87805b43821dc6",
+      "timestamp_s": 8.75,
+      "width_px": 3840
+    },
+    {
+      "file": "00036.jpg",
+      "frame_index": 36,
+      "height_px": 2160,
+      "sha256": "0ec4a3a60796884e4c623b171b56ae54c7fac28eb0ecdea52b5300a812971776",
+      "timestamp_s": 9.0,
+      "width_px": 3840
+    },
+    {
+      "file": "00037.jpg",
+      "frame_index": 37,
+      "height_px": 2160,
+      "sha256": "b0982eae84dfbbdf57851fe68273e70875221298e660906abce34d4852903898",
+      "timestamp_s": 9.25,
+      "width_px": 3840
+    },
+    {
+      "file": "00038.jpg",
+      "frame_index": 38,
+      "height_px": 2160,
+      "sha256": "404e7a761e0355d49e61cb8711d7d3a2826726accfd4e9484343ed7cfa15a383",
+      "timestamp_s": 9.5,
+      "width_px": 3840
+    },
+    {
+      "file": "00039.jpg",
+      "frame_index": 39,
+      "height_px": 2160,
+      "sha256": "2b2c9d7bbeb2cb1d89f86c3b4dba5623b1969544792dea236490db1a6bd7e349",
+      "timestamp_s": 9.75,
+      "width_px": 3840
+    }
+  ],
+  "sampling": {
+    "fps": 4.0,
+    "max_seconds": 10.0
+  },
+  "schema_version": "0.1.0",
+  "source": {
+    "licence": "PD",
+    "manifest": "bakeoff/clips/holdout-dejeuner-des-minet-1906.json",
+    "media_path": "bakeoff\\media\\holdout-dejeuner-des-minet-1906.webm",
+    "media_sha256": "970df599811d6775cd0c4a742bc199abade2d0f6c359e37235088b7b07bb1a3f"
+  }
+}

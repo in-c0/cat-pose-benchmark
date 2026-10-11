@@ -9,7 +9,7 @@ ear, tail, contact, and scene-relative motion in real environments.**
 **Technical notes**
 
 - **06 (20 Sep 2026):** [*Sixteen passes: what was proposed, what was tested, and what survived*](paper/06-sixteen-passes/README.md) ([PDF](paper/06-sixteen-passes/sixteen-passes-v0.2.pdf)). The audit trail behind note 05 as one table: nineteen passes, each with its predeclared test, number and disposition, plus the truth and scorer revisions and what found them. One method change survived (the two-sided bridge); every zero-shot semantic, single-feature structural and linear learned verifier failed its test; the reviewer's own audit found the scorer had been judging the detector's box rather than the reported curve.
-- **05 (20 Sep 2026):** [*Frozen truth: ten passes against fixed frame labels, and a prospective holdout that undid one of them*](paper/05-frozen-truth/README.md) ([PDF](paper/05-frozen-truth/frozen-truth-v0.3.pdf)). A written-down frame truth (147 dev frames, model-annotated, human pass pending) replaces the proxy. One change survives the reviewer passes: a two-sided SAM2 bridge (v3), precision 0.919, recall 0.878 on the dev clips under scorer v2 (v0.3 judges the reported curve, not the detector's box). Six ideas rejected on the same truth. Twelve holdout clips drawn by a precommitted metadata-only protocol and annotated before inference: the bridge's recall gain generalises on the second draw (0.71 → 0.74) and not the first; precision on unseen video is 0.69–0.71, set by wrong-part assertions the dev clips never showed.
+- **05 (20 Sep 2026):** [*Frozen truth: ten passes against fixed frame labels, and a prospective holdout that undid one of them*](paper/05-frozen-truth/README.md) ([PDF](paper/05-frozen-truth/frozen-truth-v0.3.pdf)). A written-down frame truth (147 dev frames, model-annotated, human pass pending) replaces the proxy. One change survives the reviewer passes: a two-sided SAM2 bridge (v3), precision 0.919, recall 0.878 on the dev clips under scorer v2 (v0.3 judges the reported curve, not the detector's box). Six ideas rejected on the same truth. Twelve holdout clips drawn by a precommitted metadata-only protocol and annotated before inference: the bridge's recall gain generalises on the second draw (0.71 → 0.74) and not the first; precision on unseen video is 0.69–0.71, set by wrong-part assertions the dev clips never showed. *Audit 2026-10-11:* those holdout figures include overrides the model annotator made after seeing the output; scored as frozen, the two holdouts pooled give v3 precision 0.57 and recall 0.65, with clip-level 95 % intervals of roughly 0.1–0.9 (six cats with a visible tail). No human has checked any of it yet; see [HR1](review/hr1/README.md) and [the audit](review/hr1/AUDIT-2026-10-11.md).
 - **04 (14 Sep 2026):** [*Held out: two new clips, a sampling rate, and a probe that did not transfer*](paper/04-held-out/README.md) ([PDF](paper/04-held-out/held-out-v0.1.pdf)). On two clips added after every threshold was fixed, the grounded method with crop check and temporal pass accepts 61 frames, all on the tail, and refuses the 25 tucked frames the plain method gets wrong nine times. Sampling at 8 fps instead of 4 quadruples its recall on *Cat Plays*. A self-trained probe on 61 pseudo-labelled tails does not transfer between two cats.
 - **03 (14 Sep 2026):** [*Coverage: a better cat detector, a bridge across short gaps, and two things that did not help*](paper/03-coverage/README.md) ([PDF](paper/03-coverage/coverage-v0.1.pdf)). Grounding DINO as the cat detector lifts frames-with-a-cat from 43 to 55 of 57; SAM2 bridging at reach 1 adds two true tails and nothing wrong. Larger models don't drop in; SAM 3 is gated. Proxy: precision 0.95, recall 0.76.
 - **02 (14 Sep 2026):** [*Whether: teaching a text-grounded tail detector to say "no"*](paper/02-whether/README.md) ([PDF](paper/02-whether/whether-v0.1.pdf)). A SigLIP crop check plus a Viterbi pass with an explicit "no tail" state take the grounded method from precision 0.52 to 0.95 at recall 0.72 on the same 57 frames; every tucked-tail frame becomes a refusal. Parameters fitted on the same frames; not yet held-out.
@@ -40,29 +40,33 @@ are released.
 
 ## Help review frames (no setup needed)
 
-The quickest way to help right now is to look at model output on real cat video and say
-whether it is on the cat. It takes about 30–45 minutes, needs no code, and gives this
-project its first numbers from a person rather than from one model checking another.
+The most useful thing anyone can do right now is look at real cat video and say whether a
+tail can be seen. Every number in the technical notes was checked against labels written by
+an AI model; none has been checked by a person. The review takes about an hour and a half in
+two sittings and needs no code.
 
-1. **Look at the sheets.** Four images, one per clip and method. Each tile is one frame with
-   the model's output drawn on it; the banner shows the frame index.
-   - [Cat Plays — body](review/results/2026-09-13-commons-v0/sheets/commons-cat-plays--body.jpg)
-   - [Cat Plays — tail](review/results/2026-09-13-commons-v0/sheets/commons-cat-plays--tail.jpg)
-   - [Jumping — body](review/results/2026-09-13-commons-v0/sheets/commons-cat-jumping-backwards--body.jpg)
-   - [Jumping — tail](review/results/2026-09-13-commons-v0/sheets/commons-cat-jumping-backwards--tail.jpg)
-2. **Get the template.** Download
-   [`TEMPLATE.csv`](review/results/2026-09-13-commons-v0/reviews/TEMPLATE.csv) and rename it
-   to `<your-github-handle>.csv`. One row per frame and body part, 285 rows.
-3. **Fill the `verdict` column** with `ok`, `wrong` or `not_visible`, following the rubric in
-   [review/README.md](review/README.md). Skip rows you are unsure about rather than guessing;
-   blank rows are ignored. `condition` and `note` are optional.
-4. **Send it back.** Either open a pull request adding your file to
-   `review/results/2026-09-13-commons-v0/reviews/`, or attach the CSV to
-   [the review call issue](https://github.com/in-c0/cat-pose-benchmark/issues/79) if you
-   would rather not deal with git. Both are fine.
+The current review is **[HR1](review/hr1/README.md)**: twelve short Commons clips that no
+method was tuned on, 456 frames.
 
-Every reviewer's verdicts are kept as a separate file. With two or more reviewers the scorer
-reports agreement and lists every disagreement, so you do not need to match anyone else.
+1. **Stage A.** Look at contact sheets of raw frames (nothing drawn on them) and say, per
+   frame, whether a cat's tail is `visible`, `partial`, `not_visible`, or that you
+   `cannot_tell`.
+2. **Stage B.** After every reviewer has finished Stage A, judge a few hundred shuffled
+   images, each with one line drawn by the method, as `on_tail`, `not_on_tail` or
+   `cannot_tell`. You will not know which method drew which line.
+3. **Submit** by posting a fingerprint of your file first and the file itself later, so that
+   nobody's answers can influence anyone else's.
+
+Everything you need, including what not to open beforehand, is in the
+**[reviewer guide](review/hr1/REVIEWER-GUIDE.md)**. Ask questions on
+[the review call issue](https://github.com/in-c0/cat-pose-benchmark/issues/79).
+
+Each reviewer's file is kept separately. Where reviewers disagree, the frame is recorded as
+uncertain rather than averaged, so you do not need to match anyone.
+
+The older review sets under `review/results/` judge earlier methods on the clips they were
+tuned on (513 and 720 rows, see [review/README.md](review/README.md)). They are still open,
+but HR1 comes first.
 
 If you want to run the models on your own cat video instead, see
 [CONTRIBUTING.md](CONTRIBUTING.md).

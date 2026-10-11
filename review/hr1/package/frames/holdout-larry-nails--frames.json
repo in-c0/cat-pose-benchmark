@@ -1,0 +1,337 @@
+{
+  "clip_id": "holdout-larry-nails",
+  "frame_count": 40,
+  "frames": [
+    {
+      "file": "00000.jpg",
+      "frame_index": 0,
+      "height_px": 1920,
+      "sha256": "39f3b65fb709ccec6bbd2800070ff44778a81324af94133642fa5eebea5efc96",
+      "timestamp_s": 0.0,
+      "width_px": 1080
+    },
+    {
+      "file": "00001.jpg",
+      "frame_index": 1,
+      "height_px": 1920,
+      "sha256": "05ccbe742e6de9c0f9b580825470ff59917f8f8658ea1cc81661cf05c3329f18",
+      "timestamp_s": 0.25,
+      "width_px": 1080
+    },
+    {
+      "file": "00002.jpg",
+      "frame_index": 2,
+      "height_px": 1920,
+      "sha256": "807b813290eab9379bb75d2bb0bbc2fff2d47e393096a650b8eb977f4760c971",
+      "timestamp_s": 0.5,
+      "width_px": 1080
+    },
+    {
+      "file": "00003.jpg",
+      "frame_index": 3,
+      "height_px": 1920,
+      "sha256": "86396ed0ab2a1ffc3ab719adb298ebfcc3a0ee4262512428c847ff081c57d4d8",
+      "timestamp_s": 0.75,
+      "width_px": 1080
+    },
+    {
+      "file": "00004.jpg",
+      "frame_index": 4,
+      "height_px": 1920,
+      "sha256": "d3477ee63dd15abab536a3ebaf4877e379bcddc8b1b3a87014188f538823bb50",
+      "timestamp_s": 1.0,
+      "width_px": 1080
+    },
+    {
+      "file": "00005.jpg",
+      "frame_index": 5,
+      "height_px": 1920,
+      "sha256": "f8dfdc4d5e3ab4dfb3918d7d7e1cf7116bd45b907f9385d3934c5f891f8c95c3",
+      "timestamp_s": 1.25,
+      "width_px": 1080
+    },
+    {
+      "file": "00006.jpg",
+      "frame_index": 6,
+      "height_px": 1920,
+      "sha256": "3538d396b021fbfb83310097e0e2d78eb10da38f9d003f3840b216ce1e34d6a0",
+      "timestamp_s": 1.5,
+      "width_px": 1080
+    },
+    {
+      "file": "00007.jpg",
+      "frame_index": 7,
+      "height_px": 1920,
+      "sha256": "b559aea99550332597e52bbd5f67b24d3d7228059f43066f17184947be43f0e4",
+      "timestamp_s": 1.75,
+      "width_px": 1080
+    },
+    {
+      "file": "00008.jpg",
+      "frame_index": 8,
+      "height_px": 1920,
+      "sha256": "2ccfbeaf1799a6057faabc6a6fe6dc1106fc76fdf154740e56e5894beeeb38f3",
+      "timestamp_s": 2.0,
+      "width_px": 1080
+    },
+    {
+      "file": "00009.jpg",
+      "frame_index": 9,
+      "height_px": 1920,
+      "sha256": "f8be2cc0957216a3a76e2fdb5f806be14e093f64a781072497f5e92570d3810d",
+      "timestamp_s": 2.25,
+      "width_px": 1080
+    },
+    {
+      "file": "00010.jpg",
+      "frame_index": 10,
+      "height_px": 1920,
+      "sha256": "4c4c9d4271b0c26e0312e7ed0116c4a5e7bb967cf1cdd4b638e1269c57b79bdb",
+      "timestamp_s": 2.5,
+      "width_px": 1080
+    },
+    {
+      "file": "00011.jpg",
+      "frame_index": 11,
+      "height_px": 1920,
+      "sha256": "5f35d1baeab5bdf5a0f8717cfaaf6e6f740bb0ca9fe2f606ad23d2de6dc383f8",
+      "timestamp_s": 2.75,
+      "width_px": 1080
+    },
+    {
+      "file": "00012.jpg",
+      "frame_index": 12,
+      "height_px": 1920,
+      "sha256": "2ab0771f43daa2bc49b2c878295accf3bac0f387176a645342c7170c4537aee8",
+      "timestamp_s": 3.0,
+      "width_px": 1080
+    },
+    {
+      "file": "00013.jpg",
+      "frame_index": 13,
+      "height_px": 1920,
+      "sha256": "31fed0f0ad8dc3c4285a604cdfec70686cc920a6a151a1e438072f6b4a57fef8",
+      "timestamp_s": 3.25,
+      "width_px": 1080
+    },
+    {
+      "file": "00014.jpg",
+      "frame_index": 14,
+      "height_px": 1920,
+      "sha256": "85cc285ff33287caa7671fe5c3ec7b1daf01d8327f166e403c771b8829f5d13c",
+      "timestamp_s": 3.5,
+      "width_px": 1080
+    },
+    {
+      "file": "00015.jpg",
+      "frame_index": 15,
+      "height_px": 1920,
+      "sha256": "45dba2717499f5505c6b4c9a2f9d07a12dfb951825ea3e10432766c0137f3597",
+      "timestamp_s": 3.75,
+      "width_px": 1080
+    },
+    {
+      "file": "00016.jpg",
+      "frame_index": 16,
+      "height_px": 1920,
+      "sha256": "b92137cb57d1d4db824215f6293fbcaedb383285776059abdb8f0c1b4bf83050",
+      "timestamp_s": 4.0,
+      "width_px": 1080
+    },
+    {
+      "file": "00017.jpg",
+      "frame_index": 17,
+      "height_px": 1920,
+      "sha256": "a009a721fa6f740dad5bf9153956f726a4d86814f5050e16fc6996284a87525e",
+      "timestamp_s": 4.25,
+      "width_px": 1080
+    },
+    {
+      "file": "00018.jpg",
+      "frame_index": 18,
+      "height_px": 1920,
+      "sha256": "1cc429512ca8ced43a017aa7c2b4f26f33be7da0f03e149f06397a58dcc28b00",
+      "timestamp_s": 4.5,
+      "width_px": 1080
+    },
+    {
+      "file": "00019.jpg",
+      "frame_index": 19,
+      "height_px": 1920,
+      "sha256": "0ca11bcd33d8ae2338278daa379b7ce699fd81cacddb95a6cbe3bc2c90624914",
+      "timestamp_s": 4.75,
+      "width_px": 1080
+    },
+    {
+      "file": "00020.jpg",
+      "frame_index": 20,
+      "height_px": 1920,
+      "sha256": "44719e64f00bd5572f886341ac136249043be8c08e62a6d7703202ad45db0b08",
+      "timestamp_s": 5.0,
+      "width_px": 1080
+    },
+    {
+      "file": "00021.jpg",
+      "frame_index": 21,
+      "height_px": 1920,
+      "sha256": "523d82a567432439f952947ed7a551d9da3714f33ec82c977860aace1047d13c",
+      "timestamp_s": 5.25,
+      "width_px": 1080
+    },
+    {
+      "file": "00022.jpg",
+      "frame_index": 22,
+      "height_px": 1920,
+      "sha256": "61ccb4c4427495cc104318e23437f43069a6dfab790b206313380124eaadd395",
+      "timestamp_s": 5.5,
+      "width_px": 1080
+    },
+    {
+      "file": "00023.jpg",
+      "frame_index": 23,
+      "height_px": 1920,
+      "sha256": "3fa88530126778b7cce37bc2b07607e38ed34111857da03b6a42acc9ec3d82fb",
+      "timestamp_s": 5.75,
+      "width_px": 1080
+    },
+    {
+      "file": "00024.jpg",
+      "frame_index": 24,
+      "height_px": 1920,
+      "sha256": "447a3366972e3f306d101549bcabcd2d097e86d951b03d46414ac54bca9e8069",
+      "timestamp_s": 6.0,
+      "width_px": 1080
+    },
+    {
+      "file": "00025.jpg",
+      "frame_index": 25,
+      "height_px": 1920,
+      "sha256": "0232e88d6a53417e8d057337f3ef57b7120396931005fd74b9e0641482810578",
+      "timestamp_s": 6.25,
+      "width_px": 1080
+    },
+    {
+      "file": "00026.jpg",
+      "frame_index": 26,
+      "height_px": 1920,
+      "sha256": "8420a17e38b426494c232cc983481ddb442288099d8b467609972b32db817468",
+      "timestamp_s": 6.5,
+      "width_px": 1080
+    },
+    {
+      "file": "00027.jpg",
+      "frame_index": 27,
+      "height_px": 1920,
+      "sha256": "9768cda05b5a75b7e15f9d1ff8120e25644aa28102cb2673068d6a1717f64cbf",
+      "timestamp_s": 6.75,
+      "width_px": 1080
+    },
+    {
+      "file": "00028.jpg",
+      "frame_index": 28,
+      "height_px": 1920,
+      "sha256": "122a1357e6e6d7809922d5a1f8a6cd7b8cfb43e67f722ff6cd8a3f4d96c675e5",
+      "timestamp_s": 7.0,
+      "width_px": 1080
+    },
+    {
+      "file": "00029.jpg",
+      "frame_index": 29,
+      "height_px": 1920,
+      "sha256": "e27b10a3a05088a5aa9413130ae60d5bdfa3f9d504b55dc8ef5f12a1ba81bdb4",
+      "timestamp_s": 7.25,
+      "width_px": 1080
+    },
+    {
+      "file": "00030.jpg",
+      "frame_index": 30,
+      "height_px": 1920,
+      "sha256": "7472bae84cb6a88706fb8a61f613c35cddba2734a29e83717d5215cb57780a35",
+      "timestamp_s": 7.5,
+      "width_px": 1080
+    },
+    {
+      "file": "00031.jpg",
+      "frame_index": 31,
+      "height_px": 1920,
+      "sha256": "1f832da17d39c576f1a1fbdb2cc049b197bd5a49c53f2092fa31b267ce65652a",
+      "timestamp_s": 7.75,
+      "width_px": 1080
+    },
+    {
+      "file": "00032.jpg",
+      "frame_index": 32,
+      "height_px": 1920,
+      "sha256": "0c639898af13d9ba6e7d51d2101e5a7c3949be58da0cf15951749c265cb68d90",
+      "timestamp_s": 8.0,
+      "width_px": 1080
+    },
+    {
+      "file": "00033.jpg",
+      "frame_index": 33,
+      "height_px": 1920,
+      "sha256": "66ee747ac28e8256cdfd2c773adc495b7029df54ca2bfb02ede6bf67ebf15939",
+      "timestamp_s": 8.25,
+      "width_px": 1080
+    },
+    {
+      "file": "00034.jpg",
+      "frame_index": 34,
+      "height_px": 1920,
+      "sha256": "ef25e6a6aa0dffb508e5cd5f162e4a5b59f7e30661b48fd79b37a1b93a4eb972",
+      "timestamp_s": 8.5,
+      "width_px": 1080
+    },
+    {
+      "file": "00035.jpg",
+      "frame_index": 35,
+      "height_px": 1920,
+      "sha256": "98cf1a14a6fe97636e417f717ea27ad006a4e92a6c37bfdcb3eedf9f45e22773",
+      "timestamp_s": 8.75,
+      "width_px": 1080
+    },
+    {
+      "file": "00036.jpg",
+      "frame_index": 36,
+      "height_px": 1920,
+      "sha256": "8657b97b3eac62575f2c06b4262659d694191ed419f522feb03f2a9076628913",
+      "timestamp_s": 9.0,
+      "width_px": 1080
+    },
+    {
+      "file": "00037.jpg",
+      "frame_index": 37,
+      "height_px": 1920,
+      "sha256": "49237b2a5695f6a209d0dffb5b802e8df65be566d668e71e7e297adcaa3f9b09",
+      "timestamp_s": 9.25,
+      "width_px": 1080
+    },
+    {
+      "file": "00038.jpg",
+      "frame_index": 38,
+      "height_px": 1920,
+      "sha256": "c001577dd858a33ab459a3b135206127e06050fdefa622aa1dad7a95be479ab1",
+      "timestamp_s": 9.5,
+      "width_px": 1080
+    },
+    {
+      "file": "00039.jpg",
+      "frame_index": 39,
+      "height_px": 1920,
+      "sha256": "59e32fc5be023f0a61ff669423269ca408c8ba0a60e1cca22822c68a8d960a17",
+      "timestamp_s": 9.75,
+      "width_px": 1080
+    }
+  ],
+  "sampling": {
+    "fps": 4.0,
+    "max_seconds": 10.0
+  },
+  "schema_version": "0.1.0",
+  "source": {
+    "licence": "CC-BY-4.0",
+    "manifest": "bakeoff/clips/holdout-larry-nails.json",
+    "media_path": "bakeoff\\media\\holdout-larry-nails.webm",
+    "media_sha256": "e10ed81213df4d9d49549a5065545a6fb9e4b4e669afdc3a6717cf03c3b4e826"
+  }
+}

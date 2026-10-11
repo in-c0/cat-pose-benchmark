@@ -28,7 +28,6 @@ import json
 from pathlib import Path
 from typing import Any
 
-from detail.grounded_tail import _iou
 from review.common import clip_workdir, load_clips
 
 TRUTH = Path(__file__).resolve().parent / "truth"
@@ -79,6 +78,8 @@ def _same(box: list[float], ref: list[float]) -> bool:
     inside the reference (a tight curve box inside a looser detector box). Containment is
     one-way on purpose: a whole-cat box that merely contains the tail is not a tail box
     (found on walking f006/f007 in pass 9)."""
+    from detail.grounded_tail import _iou  # lazy: keeps cv2/numpy out of the light review tests
+
     if _iou(box, ref) >= IOU_MIN:
         return True
     x0, y0 = max(box[0], ref[0]), max(box[1], ref[1])
@@ -152,6 +153,9 @@ def judge(method: str, run_clip: str, review_clip: str, factor: int, truth: dict
             for k in ("output_status", "wrong_part", "box_quality", "instance"):
                 if ov.get(k):
                     row[k] = ov[k]
+            if row["output_status"] in ("correct", "partial") and not ov.get("wrong_part"):
+                # an override to correct must not keep the automatic wrong_part label
+                row["wrong_part"] = ""
             row["note"] = "override: " + ov.get("reason", "")
         rows.append(row)
     return rows
