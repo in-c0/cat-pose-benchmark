@@ -293,8 +293,8 @@ class PackageTests(unittest.TestCase):
             manifest = json.loads((tmp / "work" / "manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(build.manifest_root(manifest), c["root_sha256"])
             self.assertEqual(set(json.loads((tmp / "package" / "commitment.json").read_text(encoding="utf-8"))), wh.COMMITMENT_KEYS)
-            sheet = Image.open(tmp / "work" / "package" / "sheets" / rows[0]["sheet"])
-            self.assertGreater(sheet.width, FRAMES_PER_SEGMENT * build.TILE_WIDTH)
+            with Image.open(tmp / "work" / "package" / "sheets" / rows[0]["sheet"]) as sheet:
+                self.assertGreater(sheet.width, FRAMES_PER_SEGMENT * build.TILE_WIDTH)
             key, tpl = tmp / "work" / "key.json", tmp / "package" / "label-TEMPLATE.csv"
             self.assertEqual(wh.verify_release(manifest, c, key, tpl), [])
             key.write_text(key.read_text(encoding="utf-8").replace("cat0", "cat1"), encoding="utf-8")

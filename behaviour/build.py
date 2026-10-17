@@ -157,7 +157,11 @@ def fetch(selected: list[dict[str, Any]], pool: dict[str, dict[str, Any]]) -> No
 def frames_from_work(title: str) -> list[tuple[float, Image.Image]]:
     d = WORK / "frames" / title_key(title)
     meta = json.loads((d / "frames.json").read_text(encoding="utf-8"))
-    return [(f["t"], Image.open(d / f["file"]).convert("RGB")) for f in meta["frames"]]
+    out = []
+    for f in meta["frames"]:
+        with Image.open(d / f["file"]) as im:
+            out.append((f["t"], im.convert("RGB")))
+    return out
 
 
 def cut_segment_video(title: str, out: Path, t0: float) -> None:
