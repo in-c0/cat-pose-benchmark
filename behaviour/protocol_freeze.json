@@ -1,0 +1,6 @@
+{
+ "frozen_at": "2026-10-17T23:50+11:00",
+ "covers": "behaviour/PROTOCOL.md, everything above the line '## Amendments' (LF line endings)",
+ "sha256": "0adcdfe7506c52210643d4b76dfa4eee48ee75c125e9be7658f5b83b7bd0bba3",
+ "labels_existing_at_freeze": 0
+}
