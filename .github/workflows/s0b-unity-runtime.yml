@@ -1,0 +1,97 @@
+name: S0B optional Unity runtime gate
+
+on:
+  pull_request:
+    paths:
+      - "synthetic/unity/S0AProxy/**"
+      - "synthetic/unity_roundtrip.py"
+      - ".github/workflows/s0b-unity-runtime.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+  UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+  UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+  UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+
+jobs:
+  runtime:
+    name: licensed Unity 6000.3.18f1 runtime gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Detect usable Unity CI credentials without exposing them
+        id: license
+        shell: bash
+        run: |
+          set -euo pipefail
+          personal=false
+          professional=false
+          if [[ -n "${UNITY_LICENSE:-}" && -n "${UNITY_EMAIL:-}" && -n "${UNITY_PASSWORD:-}" ]]; then
+            personal=true
+          fi
+          if [[ -n "${UNITY_SERIAL:-}" && -n "${UNITY_EMAIL:-}" && -n "${UNITY_PASSWORD:-}" ]]; then
+            professional=true
+          fi
+          if [[ "$personal" == true || "$professional" == true ]]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+            echo "Unity CI credential set detected; runtime gate will execute." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "No usable Unity CI credential set is configured. Runtime gate was not attempted; unity_runtime_verified remains false." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Run pinned Unity Editor exporter through GameCI
+        if: steps.license.outputs.available == 'true'
+        uses: game-ci/unity-builder@v5.0.0
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+        with:
+          projectPath: synthetic/unity/S0AProxy
+          unityVersion: auto
+          targetPlatform: StandaloneLinux64
+          buildMethod: CatPose.S0B.S0BProxyExportCommand.Run
+          customParameters: -s0Output /github/workspace/s0b-unity.json
+          versioning: None
+
+      - uses: actions/setup-python@v6
+        if: steps.license.outputs.available == 'true'
+        with:
+          python-version: "3.12"
+
+      - name: Run authoritative S0B round-trip comparator
+        if: steps.license.outputs.available == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s s0b-unity.json
+          python -m synthetic.unity_roundtrip \
+            s0b-unity.json \
+            --summary s0b-roundtrip.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('s0b-roundtrip.json').read_text(encoding='utf-8'))
+          assert report['contract_valid'] is True, report
+          assert report['unity_runtime_verified'] is True, report
+          assert report['performance_analysis_performed'] is False, report
+          print('actual Unity runtime export passed the frozen S0B round-trip gate')
+          PY
+
+      - name: Upload runtime evidence
+        if: steps.license.outputs.available == 'true' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s0b-unity-runtime-evidence
+          path: |
+            s0b-unity.json
+            s0b-roundtrip.json
+          if-no-files-found: warn
+          retention-days: 14

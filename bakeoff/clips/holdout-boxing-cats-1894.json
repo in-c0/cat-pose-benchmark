@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "clip_id": "holdout-boxing-cats-1894",
+  "source": {
+    "kind": "redistributable",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/65/The_Boxing_Cats_%28Prof._Welton%27s%29_%281894%29_Best_Picture_Quality_Available.webm",
+    "local_path": "bakeoff/media/holdout-boxing-cats-1894.webm"
+  },
+  "licence": {
+    "status": "verified",
+    "identifier": "PD",
+    "source_url": "https://commons.wikimedia.org/wiki/File:The_Boxing_Cats_(Prof._Welton's)_(1894)_Best_Picture_Quality_Available.webm",
+    "redistribution": "allowed",
+    "notes": "Commons metadata: licence Public domain, uploader The Smart Star, artist Directed by William K.L. Dickson and William Heise.. Selected by the precommitted metadata-only protocol in review/holdout/sample_pool.py (seed 20260920, rank 2); nothing about the content was seen before selection."
+  },
+  "slices": [
+    "holdout"
+  ],
+  "notes": "Prospective holdout clip 2/4. Commons description: The Boxing Cats (Prof. Welton's) (1894)\nDirected by William K.L. Dickson and William Heise .\n\nBest quality available."
+}

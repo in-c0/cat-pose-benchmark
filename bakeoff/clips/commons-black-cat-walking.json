@@ -1,0 +1,21 @@
+{
+  "schema_version": "0.1.0",
+  "clip_id": "commons-black-cat-walking",
+  "source": {
+    "kind": "redistributable",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e0/Black_Cat_walking.webm",
+    "local_path": "bakeoff/media/black-cat-walking.webm"
+  },
+  "licence": {
+    "status": "verified",
+    "identifier": "CC0-1.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Black_Cat_walking.webm",
+    "redistribution": "allowed",
+    "notes": "Author: Dzkouslavia. Wikimedia Commons records the uploader's own work released under CC0 1.0 (checked via the Commons API extmetadata on 2026-09-14)."
+  },
+  "slices": [
+    "lateral_locomotion",
+    "tail_dynamics"
+  ],
+  "notes": "18.9 s 1080p clip of a black cat walking. Held-out clip for the tail methods: never used to choose a threshold."
+}

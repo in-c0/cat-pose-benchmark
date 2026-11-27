@@ -1,0 +1,32 @@
+{
+  "bridge": {
+    "area_ratio": [
+      0.4,
+      2.5
+    ],
+    "fillable_statuses": [
+      "centreline_failed",
+      "empty_mask",
+      "no_cat",
+      "no_tail_box",
+      "temporal_none"
+    ],
+    "max_reach": 1
+  },
+  "clip_id": "commons-cat-plays",
+  "evidence_tier": "S2",
+  "method": "tail_grounded_v2",
+  "schema_version": "0.1.0",
+  "source_method": "tail_grounded_v1",
+  "summary": {
+    "frames_total": 33,
+    "frames_with_curve": 7,
+    "status_counts": {
+      "all_look_like_paw": 15,
+      "ok": 6,
+      "propagated": 1,
+      "propagation_rejected": 1,
+      "temporal_none": 10
+    }
+  }
+}

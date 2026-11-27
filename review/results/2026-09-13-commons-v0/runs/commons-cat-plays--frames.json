@@ -1,0 +1,281 @@
+{
+  "clip_id": "commons-cat-plays",
+  "frame_count": 33,
+  "frames": [
+    {
+      "file": "00000.jpg",
+      "frame_index": 0,
+      "height_px": 1280,
+      "sha256": "135f5235cc98c355da394a1ee41358794fbf318b0835553f0b6afb09ad61a965",
+      "timestamp_s": 0.0,
+      "width_px": 720
+    },
+    {
+      "file": "00001.jpg",
+      "frame_index": 1,
+      "height_px": 1280,
+      "sha256": "f76c7d5deefd9fbfb672e3fe16388c414610b712aef9394248c366229566bb30",
+      "timestamp_s": 0.25,
+      "width_px": 720
+    },
+    {
+      "file": "00002.jpg",
+      "frame_index": 2,
+      "height_px": 1280,
+      "sha256": "4cf7155e2dae419d10e6b01fee196c6883a870875db5491cf7a834dd025026c5",
+      "timestamp_s": 0.5,
+      "width_px": 720
+    },
+    {
+      "file": "00003.jpg",
+      "frame_index": 3,
+      "height_px": 1280,
+      "sha256": "2f8ff93a86db8e48e32a96b6bfa6493b1b981938cca571a4e823667410f16ec6",
+      "timestamp_s": 0.75,
+      "width_px": 720
+    },
+    {
+      "file": "00004.jpg",
+      "frame_index": 4,
+      "height_px": 1280,
+      "sha256": "1ed6356ad99e691395b5583ae21afdb6fb63029c53d7ff0c4eb9f80f5796da1d",
+      "timestamp_s": 1.0,
+      "width_px": 720
+    },
+    {
+      "file": "00005.jpg",
+      "frame_index": 5,
+      "height_px": 1280,
+      "sha256": "33596df5d669e820025491fd47316fddbe64e1d376b2d64ac82fa8d988203153",
+      "timestamp_s": 1.25,
+      "width_px": 720
+    },
+    {
+      "file": "00006.jpg",
+      "frame_index": 6,
+      "height_px": 1280,
+      "sha256": "9867289c123ff647b6080b7e9fadeb0c7148ce4fc269623d19de13b11ec77085",
+      "timestamp_s": 1.5,
+      "width_px": 720
+    },
+    {
+      "file": "00007.jpg",
+      "frame_index": 7,
+      "height_px": 1280,
+      "sha256": "6fc9bdce1c3ff695a036aaa98769fd31bf13223084135ac88b3f0a6b822e5853",
+      "timestamp_s": 1.75,
+      "width_px": 720
+    },
+    {
+      "file": "00008.jpg",
+      "frame_index": 8,
+      "height_px": 1280,
+      "sha256": "41343c80b9f30b1785649d86c74b3c548ae36993133252ca4ac4f4c2123b59f9",
+      "timestamp_s": 2.0,
+      "width_px": 720
+    },
+    {
+      "file": "00009.jpg",
+      "frame_index": 9,
+      "height_px": 1280,
+      "sha256": "32e64a91df2965e1af99a48a235daf89cb5a95383fd96f59758d3ea37f27e934",
+      "timestamp_s": 2.25,
+      "width_px": 720
+    },
+    {
+      "file": "00010.jpg",
+      "frame_index": 10,
+      "height_px": 1280,
+      "sha256": "c3e8d79bde4402dcd713ff8603300f38020f5b013d8032931e40d2335971c519",
+      "timestamp_s": 2.5,
+      "width_px": 720
+    },
+    {
+      "file": "00011.jpg",
+      "frame_index": 11,
+      "height_px": 1280,
+      "sha256": "208f0d33d3f248afbbd42ef559a5337f0201f0ba217dde69f5545a9b043c3985",
+      "timestamp_s": 2.75,
+      "width_px": 720
+    },
+    {
+      "file": "00012.jpg",
+      "frame_index": 12,
+      "height_px": 1280,
+      "sha256": "1015be1f8008b9ed77529f7ae16a1ca32777e33bc1d73a61bfa64e57361ce0c3",
+      "timestamp_s": 3.0,
+      "width_px": 720
+    },
+    {
+      "file": "00013.jpg",
+      "frame_index": 13,
+      "height_px": 1280,
+      "sha256": "9f12f55b47a7e0eee8091b5dcb4f20d40a1ed6ccdd370a513fd6be152a8620ec",
+      "timestamp_s": 3.25,
+      "width_px": 720
+    },
+    {
+      "file": "00014.jpg",
+      "frame_index": 14,
+      "height_px": 1280,
+      "sha256": "de48ece77ec4858f3e35282bad4d1cf24a7d876378fd8d034550fc4f32282515",
+      "timestamp_s": 3.5,
+      "width_px": 720
+    },
+    {
+      "file": "00015.jpg",
+      "frame_index": 15,
+      "height_px": 1280,
+      "sha256": "73dc645f81dee3f7525be83c5d056e7097b063aa7f74afec35409c33f0a416d4",
+      "timestamp_s": 3.75,
+      "width_px": 720
+    },
+    {
+      "file": "00016.jpg",
+      "frame_index": 16,
+      "height_px": 1280,
+      "sha256": "a52ac0d8c01b5b541077cbc5fb9d61f51bb2e02bc93d0b5938e7c66ef77d7ead",
+      "timestamp_s": 4.0,
+      "width_px": 720
+    },
+    {
+      "file": "00017.jpg",
+      "frame_index": 17,
+      "height_px": 1280,
+      "sha256": "d0ae689ffeda8bd0295b38393eaf437bc8347f1c9bc83917d9419c71e906742b",
+      "timestamp_s": 4.25,
+      "width_px": 720
+    },
+    {
+      "file": "00018.jpg",
+      "frame_index": 18,
+      "height_px": 1280,
+      "sha256": "e6fd1b4f4a3e1d72d71d744a689bc27063a9059b1198b20cdf1c1c01d9cf3fcc",
+      "timestamp_s": 4.5,
+      "width_px": 720
+    },
+    {
+      "file": "00019.jpg",
+      "frame_index": 19,
+      "height_px": 1280,
+      "sha256": "f50b910e74b13d450cd7805fd942f3da4b14e06a324a805f154ecf3e92dc751c",
+      "timestamp_s": 4.75,
+      "width_px": 720
+    },
+    {
+      "file": "00020.jpg",
+      "frame_index": 20,
+      "height_px": 1280,
+      "sha256": "bd025abe260f8d905e28d0cfcf8abb07555abeb295141422f9ff9260d5593262",
+      "timestamp_s": 5.0,
+      "width_px": 720
+    },
+    {
+      "file": "00021.jpg",
+      "frame_index": 21,
+      "height_px": 1280,
+      "sha256": "b47c0ab6eaaf287a8e3ffe9a7442b6659ce2e43f2073a7b763d3f6d9f33bcd7a",
+      "timestamp_s": 5.25,
+      "width_px": 720
+    },
+    {
+      "file": "00022.jpg",
+      "frame_index": 22,
+      "height_px": 1280,
+      "sha256": "2d5bc97bdd2bf0bd2fa00a678de1ef263c900eee3e7217a29bf45d38b0a35ea5",
+      "timestamp_s": 5.5,
+      "width_px": 720
+    },
+    {
+      "file": "00023.jpg",
+      "frame_index": 23,
+      "height_px": 1280,
+      "sha256": "b5dcb33c17fe83e96f4164479898c30e6ea8e75110bfaf4541db9448bccdc2bc",
+      "timestamp_s": 5.75,
+      "width_px": 720
+    },
+    {
+      "file": "00024.jpg",
+      "frame_index": 24,
+      "height_px": 1280,
+      "sha256": "d529d92489f895729aef317d66deb1e16d66369a888b4c71565ab5b9174b8cc3",
+      "timestamp_s": 6.0,
+      "width_px": 720
+    },
+    {
+      "file": "00025.jpg",
+      "frame_index": 25,
+      "height_px": 1280,
+      "sha256": "6ee320ba4f14a7bf590e377f03ee05524f58e879d7909def64eeb92bc5e5860a",
+      "timestamp_s": 6.25,
+      "width_px": 720
+    },
+    {
+      "file": "00026.jpg",
+      "frame_index": 26,
+      "height_px": 1280,
+      "sha256": "9ef683ef2424d1c3124836a8dda0e819b9ff356e607ecf518ba440a6045d7386",
+      "timestamp_s": 6.5,
+      "width_px": 720
+    },
+    {
+      "file": "00027.jpg",
+      "frame_index": 27,
+      "height_px": 1280,
+      "sha256": "22d7078a36717af3b6e49772e566bc14a0606e30bfd59cc6cdb6eb6026316457",
+      "timestamp_s": 6.75,
+      "width_px": 720
+    },
+    {
+      "file": "00028.jpg",
+      "frame_index": 28,
+      "height_px": 1280,
+      "sha256": "754f212e138a855bfbded2f6aaef2d853b3615ba44e1411d83e2bd6945ddc9c6",
+      "timestamp_s": 7.0,
+      "width_px": 720
+    },
+    {
+      "file": "00029.jpg",
+      "frame_index": 29,
+      "height_px": 1280,
+      "sha256": "dc87c1dbf2da4c6e62e1ff711e3f33c4a9062c20a4025aedc3f331ad88f782c8",
+      "timestamp_s": 7.25,
+      "width_px": 720
+    },
+    {
+      "file": "00030.jpg",
+      "frame_index": 30,
+      "height_px": 1280,
+      "sha256": "af28bebac084766d1a07fca25682e921dc4398ed381e8608144e25ec814b7d37",
+      "timestamp_s": 7.5,
+      "width_px": 720
+    },
+    {
+      "file": "00031.jpg",
+      "frame_index": 31,
+      "height_px": 1280,
+      "sha256": "d05adcb554d9f2b4adaa4614d1eb3add3b8c4847377870c68d9440981ca256f3",
+      "timestamp_s": 7.75,
+      "width_px": 720
+    },
+    {
+      "file": "00032.jpg",
+      "frame_index": 32,
+      "height_px": 1280,
+      "sha256": "9426a62086d6b6add1e44c2e560bbd59d2396c2beed2664f969e42e6a687bc09",
+      "timestamp_s": 8.0,
+      "width_px": 720
+    }
+  ],
+  "sampling": {
+    "fps": 4.0,
+    "max_seconds": 8.3
+  },
+  "schema_version": "0.1.0",
+  "source": {
+    "licence": "CC-BY-SA-4.0",
+    "manifest": "bakeoff/clips/commons-cat-plays.json",
+    "media_path": "bakeoff\\media\\cat-plays.webm",
+    "media_sha256": "3258309e1d573fda6595fee0c02e3f055931a06c01bac24d986a5aff28297b32"
+  }
+}

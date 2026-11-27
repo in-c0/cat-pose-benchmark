@@ -1,0 +1,112 @@
+name: SAM2 tail sequence propagation
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "detail/sam2_tail_video.py"
+      - "detail/mask_centerline.py"
+      - "detail/fixtures/superanimal-jumping-tail-seed-frame5.json"
+      - "bakeoff/materialize_clip.py"
+      - "bakeoff/clips/commons-cat-jumping-backwards.json"
+      - ".github/workflows/sam2-tail-sequence-smoke.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  propagate:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env:
+      SAM2_BUILD_CUDA: "0"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install CPU SAM2 stack
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            "torch==2.5.1" "torchvision==0.20.1" \
+            --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install \
+            "numpy==1.26.4" \
+            pillow \
+            scikit-image \
+            imageio-ffmpeg \
+            huggingface_hub
+          SAM2_BUILD_CUDA=0 python -m pip install \
+            "git+https://github.com/facebookresearch/sam2.git@2b90b9f5ceec907a1c18123530e92e794ad901a4"
+
+      - name: Materialize licence-approved source clip
+        run: |
+          set -o pipefail
+          python -m bakeoff.materialize_clip bakeoff/clips/commons-cat-jumping-backwards.json \
+            | tee /tmp/materialized.json
+
+      - name: Recreate teacher-screen sequence as JPEGs
+        run: |
+          FFMPEG="$(python -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')"
+          "$FFMPEG" -hide_banner -loglevel error -y \
+            -i bakeoff/media/cat-jumping-backwards.webm \
+            -t 8.0 -vf fps=1.5 -an /tmp/jumping-tail-sampled.mp4
+          mkdir -p /tmp/jumping-tail-frames
+          "$FFMPEG" -hide_banner -loglevel error -y \
+            -i /tmp/jumping-tail-sampled.mp4 \
+            -q:v 2 -start_number 0 /tmp/jumping-tail-frames/%05d.jpg
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          frames = sorted(Path('/tmp/jumping-tail-frames').glob('*.jpg'))
+          print('frame count', len(frames))
+          assert len(frames) == 12, len(frames)
+          assert Image.open(frames[5]).size == (1920, 1080)
+          PY
+
+      - name: Propagate one automatic tail seed through sequence
+        run: |
+          set -o pipefail
+          python -m detail.sam2_tail_video \
+            /tmp/jumping-tail-frames \
+            detail/fixtures/superanimal-jumping-tail-seed-frame5.json \
+            --output-dir /tmp/tail-sequence \
+            --checkpoint facebook/sam2.1-hiera-tiny \
+            --device cpu \
+            --samples 24 \
+            | tee /tmp/tail-sequence-summary.json
+
+      - name: Print sequence diagnostics
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result = json.loads(Path('/tmp/tail-sequence/sequence-result.json').read_text())
+          print(json.dumps(result['summary'], indent=2, sort_keys=True))
+          for frame in result['frames']:
+              print(
+                  frame['frame_index'],
+                  frame['curve_status'],
+                  'area=', round(frame['mask_area_fraction'], 6),
+                  'length=', round(frame.get('curve_length_px', 0.0), 2),
+              )
+          PY
+
+      - name: Upload sequence evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jumping-cat-sam2-tail-sequence
+          if-no-files-found: warn
+          path: |
+            /tmp/materialized.json
+            /tmp/tail-sequence-summary.json
+            /tmp/tail-sequence/sequence-result.json
+            /tmp/tail-sequence/sequence-overlay.jpg
+            /tmp/tail-sequence/overlays/*.jpg

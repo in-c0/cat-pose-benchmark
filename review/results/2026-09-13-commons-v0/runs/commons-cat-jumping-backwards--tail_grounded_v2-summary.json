@@ -1,0 +1,33 @@
+{
+  "bridge": {
+    "area_ratio": [
+      0.4,
+      2.5
+    ],
+    "fillable_statuses": [
+      "centreline_failed",
+      "empty_mask",
+      "no_cat",
+      "no_tail_box",
+      "temporal_none"
+    ],
+    "max_reach": 1
+  },
+  "clip_id": "commons-cat-jumping-backwards",
+  "evidence_tier": "S2",
+  "method": "tail_grounded_v2",
+  "schema_version": "0.1.0",
+  "source_method": "tail_grounded_v1",
+  "summary": {
+    "frames_total": 24,
+    "frames_with_curve": 13,
+    "status_counts": {
+      "no_cat": 2,
+      "no_tail_box": 1,
+      "ok": 12,
+      "propagated": 1,
+      "propagation_rejected": 4,
+      "temporal_none": 4
+    }
+  }
+}

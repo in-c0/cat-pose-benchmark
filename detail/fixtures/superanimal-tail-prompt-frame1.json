@@ -1,0 +1,67 @@
+{
+  "schema_version": "0.1.0",
+  "clip_id": "commons-cat-plays-superanimal-smoke",
+  "source_video": "bakeoff/media/cat-plays.webm",
+  "source_frame": {
+    "smoke_frame_index": 1,
+    "timestamp_s": 0.25,
+    "width_px": 720,
+    "height_px": 1280
+  },
+  "prompt_provenance": {
+    "evidence_tier": "R3",
+    "model": "DeepLabCut SuperAnimal-Quadruped",
+    "github_actions_run": 31890416926,
+    "artifact_id": 9248421061,
+    "checkpoint_status": "research_only",
+    "derived_data_status": "research_only_until_issue_9_review",
+    "note": "Prompt points are model-derived predictions from the Phase-0 research baseline, not manual labels or independent ground truth."
+  },
+  "positive_points": [
+    {
+      "semantic_name": "tail_base",
+      "x_px": 267.8671875,
+      "y_px": 422.40625,
+      "score": 0.7000179290771484
+    },
+    {
+      "semantic_name": "tail_tip",
+      "x_px": 358.2578125,
+      "y_px": 311.40625,
+      "score": 0.7736359238624573
+    }
+  ],
+  "negative_points": [
+    {
+      "semantic_name": "nose",
+      "x_px": 483.4140625,
+      "y_px": 665.21875,
+      "score": 0.7084770798683167
+    },
+    {
+      "semantic_name": "neck_base",
+      "x_px": 406.9296875,
+      "y_px": 616.65625,
+      "score": 0.36498120427131653
+    },
+    {
+      "semantic_name": "back_middle",
+      "x_px": 274.8203125,
+      "y_px": 547.28125,
+      "score": 0.8290557861328125
+    },
+    {
+      "semantic_name": "left_hind_paw",
+      "x_px": 476.4609375,
+      "y_px": 450.15625,
+      "score": 0.5118713974952698
+    }
+  ],
+  "segmentation_model": {
+    "repository": "facebookresearch/sam2",
+    "checkpoint": "facebook/sam2.1-hiera-tiny",
+    "code_license": "Apache-2.0",
+    "checkpoint_license": "Apache-2.0"
+  },
+  "scientific_boundary": "The resulting SAM2 mask and any derived centreline are R3 model-derived research evidence. They must not be promoted to observed truth or product-training labels without independent licensing/evidence review."
+}

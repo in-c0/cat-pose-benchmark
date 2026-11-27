@@ -1,0 +1,192 @@
+name: Automatic jumping-cat tail pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "detail/prompt_from_prediction.py"
+      - "detail/sam2_tail_prompt.py"
+      - "detail/mask_centerline.py"
+      - "bakeoff/adapters/deeplabcut_common.py"
+      - "bakeoff/adapters/superanimal_quadruped.py"
+      - "bakeoff/materialize_clip.py"
+      - "bakeoff/clips/commons-cat-jumping-backwards.json"
+      - ".github/workflows/auto-tail-jumping-smoke.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  teacher-prompts:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install CPU DeepLabCut research stack
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            "torch==2.4.1" "torchvision==0.19.1" \
+            --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install "deeplabcut==3.0.1" pillow
+
+      - name: Materialize licence-approved jumping-cat clip
+        run: |
+          set -o pipefail
+          python -m bakeoff.materialize_clip bakeoff/clips/commons-cat-jumping-backwards.json \
+            | tee /tmp/materialized.json
+
+      - name: Create original-motion sampled video and manifest
+        run: |
+          FFMPEG="$(python -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')"
+          "$FFMPEG" -hide_banner -loglevel error -y \
+            -i bakeoff/media/cat-jumping-backwards.webm \
+            -t 8.0 -vf fps=1.5 -an /tmp/jumping-tail-sampled.mp4
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          manifest = json.loads(Path('bakeoff/clips/commons-cat-jumping-backwards.json').read_text())
+          manifest['clip_id'] = 'commons-cat-jumping-backwards-tail-screen'
+          manifest['source']['local_path'] = '/tmp/jumping-tail-sampled.mp4'
+          Path('/tmp/jumping-tail-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
+          PY
+
+      - name: Run SuperAnimal-Quadruped on sampled frames
+        run: |
+          set -o pipefail
+          python -m bakeoff.adapters.superanimal_quadruped \
+            --clip /tmp/jumping-tail-manifest.json \
+            --output /tmp/jumping-superanimal-prediction.json \
+            --device cpu \
+            --batch-size 1 \
+            | tee /tmp/superanimal-run.txt
+
+      - name: Select tail frame and prompts automatically
+        run: |
+          set -o pipefail
+          python -m detail.prompt_from_prediction \
+            /tmp/jumping-superanimal-prediction.json \
+            --source-video /tmp/jumping-tail-sampled.mp4 \
+            --output /tmp/selected-tail-prompt.json \
+            --min-score 0.2 \
+            --min-separation-fraction 0.03 \
+            --github-actions-run "$GITHUB_RUN_ID" \
+            | tee /tmp/prompt-selection.txt
+
+      - name: Extract selected frame and render prompt QA overlay
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import cv2
+          from PIL import Image, ImageDraw
+
+          prompt = json.loads(Path('/tmp/selected-tail-prompt.json').read_text())
+          index = int(prompt['source_frame']['smoke_frame_index'])
+          cap = cv2.VideoCapture('/tmp/jumping-tail-sampled.mp4')
+          cap.set(cv2.CAP_PROP_POS_FRAMES, index)
+          ok, frame = cap.read()
+          cap.release()
+          assert ok, f'Could not read selected frame {index}'
+          assert cv2.imwrite('/tmp/selected-tail-frame.png', frame)
+
+          image = Image.open('/tmp/selected-tail-frame.png').convert('RGB')
+          assert image.size == (
+              int(prompt['source_frame']['width_px']),
+              int(prompt['source_frame']['height_px']),
+          ), (image.size, prompt['source_frame'])
+          draw = ImageDraw.Draw(image)
+          for point in prompt['positive_points']:
+              x, y = float(point['x_px']), float(point['y_px'])
+              draw.ellipse((x-7, y-7, x+7, y+7), fill='lime', outline='white', width=2)
+              draw.text((x+9, y-7), point['semantic_name'], fill='red')
+          for point in prompt['negative_points']:
+              x, y = float(point['x_px']), float(point['y_px'])
+              draw.ellipse((x-6, y-6, x+6, y+6), fill='blue', outline='white', width=2)
+          image.save('/tmp/selected-tail-prompt-overlay.jpg', quality=95)
+          print('selected frame', index, 'timestamp', prompt['source_frame']['timestamp_s'])
+          PY
+
+      - name: Upload automatic teacher seed
+        uses: actions/upload-artifact@v4
+        with:
+          name: jumping-cat-superanimal-tail-seed
+          if-no-files-found: error
+          path: |
+            /tmp/materialized.json
+            /tmp/jumping-tail-manifest.json
+            /tmp/jumping-superanimal-prediction.json
+            /tmp/selected-tail-prompt.json
+            /tmp/selected-tail-frame.png
+            /tmp/selected-tail-prompt-overlay.jpg
+            /tmp/prompt-selection.txt
+
+  sam2-centreline:
+    needs: teacher-prompts
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    env:
+      SAM2_BUILD_CUDA: "0"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Download automatic teacher seed
+        uses: actions/download-artifact@v4
+        with:
+          name: jumping-cat-superanimal-tail-seed
+          path: /tmp/seed
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install CPU SAM2 stack
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            "torch==2.5.1" "torchvision==0.20.1" \
+            --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install \
+            "numpy==1.26.4" \
+            pillow \
+            scikit-image \
+            huggingface_hub
+          SAM2_BUILD_CUDA=0 python -m pip install \
+            "git+https://github.com/facebookresearch/sam2.git@2b90b9f5ceec907a1c18123530e92e794ad901a4"
+
+      - name: Segment tail and derive centreline
+        run: |
+          set -o pipefail
+          python -m detail.sam2_tail_prompt \
+            /tmp/seed/selected-tail-frame.png \
+            /tmp/seed/selected-tail-prompt.json \
+            --output-dir /tmp/auto-tail-result \
+            --checkpoint facebook/sam2.1-hiera-tiny \
+            --samples 24 \
+            --device cpu \
+            | tee /tmp/auto-tail-run.json
+
+      - name: Upload automatic tail result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jumping-cat-auto-tail-result
+          if-no-files-found: warn
+          path: |
+            /tmp/auto-tail-run.json
+            /tmp/auto-tail-result/diagnostics.json
+            /tmp/auto-tail-result/tail-curve.json
+            /tmp/auto-tail-result/tail-mask.npy
+            /tmp/auto-tail-result/tail-mask.png
+            /tmp/auto-tail-result/tail-overlay.jpg

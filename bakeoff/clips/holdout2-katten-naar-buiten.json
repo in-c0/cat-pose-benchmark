@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "clip_id": "holdout2-katten-naar-buiten",
+  "source": {
+    "kind": "redistributable",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Dit_is_waarom_katten_nooit_meer_naar_buiten_mogen.webm",
+    "local_path": "bakeoff/media/holdout2-katten-naar-buiten.webm"
+  },
+  "licence": {
+    "status": "verified",
+    "identifier": "CC-BY-3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Dit_is_waarom_katten_nooit_meer_naar_buiten_mogen.webm",
+    "redistribution": "allowed",
+    "notes": "Commons metadata: licence CC BY 3.0, uploader PJ Geest, artist Universiteit van Nederland. Holdout #2: continuation of the frozen seed-20260920 order (review/holdout/selection2.json, rank 15); nothing about the content was seen before selection."
+  },
+  "slices": [
+    "holdout"
+  ],
+  "notes": "Prospective holdout #2. Commons description: Katten zijn verantwoordelijk voor het doden van 18 miljoen vogels per jaar. Dit gejaag is strijdig met de wet, zegt hoogleraar natuurbeschermingsrecht Arie Trou"
+}

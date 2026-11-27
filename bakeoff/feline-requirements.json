@@ -1,0 +1,27 @@
+{
+  "schema_version": "0.1.0",
+  "required_groups": {
+    "paws": [
+      "left_front_paw",
+      "right_front_paw",
+      "left_hind_paw",
+      "right_hind_paw"
+    ],
+    "ears": [
+      "left_ear_tip",
+      "right_ear_tip"
+    ],
+    "face": [
+      "nose",
+      "left_eye",
+      "right_eye"
+    ],
+    "tail": [
+      "tail_base",
+      "tail_mid",
+      "tail_tip"
+    ]
+  },
+  "minimum_tail_points_for_curve": 3,
+  "notes": "A baseline is not penalized for missing feline-specific points in its native ontology; the gap is measured explicitly to decide whether a feline-specific head is warranted."
+}

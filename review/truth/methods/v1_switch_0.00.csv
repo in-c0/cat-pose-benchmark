@@ -1,0 +1,148 @@
+clip_id,frame_index,method,output_status,wrong_part,box_quality,note
+commons-black-cat-walking,0,rc_sw0.00,wrong_part,other,,auto: box does not match reference (or frame not visible)
+commons-black-cat-walking,1,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,2,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,3,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,4,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,5,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,6,rc_sw0.00,no_output,,,temporal_none
+commons-black-cat-walking,7,rc_sw0.00,no_output,,,temporal_none
+commons-black-cat-walking,8,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,9,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,10,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,11,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,12,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,13,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,14,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,15,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,16,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,17,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,18,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,19,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,20,rc_sw0.00,no_output,,,temporal_none
+commons-black-cat-walking,21,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,22,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,23,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,24,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,25,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,26,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,27,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,28,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,29,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,30,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,31,rc_sw0.00,no_output,,,temporal_none
+commons-black-cat-walking,32,rc_sw0.00,no_output,,,temporal_none
+commons-black-cat-walking,33,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,34,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,35,rc_sw0.00,correct,,usable,
+commons-black-cat-walking,36,rc_sw0.00,no_output,,,no_tail_box
+commons-black-cat-walking,37,rc_sw0.00,no_output,,,no_cat
+commons-cat-jumping-backwards,0,rc_sw0.00,no_output,,,no_cat
+commons-cat-jumping-backwards,1,rc_sw0.00,no_output,,,no_cat
+commons-cat-jumping-backwards,2,rc_sw0.00,no_output,,,temporal_none
+commons-cat-jumping-backwards,3,rc_sw0.00,correct,,usable,
+commons-cat-jumping-backwards,4,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-jumping-backwards,5,rc_sw0.00,correct,,usable,
+commons-cat-jumping-backwards,6,rc_sw0.00,no_output,,,temporal_none
+commons-cat-jumping-backwards,7,rc_sw0.00,correct,,usable,
+commons-cat-jumping-backwards,8,rc_sw0.00,correct,,usable,
+commons-cat-jumping-backwards,9,rc_sw0.00,correct,,usable,
+commons-cat-jumping-backwards,10,rc_sw0.00,correct,,usable,
+commons-cat-jumping-backwards,11,rc_sw0.00,correct,,usable,
+commons-cat-jumping-backwards,12,rc_sw0.00,correct,,usable,
+commons-cat-jumping-backwards,13,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-jumping-backwards,14,rc_sw0.00,correct,,usable,
+commons-cat-jumping-backwards,15,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-jumping-backwards,16,rc_sw0.00,correct,,usable,
+commons-cat-jumping-backwards,17,rc_sw0.00,correct,,usable,
+commons-cat-jumping-backwards,18,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-jumping-backwards,19,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-jumping-backwards,20,rc_sw0.00,correct,,usable,
+commons-cat-jumping-backwards,21,rc_sw0.00,no_output,,,temporal_none
+commons-cat-jumping-backwards,22,rc_sw0.00,correct,,usable,
+commons-cat-jumping-backwards,23,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,0,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,1,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,2,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,3,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,4,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,5,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,6,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,7,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,8,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,9,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,10,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,11,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,12,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,13,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,14,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,15,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,16,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,17,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,18,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,19,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,20,rc_sw0.00,no_output,,,temporal_none
+commons-cat-licking-tail,21,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,22,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,23,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,24,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,25,rc_sw0.00,correct,,usable,
+commons-cat-licking-tail,26,rc_sw0.00,no_output,,,temporal_none
+commons-cat-licking-tail,27,rc_sw0.00,correct,,usable,no reference box; accepted on visibility alone — check by eye
+commons-cat-licking-tail,28,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-licking-tail,29,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-licking-tail,30,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-licking-tail,31,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-licking-tail,32,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-licking-tail,33,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-licking-tail,34,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-licking-tail,35,rc_sw0.00,correct,,usable,no reference box; accepted on visibility alone — check by eye
+commons-cat-licking-tail,36,rc_sw0.00,no_output,,,temporal_none
+commons-cat-licking-tail,37,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-licking-tail,38,rc_sw0.00,wrong_part,other,,auto: box does not match reference (or frame not visible)
+commons-cat-licking-tail,39,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-licking-tail,40,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-licking-tail,41,rc_sw0.00,wrong_part,other,,auto: box does not match reference (or frame not visible)
+commons-cat-licking-tail,42,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-licking-tail,43,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-licking-tail,44,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-licking-tail,45,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-licking-tail,46,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-licking-tail,47,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-licking-tail,48,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-licking-tail,49,rc_sw0.00,no_output,,,no_tail_box
+commons-cat-licking-tail,50,rc_sw0.00,no_output,,,temporal_none
+commons-cat-licking-tail,51,rc_sw0.00,wrong_part,other,,auto: box does not match reference (or frame not visible)
+commons-cat-plays,0,rc_sw0.00,wrong_part,other,,auto: box does not match reference (or frame not visible)
+commons-cat-plays,1,rc_sw0.00,no_output,,,temporal_none
+commons-cat-plays,2,rc_sw0.00,wrong_part,other,,auto: box does not match reference (or frame not visible)
+commons-cat-plays,3,rc_sw0.00,wrong_part,other,,auto: box does not match reference (or frame not visible)
+commons-cat-plays,4,rc_sw0.00,no_output,,,temporal_none
+commons-cat-plays,5,rc_sw0.00,correct,,usable,
+commons-cat-plays,6,rc_sw0.00,no_output,,,temporal_none
+commons-cat-plays,7,rc_sw0.00,correct,,usable,
+commons-cat-plays,8,rc_sw0.00,correct,,usable,
+commons-cat-plays,9,rc_sw0.00,no_output,,,all_look_like_paw
+commons-cat-plays,10,rc_sw0.00,wrong_part,other,,auto: box does not match reference (or frame not visible)
+commons-cat-plays,11,rc_sw0.00,no_output,,,all_look_like_paw
+commons-cat-plays,12,rc_sw0.00,no_output,,,all_look_like_paw
+commons-cat-plays,13,rc_sw0.00,wrong_part,other,,auto: box does not match reference (or frame not visible)
+commons-cat-plays,14,rc_sw0.00,no_output,,,all_look_like_paw
+commons-cat-plays,15,rc_sw0.00,no_output,,,temporal_none
+commons-cat-plays,16,rc_sw0.00,wrong_part,other,,auto: box does not match reference (or frame not visible)
+commons-cat-plays,17,rc_sw0.00,no_output,,,temporal_none
+commons-cat-plays,18,rc_sw0.00,wrong_part,other,,auto: box does not match reference (or frame not visible)
+commons-cat-plays,19,rc_sw0.00,no_output,,,temporal_none
+commons-cat-plays,20,rc_sw0.00,correct,,usable,
+commons-cat-plays,21,rc_sw0.00,no_output,,,all_look_like_paw
+commons-cat-plays,22,rc_sw0.00,no_output,,,all_look_like_paw
+commons-cat-plays,23,rc_sw0.00,no_output,,,all_look_like_paw
+commons-cat-plays,24,rc_sw0.00,no_output,,,all_look_like_paw
+commons-cat-plays,25,rc_sw0.00,no_output,,,all_look_like_paw
+commons-cat-plays,26,rc_sw0.00,no_output,,,all_look_like_paw
+commons-cat-plays,27,rc_sw0.00,no_output,,,all_look_like_paw
+commons-cat-plays,28,rc_sw0.00,no_output,,,all_look_like_paw
+commons-cat-plays,29,rc_sw0.00,no_output,,,all_look_like_paw
+commons-cat-plays,30,rc_sw0.00,wrong_part,other,,auto: box does not match reference (or frame not visible)
+commons-cat-plays,31,rc_sw0.00,no_output,,,all_look_like_paw
+commons-cat-plays,32,rc_sw0.00,no_output,,,all_look_like_paw
