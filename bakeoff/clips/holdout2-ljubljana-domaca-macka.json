@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "clip_id": "holdout2-ljubljana-domaca-macka",
+  "source": {
+    "kind": "redistributable",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/58/2022-10-18_LJUBLJANA_Doma_CARNIVORA_Felis_catus_DOMA%C4%8CA_MA%C4%8CKA_2.webm",
+    "local_path": "bakeoff/media/holdout2-ljubljana-domaca-macka.webm"
+  },
+  "licence": {
+    "status": "verified",
+    "identifier": "CC-BY-3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:2022-10-18_LJUBLJANA_Doma_CARNIVORA_Felis_catus_DOMAČA_MAČKA_2.webm",
+    "redistribution": "allowed",
+    "notes": "Commons metadata: licence CC BY 3.0, uploader Sporti, artist NaIzletuSi ™. Holdout #2: continuation of the frozen seed-20260920 order (review/holdout/selection2.json, rank 5); nothing about the content was seen before selection."
+  },
+  "slices": [
+    "holdout"
+  ],
+  "notes": "Prospective holdout #2. Commons description: 2022-10-18 LJUBLJANA Doma CARNIVORA Felis catus DOMAČA MAČKA"
+}

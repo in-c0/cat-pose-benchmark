@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "clip_id": "holdout-dejeuner-des-minet-1906",
+  "source": {
+    "kind": "redistributable",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/73/Le_D%C3%A9jeuner_des_Minet_%281906%29.webm",
+    "local_path": "bakeoff/media/holdout-dejeuner-des-minet-1906.webm"
+  },
+  "licence": {
+    "status": "verified",
+    "identifier": "PD",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Le_Déjeuner_des_Minet_(1906).webm",
+    "redistribution": "allowed",
+    "notes": "Commons metadata: licence Public domain, uploader Yann, artist UnknownUnknown  / Pathé Frères. Selected by the precommitted metadata-only protocol in review/holdout/sample_pool.py (seed 20260920, rank 4); nothing about the content was seen before selection."
+  },
+  "slices": [
+    "holdout"
+  ],
+  "notes": "Prospective holdout clip 4/4. Commons description: Cat's breakfast (1906) with Estelle Roy de Menditte."
+}

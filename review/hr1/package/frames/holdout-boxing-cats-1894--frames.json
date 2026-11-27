@@ -1,0 +1,337 @@
+{
+  "clip_id": "holdout-boxing-cats-1894",
+  "frame_count": 40,
+  "frames": [
+    {
+      "file": "00000.jpg",
+      "frame_index": 0,
+      "height_px": 1080,
+      "sha256": "d381a77ceb4ac37873f3b2543b260566234ef72b61a9be60ef0bc3d269984274",
+      "timestamp_s": 0.0,
+      "width_px": 1440
+    },
+    {
+      "file": "00001.jpg",
+      "frame_index": 1,
+      "height_px": 1080,
+      "sha256": "d381a77ceb4ac37873f3b2543b260566234ef72b61a9be60ef0bc3d269984274",
+      "timestamp_s": 0.25,
+      "width_px": 1440
+    },
+    {
+      "file": "00002.jpg",
+      "frame_index": 2,
+      "height_px": 1080,
+      "sha256": "1c2d0eabc724839b22e346f3eeea658efe5fd57908877afeeea2883932038c8c",
+      "timestamp_s": 0.5,
+      "width_px": 1440
+    },
+    {
+      "file": "00003.jpg",
+      "frame_index": 3,
+      "height_px": 1080,
+      "sha256": "1557d9361ba8a7e92321739bb7cd45bc0a52374388170c246bbe9c65dfae7775",
+      "timestamp_s": 0.75,
+      "width_px": 1440
+    },
+    {
+      "file": "00004.jpg",
+      "frame_index": 4,
+      "height_px": 1080,
+      "sha256": "4858aa57a6c1e21258ca702185eef05002fced85ab071584302805bd7c98e9f7",
+      "timestamp_s": 1.0,
+      "width_px": 1440
+    },
+    {
+      "file": "00005.jpg",
+      "frame_index": 5,
+      "height_px": 1080,
+      "sha256": "ec0a017fdf70a6300303cb07727bb0ec5ce3371e16a8342176fd5c4205f807ff",
+      "timestamp_s": 1.25,
+      "width_px": 1440
+    },
+    {
+      "file": "00006.jpg",
+      "frame_index": 6,
+      "height_px": 1080,
+      "sha256": "ecac1d82f38b5542e59eb34cbe6c5787dab6e726451b1d630497301fb3d73322",
+      "timestamp_s": 1.5,
+      "width_px": 1440
+    },
+    {
+      "file": "00007.jpg",
+      "frame_index": 7,
+      "height_px": 1080,
+      "sha256": "45a883143fe466444d068519e0f7ea6b5ce6c50445c1e6882c9765aad3ce37c5",
+      "timestamp_s": 1.75,
+      "width_px": 1440
+    },
+    {
+      "file": "00008.jpg",
+      "frame_index": 8,
+      "height_px": 1080,
+      "sha256": "dcb96430e4ba6b828448da5f9b725382d76efdfda9e1d0e3cabf807e260b2cd1",
+      "timestamp_s": 2.0,
+      "width_px": 1440
+    },
+    {
+      "file": "00009.jpg",
+      "frame_index": 9,
+      "height_px": 1080,
+      "sha256": "5b4aa4b34d1af91641244d5d697ffedc5c2c1b27a7a9461fcd29e9c8cd4f1012",
+      "timestamp_s": 2.25,
+      "width_px": 1440
+    },
+    {
+      "file": "00010.jpg",
+      "frame_index": 10,
+      "height_px": 1080,
+      "sha256": "702687dc7095a095761b0c20ca7a8bb07486a6196cb0fb921047192563552111",
+      "timestamp_s": 2.5,
+      "width_px": 1440
+    },
+    {
+      "file": "00011.jpg",
+      "frame_index": 11,
+      "height_px": 1080,
+      "sha256": "115ce7b5cdeacfd1d7c2e0bd8a97f6f7528a197d6748df6ec9dc489a2285fda5",
+      "timestamp_s": 2.75,
+      "width_px": 1440
+    },
+    {
+      "file": "00012.jpg",
+      "frame_index": 12,
+      "height_px": 1080,
+      "sha256": "b94e078c097723925362c0c66638de1839a82917e6ad07eaeaf3c5373bb0aecf",
+      "timestamp_s": 3.0,
+      "width_px": 1440
+    },
+    {
+      "file": "00013.jpg",
+      "frame_index": 13,
+      "height_px": 1080,
+      "sha256": "fd007407bc957feaf175c0a94a09c9cac83d4b1d21e0e778d42e12c8d7b34850",
+      "timestamp_s": 3.25,
+      "width_px": 1440
+    },
+    {
+      "file": "00014.jpg",
+      "frame_index": 14,
+      "height_px": 1080,
+      "sha256": "2d68eab6bbae206a0710ec334af245b9257c66411405a59897dd5292bace1721",
+      "timestamp_s": 3.5,
+      "width_px": 1440
+    },
+    {
+      "file": "00015.jpg",
+      "frame_index": 15,
+      "height_px": 1080,
+      "sha256": "a176047280b2544d1ba7f8a710f69558faf886472f7d5608f6631a85afed44ed",
+      "timestamp_s": 3.75,
+      "width_px": 1440
+    },
+    {
+      "file": "00016.jpg",
+      "frame_index": 16,
+      "height_px": 1080,
+      "sha256": "7a1ceb998ae725ae4fe01a8c4cebf242b40a57ba1eb9a62d73be7a53b20b62b3",
+      "timestamp_s": 4.0,
+      "width_px": 1440
+    },
+    {
+      "file": "00017.jpg",
+      "frame_index": 17,
+      "height_px": 1080,
+      "sha256": "18135529b4a987ebe41f98a715fa095a60448f98eb0e78dfdbaaa04af4022bc4",
+      "timestamp_s": 4.25,
+      "width_px": 1440
+    },
+    {
+      "file": "00018.jpg",
+      "frame_index": 18,
+      "height_px": 1080,
+      "sha256": "bedc0f164f57fc3d59fb7f176322479079ef17bd525c0898ae1201dd38d6170c",
+      "timestamp_s": 4.5,
+      "width_px": 1440
+    },
+    {
+      "file": "00019.jpg",
+      "frame_index": 19,
+      "height_px": 1080,
+      "sha256": "70428bc9582af270ac5d346b43643600fa55329184321744163f8bcad0584e95",
+      "timestamp_s": 4.75,
+      "width_px": 1440
+    },
+    {
+      "file": "00020.jpg",
+      "frame_index": 20,
+      "height_px": 1080,
+      "sha256": "2c281519c154b0b8ca54466ed7a2d0aed234315ba007e533ad334cc06541c450",
+      "timestamp_s": 5.0,
+      "width_px": 1440
+    },
+    {
+      "file": "00021.jpg",
+      "frame_index": 21,
+      "height_px": 1080,
+      "sha256": "212b9aa01b771592952f5f6b5e35ed960525f72fb48b7c6faebdd48c5babcd3f",
+      "timestamp_s": 5.25,
+      "width_px": 1440
+    },
+    {
+      "file": "00022.jpg",
+      "frame_index": 22,
+      "height_px": 1080,
+      "sha256": "28661b629da2ed0358bdbd560e1cbcf4e7f53fb6b0e15c283ba4582e24a1f672",
+      "timestamp_s": 5.5,
+      "width_px": 1440
+    },
+    {
+      "file": "00023.jpg",
+      "frame_index": 23,
+      "height_px": 1080,
+      "sha256": "608d61ec94cfb95791a0fff1609da363ac08d3550c72a8ed578ac26e387a6f89",
+      "timestamp_s": 5.75,
+      "width_px": 1440
+    },
+    {
+      "file": "00024.jpg",
+      "frame_index": 24,
+      "height_px": 1080,
+      "sha256": "606f6cbfb7bb44a54656385ce847fa46ed5ff68dba0e0227a05306f44aca8392",
+      "timestamp_s": 6.0,
+      "width_px": 1440
+    },
+    {
+      "file": "00025.jpg",
+      "frame_index": 25,
+      "height_px": 1080,
+      "sha256": "ac24a711b01bc01d999d2389cc3270045fadd4ab681878e2093cc2677760a964",
+      "timestamp_s": 6.25,
+      "width_px": 1440
+    },
+    {
+      "file": "00026.jpg",
+      "frame_index": 26,
+      "height_px": 1080,
+      "sha256": "3df52f288466b541b5c4322e8cf9b2e4b9a7a18dc15c0e366479405d4b7d1916",
+      "timestamp_s": 6.5,
+      "width_px": 1440
+    },
+    {
+      "file": "00027.jpg",
+      "frame_index": 27,
+      "height_px": 1080,
+      "sha256": "b6e26c0bef7c25d03d9508841cf4c14025f6fcba2ba434ba1b5f754b0550aab6",
+      "timestamp_s": 6.75,
+      "width_px": 1440
+    },
+    {
+      "file": "00028.jpg",
+      "frame_index": 28,
+      "height_px": 1080,
+      "sha256": "3515ad0ffe3ce30907314d4fda6f28907d40dda381c54c6ae6d1e697a3f2cf93",
+      "timestamp_s": 7.0,
+      "width_px": 1440
+    },
+    {
+      "file": "00029.jpg",
+      "frame_index": 29,
+      "height_px": 1080,
+      "sha256": "c8b10aa18f66af8c0ab9ef16a53eaf74b85d9d09127c1bc224125119a682dabf",
+      "timestamp_s": 7.25,
+      "width_px": 1440
+    },
+    {
+      "file": "00030.jpg",
+      "frame_index": 30,
+      "height_px": 1080,
+      "sha256": "46b7e7c1798a9bc65eaaa482630010119c549ac86f1714c2ffbeb81614b8d2b9",
+      "timestamp_s": 7.5,
+      "width_px": 1440
+    },
+    {
+      "file": "00031.jpg",
+      "frame_index": 31,
+      "height_px": 1080,
+      "sha256": "7acce30370c5e51c3bd1fbc1244f1fc7b07b264c06c10387ce3197f4d74c6bce",
+      "timestamp_s": 7.75,
+      "width_px": 1440
+    },
+    {
+      "file": "00032.jpg",
+      "frame_index": 32,
+      "height_px": 1080,
+      "sha256": "103904b0fc9be1bca308857f8a45984c4b72662dbe7272b28cad2851921550e0",
+      "timestamp_s": 8.0,
+      "width_px": 1440
+    },
+    {
+      "file": "00033.jpg",
+      "frame_index": 33,
+      "height_px": 1080,
+      "sha256": "976d4679be195efaf64f90167c7f437c5f3456af466125040dc99a3383e19a30",
+      "timestamp_s": 8.25,
+      "width_px": 1440
+    },
+    {
+      "file": "00034.jpg",
+      "frame_index": 34,
+      "height_px": 1080,
+      "sha256": "cbb1704e362074265e29ddfe01de393f574b8ee8ac896608ab234859a250239f",
+      "timestamp_s": 8.5,
+      "width_px": 1440
+    },
+    {
+      "file": "00035.jpg",
+      "frame_index": 35,
+      "height_px": 1080,
+      "sha256": "36af32fab0aea98e4d8cd153782be15ce2fe01a2f0528708386e8432ff3f1402",
+      "timestamp_s": 8.75,
+      "width_px": 1440
+    },
+    {
+      "file": "00036.jpg",
+      "frame_index": 36,
+      "height_px": 1080,
+      "sha256": "1a800868fee47a75c64bd7a5d6a9397c79b4dcea84fc6ae19a7347da66235e0d",
+      "timestamp_s": 9.0,
+      "width_px": 1440
+    },
+    {
+      "file": "00037.jpg",
+      "frame_index": 37,
+      "height_px": 1080,
+      "sha256": "5ed9882201659795fb5def10ef62399e9db40a5028791bcc5c636a1113000245",
+      "timestamp_s": 9.25,
+      "width_px": 1440
+    },
+    {
+      "file": "00038.jpg",
+      "frame_index": 38,
+      "height_px": 1080,
+      "sha256": "74cd41e48d5db2359e142ff5d9847bd83c138cc2f7e25a66beadb4d2d34d66c9",
+      "timestamp_s": 9.5,
+      "width_px": 1440
+    },
+    {
+      "file": "00039.jpg",
+      "frame_index": 39,
+      "height_px": 1080,
+      "sha256": "a4991050636f812559b528b709befd902fd2e11233db3698a7a5f7b07668a139",
+      "timestamp_s": 9.75,
+      "width_px": 1440
+    }
+  ],
+  "sampling": {
+    "fps": 4.0,
+    "max_seconds": 10.0
+  },
+  "schema_version": "0.1.0",
+  "source": {
+    "licence": "PD",
+    "manifest": "bakeoff/clips/holdout-boxing-cats-1894.json",
+    "media_path": "bakeoff\\media\\holdout-boxing-cats-1894.webm",
+    "media_sha256": "0a4517063fb9ff5318f60f45ec15c74ec3fb9a0ac2c961a34d8e84d6187b80a8"
+  }
+}

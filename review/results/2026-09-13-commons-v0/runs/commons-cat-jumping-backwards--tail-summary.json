@@ -1,0 +1,45 @@
+{
+  "clip_id": "commons-cat-jumping-backwards",
+  "evidence_tier": "S2",
+  "method": "tail",
+  "model": {
+    "checkpoint": "facebook/sam2.1-hiera-tiny",
+    "device": "cuda",
+    "prompt": "review\\work\\commons-cat-jumping-backwards\\tail-prompt.json"
+  },
+  "schema_version": "0.1.0",
+  "summary": {
+    "curve_coverage": 0.875,
+    "degenerate_curve_frames": [
+      4,
+      13,
+      15,
+      18,
+      20
+    ],
+    "engineering_feasibility": "revise",
+    "frames_failed": [
+      0,
+      17,
+      19
+    ],
+    "frames_total": 24,
+    "frames_with_curve": 21,
+    "input_seed_mask_area_fraction": 0.006343074845679013,
+    "interpretation_boundary": "Seed preservation, curve coverage, mask expansion and temporal displacement are failure-discovery metrics, not landmark accuracy. Inter-frame displacement contains true cat motion and projection change. Numerical accuracy requires independent visible-tail labels.",
+    "max_chronological_root_step_fraction": 0.14537603162279658,
+    "max_chronological_tip_step_fraction": 0.2591174564708818,
+    "mean_chronological_root_step_fraction": 0.05044428231950563,
+    "mean_chronological_tip_step_fraction": 0.07440387416983889,
+    "minimum_non_degenerate_curve_length_px": 22.029071700822982,
+    "suspicious_expansion_frames": [
+      21,
+      22,
+      23
+    ],
+    "suspicious_expansion_threshold": 0.02537229938271605,
+    "video_seed_mask_area_fraction": 0.006077353395061729,
+    "video_seed_preserved": false,
+    "video_seed_vs_input_mask_iou": 0.0
+  }
+}

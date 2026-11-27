@@ -1,0 +1,21 @@
+{
+  "schema_version": "0.1.0",
+  "clip_id": "holdout2-katze-katzengras",
+  "source": {
+    "kind": "redistributable",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/75/Katze_isst_Katzengras_20250531_C1387.webm/Katze_isst_Katzengras_20250531_C1387.webm.1080p.vp9.webm",
+    "local_path": "bakeoff/media/holdout2-katze-katzengras.webm",
+    "original_url": "https://upload.wikimedia.org/wikipedia/commons/7/75/Katze_isst_Katzengras_20250531_C1387.webm"
+  },
+  "licence": {
+    "status": "verified",
+    "identifier": "CC-BY-4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Katze_isst_Katzengras_20250531_C1387.webm",
+    "redistribution": "allowed",
+    "notes": "Commons metadata: licence CC BY 4.0, uploader PantheraLeo1359531, artist PantheraLeo1359531. Holdout #2: continuation of the frozen seed-20260920 order (review/holdout/selection2.json, rank 12); nothing about the content was seen before selection."
+  },
+  "slices": [
+    "holdout"
+  ],
+  "notes": "Prospective holdout #2. Commons description: The video shows a cat's behavior: eating cat grass. The original upload is AV1 4K that the bundled ffmpeg (libaom) cannot decode ('Bitstream not supported'); the Commons 1080p VP9 transcode of the same file is used instead, recorded here. Same content, lower resolution; still above the 360 px eligibility floor."
+}

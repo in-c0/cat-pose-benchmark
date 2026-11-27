@@ -1,0 +1,112 @@
+name: SAM2 prompted tail smoke
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "detail/sam2_tail_prompt.py"
+      - "detail/mask_centerline.py"
+      - "detail/fixtures/superanimal-tail-prompt-frame1.json"
+      - "bakeoff/materialize_clip.py"
+      - "bakeoff/clips/commons-cat-plays.json"
+      - ".github/workflows/sam2-tail-real-cat-smoke.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    env:
+      SAM2_BUILD_CUDA: "0"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install CPU SAM2 stack
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            "torch==2.5.1" "torchvision==0.20.1" \
+            --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install \
+            "numpy==1.26.4" \
+            pillow \
+            scikit-image \
+            imageio-ffmpeg \
+            huggingface_hub
+          SAM2_BUILD_CUDA=0 python -m pip install \
+            "git+https://github.com/facebookresearch/sam2.git@2b90b9f5ceec907a1c18123530e92e794ad901a4"
+
+      - name: Report resolved versions
+        run: |
+          python - <<'PY'
+          import numpy, torch, torchvision
+          import sam2
+          print("numpy", numpy.__version__)
+          print("torch", torch.__version__)
+          print("torchvision", torchvision.__version__)
+          print("sam2", getattr(sam2, "__version__", "commit-pinned"))
+          print("cuda available", torch.cuda.is_available())
+          PY
+
+      - name: Materialize licence-approved source clip
+        run: |
+          set -o pipefail
+          python -m bakeoff.materialize_clip bakeoff/clips/commons-cat-plays.json \
+            | tee /tmp/materialized.json
+
+      - name: Extract SuperAnimal smoke frame 1
+        run: |
+          FFMPEG="$(python -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')"
+          "$FFMPEG" -hide_banner -loglevel error -y \
+            -ss 0.25 \
+            -i bakeoff/media/cat-plays.webm \
+            -frames:v 1 \
+            /tmp/cat-frame-0001.png
+          python - <<'PY'
+          from PIL import Image
+          image = Image.open('/tmp/cat-frame-0001.png')
+          print('frame size', image.size)
+          assert image.size == (720, 1280), image.size
+          PY
+
+      - name: Prompt SAM2 and derive tail centreline
+        run: |
+          set -o pipefail
+          python -m detail.sam2_tail_prompt \
+            /tmp/cat-frame-0001.png \
+            detail/fixtures/superanimal-tail-prompt-frame1.json \
+            --output-dir /tmp/sam2-tail \
+            --checkpoint facebook/sam2.1-hiera-tiny \
+            --samples 24 \
+            --device cpu \
+            | tee /tmp/sam2-tail-run.json
+
+      - name: Print diagnostics
+        run: |
+          cat /tmp/sam2-tail/diagnostics.json
+          cat /tmp/sam2-tail/tail-curve.json
+
+      - name: Upload segmentation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sam2-prompted-tail-smoke
+          if-no-files-found: warn
+          path: |
+            /tmp/materialized.json
+            /tmp/cat-frame-0001.png
+            /tmp/sam2-tail-run.json
+            /tmp/sam2-tail/diagnostics.json
+            /tmp/sam2-tail/tail-curve.json
+            /tmp/sam2-tail/tail-mask.npy
+            /tmp/sam2-tail/tail-mask.png
+            /tmp/sam2-tail/tail-overlay.jpg

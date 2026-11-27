@@ -1,0 +1,122 @@
+name: Whole-animal identity regression
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "temporal/sam2_whole_animal_track.py"
+      - "temporal/test_sam2_whole_animal_track.py"
+      - "temporal/fixtures/superanimal-grey-cat-identity-seed-frame5.json"
+      - "bakeoff/materialize_clip.py"
+      - "bakeoff/clips/commons-cat-jumping-backwards.json"
+      - ".github/workflows/whole-animal-identity-smoke.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  lightweight:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install lightweight dependencies
+        run: python -m pip install --disable-pip-version-check numpy pillow
+      - name: Run temporal identity tests
+        run: python -m unittest discover -s temporal -p 'test_sam2_whole_animal_track.py'
+
+  real-sequence:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env:
+      SAM2_BUILD_CUDA: "0"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - name: Install CPU SAM2 stack
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            "torch==2.5.1" "torchvision==0.20.1" \
+            --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install \
+            "numpy==1.26.4" \
+            pillow \
+            imageio-ffmpeg \
+            huggingface_hub
+          SAM2_BUILD_CUDA=0 python -m pip install \
+            "git+https://github.com/facebookresearch/sam2.git@2b90b9f5ceec907a1c18123530e92e794ad901a4"
+      - name: Materialize licence-approved source clip
+        run: |
+          set -o pipefail
+          python -m bakeoff.materialize_clip bakeoff/clips/commons-cat-jumping-backwards.json \
+            | tee /tmp/materialized.json
+      - name: Recreate exact 12-frame regression sequence
+        run: |
+          FFMPEG="$(python -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')"
+          "$FFMPEG" -hide_banner -loglevel error -y \
+            -i bakeoff/media/cat-jumping-backwards.webm \
+            -t 8.0 -vf fps=1.5 -an /tmp/jumping-identity-sampled.mp4
+          mkdir -p /tmp/jumping-identity-frames
+          "$FFMPEG" -hide_banner -loglevel error -y \
+            -i /tmp/jumping-identity-sampled.mp4 \
+            -q:v 2 -start_number 0 /tmp/jumping-identity-frames/%05d.jpg
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          frames = sorted(Path('/tmp/jumping-identity-frames').glob('*.jpg'))
+          print('frame count', len(frames))
+          assert len(frames) == 12, len(frames)
+          assert Image.open(frames[5]).size == (1920, 1080)
+          PY
+      - name: Track whole target cat through second-cat failure window
+        run: |
+          set -o pipefail
+          python -m temporal.sam2_whole_animal_track \
+            /tmp/jumping-identity-frames \
+            temporal/fixtures/superanimal-grey-cat-identity-seed-frame5.json \
+            --output-dir /tmp/identity-result \
+            --checkpoint facebook/sam2.1-hiera-tiny \
+            --device cpu \
+            | tee /tmp/identity-summary.json
+      - name: Print identity diagnostics
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result = json.loads(Path('/tmp/identity-result/identity-result.json').read_text())
+          print(json.dumps(result['summary'], indent=2, sort_keys=True))
+          print('seed candidate:', json.dumps(result['seed_candidate'], indent=2, sort_keys=True))
+          for frame in result['frames']:
+              print(
+                  frame['frame_index'],
+                  'area=', round(frame['mask_area_fraction'], 5),
+                  'appearance_jsd=', None if frame['seed_appearance_jsd'] is None else round(frame['seed_appearance_jsd'], 4),
+                  'bbox=', frame['bbox_xyxy'],
+              )
+          PY
+      - name: Upload identity evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jumping-cat-whole-animal-identity
+          if-no-files-found: warn
+          path: |
+            /tmp/materialized.json
+            /tmp/identity-summary.json
+            /tmp/identity-result/identity-result.json
+            /tmp/identity-result/seed-mask.npy
+            /tmp/identity-result/seed-mask.png
+            /tmp/identity-result/identity-contact-sheet.jpg
+            /tmp/identity-result/overlays/*.jpg

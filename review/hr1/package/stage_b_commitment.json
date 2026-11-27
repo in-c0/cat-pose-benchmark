@@ -1,0 +1,7 @@
+{
+  "n_items": 160,
+  "n_repeats": 15,
+  "note": "Stage B images are released after every reviewer has locked Stage A. The key, the method outputs and the manifest (which holds the shuffle salt) stay private until every reviewer has locked Stage B. root_sha256 is the SHA-256 of the canonical manifest; see review/hr1/README.md.",
+  "root_sha256": "b5bde2a38928ed368f8f742ec47b5293892ec5b53572e7da8768945cd44f1cf5",
+  "scheme": "sha256(json.dumps(manifest, sort_keys=True, separators=(',', ':')))"
+}

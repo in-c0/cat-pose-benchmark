@@ -1,0 +1,86 @@
+name: Tail frame contact sheet
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "bakeoff/clips/commons-cat-jumping-backwards.json"
+      - "bakeoff/materialize_clip.py"
+      - ".github/workflows/tail-frame-contact-sheet.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  screen:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 12
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install lightweight media tools
+        run: python -m pip install --disable-pip-version-check pillow imageio-ffmpeg
+
+      - name: Materialize licence-approved jumping-cat clip
+        run: |
+          set -o pipefail
+          python -m bakeoff.materialize_clip bakeoff/clips/commons-cat-jumping-backwards.json \
+            | tee /tmp/materialized.json
+
+      - name: Extract original-motion screening frames
+        run: |
+          mkdir -p /tmp/tail-screen/frames
+          FFMPEG="$(python -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')"
+          # The source contains an original motion segment followed by a slow-motion
+          # replay. Screen only the first 8 seconds to avoid selecting a duplicate replay.
+          "$FFMPEG" -hide_banner -loglevel error -y \
+            -i bakeoff/media/cat-jumping-backwards.webm \
+            -t 8.0 -vf fps=1.5 \
+            /tmp/tail-screen/frames/frame-%02d.png
+
+      - name: Build labelled contact sheet
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image, ImageDraw
+
+          paths = sorted(Path('/tmp/tail-screen/frames').glob('frame-*.png'))
+          assert paths, 'No screening frames extracted'
+          thumbs = []
+          for index, path in enumerate(paths):
+              image = Image.open(path).convert('RGB')
+              image.thumbnail((320, 240))
+              canvas = Image.new('RGB', (320, 270), 'white')
+              x = (320 - image.width) // 2
+              y = 24 + (240 - image.height) // 2
+              canvas.paste(image, (x, y))
+              draw = ImageDraw.Draw(canvas)
+              timestamp = index / 1.5
+              draw.text((8, 6), f'frame {index:02d}  t≈{timestamp:.2f}s', fill='black')
+              thumbs.append(canvas)
+
+          columns = 3
+          rows = (len(thumbs) + columns - 1) // columns
+          sheet = Image.new('RGB', (columns * 320, rows * 270), 'white')
+          for index, image in enumerate(thumbs):
+              sheet.paste(image, ((index % columns) * 320, (index // columns) * 270))
+          sheet.save('/tmp/tail-screen/contact-sheet.jpg', quality=94)
+          print('frames', len(paths))
+          PY
+
+      - name: Upload screening evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: jumping-cat-tail-frame-screen
+          if-no-files-found: error
+          path: |
+            /tmp/materialized.json
+            /tmp/tail-screen/contact-sheet.jpg
+            /tmp/tail-screen/frames/*.png

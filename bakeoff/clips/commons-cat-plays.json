@@ -1,0 +1,23 @@
+{
+  "schema_version": "0.1.0",
+  "clip_id": "commons-cat-plays",
+  "source": {
+    "kind": "redistributable",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Cat_Plays.webm",
+    "local_path": "bakeoff/media/cat-plays.webm"
+  },
+  "licence": {
+    "status": "verified",
+    "identifier": "CC-BY-SA-4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Cat_Plays.webm",
+    "redistribution": "allowed",
+    "notes": "Author: Riverarvi. Wikimedia Commons records the uploader's own work under Creative Commons Attribution-ShareAlike 4.0 International. Preserve attribution and share-alike obligations for redistributed adaptations."
+  },
+  "slices": [
+    "posture_transition",
+    "self_occlusion",
+    "face_ear_detail",
+    "tail_dynamics"
+  ],
+  "notes": "8.3 s portrait-oriented video of a semi-feral tuxedo cat playing. Useful as a compact first real-video smoke clip."
+}

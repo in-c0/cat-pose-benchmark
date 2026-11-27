@@ -1,0 +1,161 @@
+clip_id,frame_index,method,output_status,wrong_part,box_quality,instance,note
+holdout-boxing-cats-1894,0,tail_grounded_v3,no_output,,,,no_cat
+holdout-boxing-cats-1894,1,tail_grounded_v3,no_output,,,,no_cat
+holdout-boxing-cats-1894,2,tail_grounded_v3,no_output,,,,no_cat
+holdout-boxing-cats-1894,3,tail_grounded_v3,no_output,,,,no_cat
+holdout-boxing-cats-1894,4,tail_grounded_v3,no_output,,,,no_cat
+holdout-boxing-cats-1894,5,tail_grounded_v3,no_output,,,,no_tail_box
+holdout-boxing-cats-1894,6,tail_grounded_v3,no_output,,,,no_cat
+holdout-boxing-cats-1894,7,tail_grounded_v3,no_output,,,,no_tail_box
+holdout-boxing-cats-1894,8,tail_grounded_v3,no_output,,,,no_tail_box
+holdout-boxing-cats-1894,9,tail_grounded_v3,no_output,,,,no_tail_box
+holdout-boxing-cats-1894,10,tail_grounded_v3,no_output,,,,no_tail_box
+holdout-boxing-cats-1894,11,tail_grounded_v3,no_output,,,,no_tail_box
+holdout-boxing-cats-1894,12,tail_grounded_v3,no_output,,,,temporal_none
+holdout-boxing-cats-1894,13,tail_grounded_v3,no_output,,,,no_tail_box
+holdout-boxing-cats-1894,14,tail_grounded_v3,no_output,,,,no_tail_box
+holdout-boxing-cats-1894,15,tail_grounded_v3,no_output,,,,temporal_none
+holdout-boxing-cats-1894,16,tail_grounded_v3,no_output,,,,no_tail_box
+holdout-boxing-cats-1894,17,tail_grounded_v3,no_output,,,,no_tail_box
+holdout-boxing-cats-1894,18,tail_grounded_v3,no_output,,,,no_cat
+holdout-boxing-cats-1894,19,tail_grounded_v3,no_output,,,,no_cat
+holdout-boxing-cats-1894,20,tail_grounded_v3,no_output,,,,no_cat
+holdout-boxing-cats-1894,21,tail_grounded_v3,no_output,,,,no_cat
+holdout-boxing-cats-1894,22,tail_grounded_v3,no_output,,,,no_cat
+holdout-boxing-cats-1894,23,tail_grounded_v3,no_output,,,,no_cat
+holdout-boxing-cats-1894,24,tail_grounded_v3,no_output,,,,no_tail_box
+holdout-boxing-cats-1894,25,tail_grounded_v3,no_output,,,,no_tail_box
+holdout-boxing-cats-1894,26,tail_grounded_v3,no_output,,,,no_tail_box
+holdout-boxing-cats-1894,27,tail_grounded_v3,no_output,,,,no_cat
+holdout-boxing-cats-1894,28,tail_grounded_v3,no_output,,,,no_cat
+holdout-boxing-cats-1894,29,tail_grounded_v3,no_output,,,,no_cat
+holdout-boxing-cats-1894,30,tail_grounded_v3,no_output,,,,temporal_none
+holdout-boxing-cats-1894,31,tail_grounded_v3,no_output,,,,no_tail_box
+holdout-boxing-cats-1894,32,tail_grounded_v3,no_output,,,,no_cat
+holdout-boxing-cats-1894,33,tail_grounded_v3,no_output,,,,no_tail_box
+holdout-boxing-cats-1894,34,tail_grounded_v3,no_output,,,,no_tail_box
+holdout-boxing-cats-1894,35,tail_grounded_v3,no_output,,,,no_tail_box
+holdout-boxing-cats-1894,36,tail_grounded_v3,no_output,,,,no_cat
+holdout-boxing-cats-1894,37,tail_grounded_v3,no_output,,,,no_tail_box
+holdout-boxing-cats-1894,38,tail_grounded_v3,no_output,,,,no_tail_box
+holdout-boxing-cats-1894,39,tail_grounded_v3,no_output,,,,no_tail_box
+holdout-cat-playing-taiwan,0,tail_grounded_v3,no_output,,,,no_tail_box
+holdout-cat-playing-taiwan,1,tail_grounded_v3,no_output,,,,temporal_none
+holdout-cat-playing-taiwan,2,tail_grounded_v3,no_output,,,,temporal_none
+holdout-cat-playing-taiwan,3,tail_grounded_v3,no_output,,,,temporal_none
+holdout-cat-playing-taiwan,4,tail_grounded_v3,no_output,,,,temporal_none
+holdout-cat-playing-taiwan,5,tail_grounded_v3,no_output,,,,temporal_none
+holdout-cat-playing-taiwan,6,tail_grounded_v3,no_output,,,,temporal_none
+holdout-cat-playing-taiwan,7,tail_grounded_v3,no_output,,,,temporal_none
+holdout-cat-playing-taiwan,8,tail_grounded_v3,no_output,,,,temporal_none
+holdout-cat-playing-taiwan,9,tail_grounded_v3,no_output,,,,temporal_none
+holdout-cat-playing-taiwan,10,tail_grounded_v3,no_output,,,,temporal_none
+holdout-cat-playing-taiwan,11,tail_grounded_v3,no_output,,,,temporal_none
+holdout-cat-playing-taiwan,12,tail_grounded_v3,no_output,,,,temporal_none
+holdout-cat-playing-taiwan,13,tail_grounded_v3,no_output,,,,temporal_none
+holdout-cat-playing-taiwan,14,tail_grounded_v3,no_output,,,,temporal_none
+holdout-cat-playing-taiwan,15,tail_grounded_v3,no_output,,,,temporal_none
+holdout-cat-playing-taiwan,16,tail_grounded_v3,no_output,,,,temporal_none
+holdout-cat-playing-taiwan,17,tail_grounded_v3,no_output,,,,temporal_none
+holdout-cat-playing-taiwan,18,tail_grounded_v3,no_output,,,,temporal_none
+holdout-cat-playing-taiwan,19,tail_grounded_v3,no_output,,,,temporal_none
+holdout-cat-playing-taiwan,20,tail_grounded_v3,no_output,,,,no_tail_box
+holdout-cat-playing-taiwan,21,tail_grounded_v3,no_output,,,,temporal_none
+holdout-cat-playing-taiwan,22,tail_grounded_v3,wrong_part,torso,unusable,,override: reach-1 propagation from the f023 rump mask; the real tail rises at right
+holdout-cat-playing-taiwan,23,tail_grounded_v3,wrong_part,torso,unusable,,override: detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,24,tail_grounded_v3,wrong_part,torso,unusable,,override: detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,25,tail_grounded_v3,wrong_part,torso,unusable,,override: detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,26,tail_grounded_v3,wrong_part,torso,unusable,,override: detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,27,tail_grounded_v3,wrong_part,torso,unusable,,override: detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,28,tail_grounded_v3,wrong_part,torso,unusable,,override: detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,29,tail_grounded_v3,wrong_part,torso,unusable,,override: detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,30,tail_grounded_v3,wrong_part,torso,unusable,,override: detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,31,tail_grounded_v3,wrong_part,torso,unusable,,override: detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,32,tail_grounded_v3,wrong_part,torso,unusable,,override: detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,33,tail_grounded_v3,wrong_part,torso,unusable,,override: detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,34,tail_grounded_v3,wrong_part,torso,unusable,,override: detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,35,tail_grounded_v3,wrong_part,torso,unusable,,override: detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,36,tail_grounded_v3,wrong_part,torso,unusable,,override: detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,37,tail_grounded_v3,wrong_part,torso,unusable,,override: detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,38,tail_grounded_v3,wrong_part,torso,unusable,,override: detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-cat-playing-taiwan,39,tail_grounded_v3,wrong_part,torso,unusable,,override: detector labels the orange rump patch a tail (checked on overlays 2026-09-20 after the holdout truth was frozen)
+holdout-dejeuner-des-minet-1906,0,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,1,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,2,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,3,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,4,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,5,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,6,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,7,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,8,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,9,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,10,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,11,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,12,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,13,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,14,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,15,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,16,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,17,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,18,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,19,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,20,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,21,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,22,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,23,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,24,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,25,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,26,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,27,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,28,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,29,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,30,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,31,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,32,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,33,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,34,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,35,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,36,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,37,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,38,tail_grounded_v3,no_output,,,,no_cat
+holdout-dejeuner-des-minet-1906,39,tail_grounded_v3,no_output,,,,no_cat
+holdout-larry-nails,0,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,1,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,2,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,3,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,4,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,5,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,6,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,7,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,8,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,9,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,10,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,11,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,12,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,13,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,14,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,15,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,16,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,17,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,18,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,19,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,20,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,21,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,22,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,23,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,24,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,25,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,26,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,27,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,28,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,29,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,30,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,31,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,32,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,33,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,34,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,35,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,36,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,37,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,38,tail_grounded_v3,correct,,usable,target,
+holdout-larry-nails,39,tail_grounded_v3,correct,,usable,target,

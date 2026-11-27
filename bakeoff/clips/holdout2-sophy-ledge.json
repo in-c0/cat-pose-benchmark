@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "clip_id": "holdout2-sophy-ledge",
+  "source": {
+    "kind": "redistributable",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Sophy_the_Cat_is_Really_High_On_A_Ledge.webm",
+    "local_path": "bakeoff/media/holdout2-sophy-ledge.webm"
+  },
+  "licence": {
+    "status": "verified",
+    "identifier": "CC0-1.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Sophy_the_Cat_is_Really_High_On_A_Ledge.webm",
+    "redistribution": "allowed",
+    "notes": "Commons metadata: licence CC0, uploader SnowyCinema, artist User:PseudoSkull. Holdout #2: continuation of the frozen seed-20260920 order (review/holdout/selection2.json, rank 9); nothing about the content was seen before selection."
+  },
+  "slices": [
+    "holdout"
+  ],
+  "notes": "Prospective holdout #2. Commons description: A video made by PseudoSkull originally uploaded to the TheGiraffecheetah YouTube channel (which, as of the upload date, is still up and running) under the title"
+}

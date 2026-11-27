@@ -1,0 +1,56 @@
+name: Feline model bake-off core
+
+on:
+  push:
+    paths:
+      - "bakeoff/**"
+      - ".github/workflows/bakeoff-tests.yml"
+  pull_request:
+    paths:
+      - "bakeoff/**"
+      - ".github/workflows/bakeoff-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install lightweight test dependencies
+        run: python -m pip install --disable-pip-version-check jsonschema pandas
+
+      - name: Run bake-off unit tests
+        run: python -m unittest discover -s bakeoff -p 'test_*.py'
+
+      - name: Generate deterministic mock prediction
+        run: |
+          python -m bakeoff.adapters.mock \
+            --clip bakeoff/fixtures/mock-clip.json \
+            --output /tmp/mock-prediction.json
+
+      - name: Validate canonical prediction schema
+        run: |
+          python -m bakeoff.validate \
+            /tmp/mock-prediction.json \
+            bakeoff/prediction.schema.json
+
+      - name: Evaluate mock prediction
+        run: |
+          python -m bakeoff.evaluate \
+            /tmp/mock-prediction.json \
+            --requirements bakeoff/feline-requirements.json \
+            --output /tmp/mock-report.json
+          cat /tmp/mock-report.json

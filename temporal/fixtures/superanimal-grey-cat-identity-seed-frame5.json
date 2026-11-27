@@ -1,0 +1,41 @@
+{
+  "schema_version": "0.1.0",
+  "clip_id": "commons-cat-jumping-backwards-identity-screen",
+  "target_id": "grey-cat-frame5-r3",
+  "source_frame": {
+    "smoke_frame_index": 5,
+    "timestamp_s": 3.3333333333333335,
+    "width_px": 1920,
+    "height_px": 1080
+  },
+  "positive_points": [
+    {"semantic_name": "nose", "x_px": 203.6171875, "y_px": 324.8828125, "score": 0.662302553653717},
+    {"semantic_name": "neck_base", "x_px": 253.8203125, "y_px": 317.7109375, "score": 0.6658955812454224},
+    {"semantic_name": "back_middle", "x_px": 354.2265625, "y_px": 267.5078125, "score": 0.674778401851654},
+    {"semantic_name": "left_front_paw", "x_px": 253.8203125, "y_px": 482.6640625, "score": 0.7812259793281555},
+    {"semantic_name": "right_front_paw", "x_px": 253.8203125, "y_px": 482.6640625, "score": 0.7057223320007324},
+    {"semantic_name": "left_hind_paw", "x_px": 440.2890625, "y_px": 482.6640625, "score": 0.8643996119499207},
+    {"semantic_name": "right_hind_paw", "x_px": 411.6015625, "y_px": 453.9765625, "score": 0.8499715924263},
+    {"semantic_name": "tail_base", "x_px": 476.1484375, "y_px": 310.5390625, "score": 0.8410953879356384},
+    {"semantic_name": "tail_tip", "x_px": 598.0703125, "y_px": 418.1171875, "score": 0.8845657706260681}
+  ],
+  "prompt_provenance": {
+    "model": "superanimal_quadruped",
+    "model_version": "3.0.1",
+    "checkpoint": "deeplabcut-modelzoo:superanimal_quadruped/hrnet_w32",
+    "checkpoint_status": "research_only",
+    "derived_data_status": "research_only_until_issue_9_review",
+    "evidence_tier": "R3",
+    "github_actions_run": 31891814198,
+    "artifact_id": 9248762634,
+    "artifact_digest": "sha256:917afea0d1cb60224194d04095d66c13a618354371125bdd2e9c1381291c6acf",
+    "note": "Machine-generated gross-body seed for the grey cat before the measured multi-cat identity failure. It is not an identity ground-truth annotation."
+  },
+  "segmentation_model": {
+    "repository": "facebookresearch/sam2",
+    "checkpoint": "facebook/sam2.1-hiera-tiny",
+    "code_license": "Apache-2.0",
+    "checkpoint_license": "Apache-2.0"
+  },
+  "scientific_boundary": "The semantic seed is R3 model-derived research evidence. The experiment measures whether a generic whole-animal track preserves the intended target through the known multi-cat failure window; it does not establish independent identity truth."
+}

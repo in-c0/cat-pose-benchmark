@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "clip_id": "holdout2-andra-and-billy",
+  "source": {
+    "kind": "redistributable",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Andra_and_Billy.webm",
+    "local_path": "bakeoff/media/holdout2-andra-and-billy.webm"
+  },
+  "licence": {
+    "status": "verified",
+    "identifier": "CC-BY-4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Andra_and_Billy.webm",
+    "redistribution": "allowed",
+    "notes": "Commons metadata: licence CC BY 4.0, uploader Spontaneous Symmetry, artist Joaquim Baeta. Holdout #2: continuation of the frozen seed-20260920 order (review/holdout/selection2.json, rank 7); nothing about the content was seen before selection."
+  },
+  "slices": [
+    "holdout"
+  ],
+  "notes": "Prospective holdout #2. Commons description: A college student plays with a faculty cat."
+}

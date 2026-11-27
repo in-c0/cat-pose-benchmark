@@ -1,0 +1,208 @@
+# cat-pose-benchmark
+
+**An open benchmark and capture methodology for temporally stable feline pose, facial,
+ear, tail, contact, and scene-relative motion in real environments.**
+
+> The repository name is provisional. The consumer cat brand and its products should
+> remain separate from this research artefact.
+
+**Technical notes**
+
+- **06 (20 Sep 2026):** [*Sixteen passes: what was proposed, what was tested, and what survived*](paper/06-sixteen-passes/README.md) ([PDF](paper/06-sixteen-passes/sixteen-passes-v0.2.pdf)). The audit trail behind note 05 as one table: nineteen passes, each with its predeclared test, number and disposition, plus the truth and scorer revisions and what found them. One method change survived (the two-sided bridge); every zero-shot semantic, single-feature structural and linear learned verifier failed its test; the reviewer's own audit found the scorer had been judging the detector's box rather than the reported curve.
+- **05 (20 Sep 2026):** [*Frozen truth: ten passes against fixed frame labels, and a prospective holdout that undid one of them*](paper/05-frozen-truth/README.md) ([PDF](paper/05-frozen-truth/frozen-truth-v0.3.pdf)). A written-down frame truth (147 dev frames, model-annotated, human pass pending) replaces the proxy. One change survives the reviewer passes: a two-sided SAM2 bridge (v3), precision 0.919, recall 0.878 on the dev clips under scorer v2 (v0.3 judges the reported curve, not the detector's box). Six ideas rejected on the same truth. Twelve holdout clips drawn by a precommitted metadata-only protocol and annotated before inference: the bridge's recall gain generalises on the second draw (0.71 → 0.74) and not the first; precision on unseen video is 0.69–0.71, set by wrong-part assertions the dev clips never showed. *Audit 2026-10-11:* those holdout figures include overrides the model annotator made after seeing the output; scored as frozen, the two holdouts pooled give v3 precision 0.57 and recall 0.65, with clip-level 95 % intervals of roughly 0.1–0.9 (six cats with a visible tail). No human has checked any of it yet; see [HR1](review/hr1/README.md) and [the audit](review/hr1/AUDIT-2026-10-11.md).
+- **04 (14 Sep 2026):** [*Held out: two new clips, a sampling rate, and a probe that did not transfer*](paper/04-held-out/README.md) ([PDF](paper/04-held-out/held-out-v0.1.pdf)). On two clips added after every threshold was fixed, the grounded method with crop check and temporal pass accepts 61 frames, all on the tail, and refuses the 25 tucked frames the plain method gets wrong nine times. Sampling at 8 fps instead of 4 quadruples its recall on *Cat Plays*. A self-trained probe on 61 pseudo-labelled tails does not transfer between two cats.
+- **03 (14 Sep 2026):** [*Coverage: a better cat detector, a bridge across short gaps, and two things that did not help*](paper/03-coverage/README.md) ([PDF](paper/03-coverage/coverage-v0.1.pdf)). Grounding DINO as the cat detector lifts frames-with-a-cat from 43 to 55 of 57; SAM2 bridging at reach 1 adds two true tails and nothing wrong. Larger models don't drop in; SAM 3 is gated. Proxy: precision 0.95, recall 0.76.
+- **02 (14 Sep 2026):** [*Whether: teaching a text-grounded tail detector to say "no"*](paper/02-whether/README.md) ([PDF](paper/02-whether/whether-v0.1.pdf)). A SigLIP crop check plus a Viterbi pass with an explicit "no tail" state take the grounded method from precision 0.52 to 0.95 at recall 0.72 on the same 57 frames; every tucked-tail frame becomes a refusal. Parameters fitted on the same frames; not yet held-out.
+- **01 (14 Sep 2026):** [*Where, not whether: finding a cat's tail in ordinary video with a text-grounded detector*](paper/01-where-not-whether/README.md) ([PDF](paper/01-where-not-whether/where-not-whether-v0.1.pdf)). Three per-frame tail methods on 57 real frames. Asking Grounding DINO for `"cat. tail."` finds an extended tail on 14 of 15 frames across two cats; when the tail is tucked it draws a paw.
+
+---
+
+## Status: research direction v0.2 + Stage 0 design + model bake-off
+
+Created 2026-08-03. Visual benchmark direction revised 2026-08-04. Scope narrowed back to the
+pose benchmark on 2026-09-11.
+
+The project is no longer based on the assumption that a real benchmark must be either
+fully hand-labelled or represented by one supposedly perfect source of truth. Its core
+methodological position is now:
+
+> **Each frame contains partially observable truths from different measurement sources,
+> each with its own provenance and time-varying uncertainty.**
+
+The Stage 0 rigid-target experiment is specified and its nominal mirror layouts have
+been compared by a reproducible geometry-conditioning simulation. No animal collection
+has started.
+
+No outbound licence is set yet. Until the decisions in
+[docs/OPEN-DECISIONS.md](docs/OPEN-DECISIONS.md) are resolved, the repository remains
+all rights reserved. A licence must be added before any data, weights, or reusable code
+are released.
+
+## Help review frames (no setup needed)
+
+The most useful thing anyone can do right now is look at real cat video and say whether a
+tail can be seen. Every number in the technical notes was checked against labels written by
+an AI model; none has been checked by a person. We estimate the review at one and a half to
+two and a half hours in two sittings (nobody has timed it yet), and it needs no code.
+
+The current review is **[HR1](review/hr1/README.md)**: twelve short Commons clips that no
+method was tuned on, 456 frames.
+
+1. **Stage A.** Look at contact sheets of raw frames (nothing drawn on them) and say, per
+   frame, whether a cat's tail is `visible`, `partial`, `not_visible`, or that you
+   `cannot_tell`.
+2. **Stage B.** After every reviewer has finished Stage A, judge 175 shuffled images,
+   each with one line drawn by the method, as `on_tail`, `not_on_tail` or
+   `cannot_tell`. You will not know which method drew which line.
+3. **Submit** by posting a fingerprint of your file first and the file itself later, so that
+   nobody's answers can influence anyone else's.
+
+Everything you need, including what not to open beforehand, is in the
+**[reviewer guide](review/hr1/REVIEWER-GUIDE.md)**. Ask questions on
+[the review call issue](https://github.com/in-c0/cat-pose-benchmark/issues/79).
+
+Each reviewer's file is kept separately. Where reviewers disagree, the frame is recorded as
+uncertain rather than averaged, so you do not need to match anyone.
+
+The older review sets under `review/results/` judge earlier methods on the clips they were
+tuned on (513 and 720 rows, see [review/README.md](review/README.md)). They are still open,
+but HR1 comes first.
+
+If you want to run the models on your own cat video instead, see
+[CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Scope note
+
+For a few weeks in August 2026 this repository grew into a multimodal "feline intent
+programme" (vocalisation acoustics, environmental audio, household context capture,
+intervention pilots, fusion ablations, latent-state discovery). None of it needed a pose
+benchmark to exist and none of it produced a positive result, so on 2026-09-11 it was
+carved out. That work is preserved unchanged on the `programme/multimodal-intent` branch
+and at tag `programme-v0-2026-08-25`; `main` is the pose benchmark only.
+
+## Research objective
+
+Build an open, licence-clean benchmark that can answer:
+
+> Can an ordinary monocular RGB system recover feline surface pose and motion with
+> calibrated uncertainty, using independent geometric and contact measurements only for
+> a compact gold-standard subset?
+
+The eventual app or puck should operate from one ordinary camera. More specialised
+capture equipment exists only to establish whether the monocular system is correct.
+
+## What counts as ground truth
+
+The benchmark does **not** pretend that every anatomical joint is directly visible.
+Annotations are separated into:
+
+1. **Surface observations** — visible landmarks, contours, face points, ear geometry,
+   and tail centreline.
+2. **Contact observations** — paw location, support surface, take-off, landing, stance,
+   and other independently measured contact events.
+3. **Latent anatomical estimates** — joint centres or hidden geometry inferred through
+   anatomical and temporal models. These are estimates, never silently promoted to
+   direct truth.
+4. **Scene-relative observations** — camera pose, surfaces, obstacles, object relations,
+   and world-space trajectory.
+5. **Temporal measurements** — displacement, velocity, acceleration, curvature change,
+   blink timing, ear flicks, tail motion, gait phase, and recovery after occlusion.
+
+Every observation records its source, quality tier, visibility, uncertainty, and
+lineage. See [docs/GROUND-TRUTH-PROVENANCE.md](docs/GROUND-TRUTH-PROVENANCE.md).
+
+## Proposed capture strategy
+
+### 1. CatPose Portal — compact gold subset
+
+A low-cost open capture appliance using one physical camera and calibrated mirrors to
+produce simultaneous virtual views. A transparent or instrumented surface can add
+independent paw-contact evidence.
+
+This avoids multi-device synchronisation while preserving true simultaneous geometry
+for fast ear, face, paw, and tail motion.
+
+The first validation step is deliberately animal-free. See
+[docs/STAGE-0-PORTAL-GEOMETRY.md](docs/STAGE-0-PORTAL-GEOMETRY.md).
+
+### 2. Monocular real-home set — deployment benchmark
+
+Ordinary owner-shot video under the conditions that break models: occlusion, motion
+blur, dark and long fur, clutter, low light, changing viewpoint, multi-cat scenes, and
+partial exits from frame.
+
+A scene-mapping system may provide camera trajectory and static-world geometry, but
+model-derived feline pose remains labelled as estimated supervision unless independently
+validated.
+
+### 3. Synthetic and reconstructed data — supplementary training only
+
+Unity-generated data, personalised digital twins, and model-generated labels may support
+pretraining, ablations, and rare-case coverage. They do not independently validate the
+same assumptions used to generate them.
+
+## Initial benchmark tracks
+
+- Temporally stable 2D surface landmarks
+- Ear articulation and facial landmark tracking
+- Tail centreline and curvature tracking
+- Calibrated 3D surface reconstruction on the gold subset
+- Paw contact, gait events, take-off, and landing
+- Occlusion recovery and long-horizon drift
+- Scene-relative position and support-surface reasoning
+- Confidence and uncertainty calibration
+- Edge deployment accuracy, latency, memory, power, and thermal behaviour
+
+## What this is not
+
+This benchmark does not decode intent and does not claim literal semantic translation.
+It produces calibrated visual measurements. What anyone infers from those measurements is
+a separate question with its own validation burden.
+
+Pain, health, welfare, or diagnostic inference is a separate research and validation
+programme. This repository produces measurement infrastructure, not veterinary claims.
+
+## First public milestone
+
+**CatPose Benchmark Protocol v0.1** should ship before model-building begins. It must
+include:
+
+- observable/latent ontology;
+- keypoint and curve topology;
+- provenance and uncertainty schema;
+- minimal CatPose Portal experiment;
+- real-home challenge taxonomy;
+- metrics and acceptance gates;
+- consent and redistribution requirements;
+- one small demonstration sequence and Unity inspection view.
+
+## Repository map
+
+```text
+docs/
+  RESEARCH-CHARTER.md               benchmark question, hypotheses, and gates
+  GROUND-TRUTH-PROVENANCE.md        observation tiers, uncertainty, and anti-circularity
+  BENCHMARK-PROTOCOL-DRAFT.md       capture tiers, evaluation tracks, and v0 experiment
+  STAGE-0-PORTAL-GEOMETRY.md        rigid-target mirror-layout experiment and gates
+  KEYPOINT-TOPOLOGY-DRAFT.md        proposed landmarks and compatibility constraints
+  ID1-PERSISTENT-IDENTITY.md        persistent same-cat identity across time (REMIND baseline)
+  ID1-YOUTUBE-VIS-ADAPTER.md        frozen YouTube-VIS feline subset for identity evaluation
+  PRIOR-ART-AND-LICENCE-SURVEY.md   existing resources and licence status
+  LICENSING-POLICY.md               contamination and release constraints
+  OPEN-DECISIONS.md                 unresolved choices that block collection
+
+schemas/
+  observation.schema.json           machine-readable observation/provenance draft
+
+stage0/                             mirror-portal geometry conditioning simulation (#1)
+synthetic/                          S0A procedural-proxy annotation contract + S0B Unity round-trip (#7, #54)
+bakeoff/                            fair test of existing animal pose models on real cat clips (#8)
+detail/                             feline detail head: SAM2 ear geometry and tail centreline (#11)
+temporal/                           whole-animal tracking and identity assignment across frames (#12)
+identity/                           ID1 persistent identity: REMIND baseline, DINOv3 pin, YouTube-VIS adapter
+review/                             human frame review: overlays, contact sheets, verdict rubric and scorer
+paper/                              technical notes (Markdown source, PDF build, figures)
+
+Each experiment directory has its own README and a reports/ or results/ folder with
+what was actually run.
+```
